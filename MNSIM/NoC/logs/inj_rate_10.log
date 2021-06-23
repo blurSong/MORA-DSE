@@ -1,0 +1,145 @@
+----------------------------------------------------------
+Initialized.
+BEGIN Configuration File: /mnt/d/MORA/Mora/Mora/MNSIM/NoC/logs/configs/inj_rate_10_mesh_config
+// $Id$
+
+// Copyright (c) 2007-2015, Trustees of The Leland Stanford Junior University
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// Redistributions of source code must retain the above copyright notice, this
+// list of conditions and the following disclaimer.
+// Redistributions in binary form must reproduce the above copyright notice,
+// this list of conditions and the following disclaimer in the documentation
+// and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+//8X8 mesh with 1 flits per packet under injection mode
+//injection rate here is packet per cycle, NOT flit per cycle
+
+// Topology
+
+topology = mesh;
+k=3;
+n=2;
+
+// Routing
+routing_function = dor;
+
+in_ports = 1;
+out_ports = 1;
+
+//Custom Traffic
+traffic = custom;
+injection_process = custom;
+
+// Constant delays
+routing_delay = 1;
+vc_alloc_delay = 1;
+sw_alloc_delay = 1;
+st_final_delay = 1;
+
+packet_size = 1;
+
+
+// Simulation
+sim_type = latency;
+sample_period = 10000;
+warmup_periods = 2;
+max_samples = 1;
+
+injection_rate = 0.000001;
+
+num_vcs = 1;
+
+buf_size = 1;
+vc_buf_size = 1;
+output_buffer_size = 1;
+
+private_bufs = 1;
+private_buf_size = 1;
+
+sim_power = 1;
+
+tech_file = techfile.txt;
+
+channel_width = 32;
+
+END Configuration File: /mnt/d/MORA/Mora/Mora/MNSIM/NoC/logs/configs/inj_rate_10_mesh_config
+Class 0:
+Packet latency average = 19.5
+	minimum = 17
+	maximum = 22
+Network latency average = 19.5
+	minimum = 17
+	maximum = 22
+Slowest packet = 0
+Flit latency average = 19.5
+	minimum = 17
+	maximum = 22
+Slowest flit = 0
+Fragmentation average = 0
+	minimum = 0
+	maximum = 0
+Injected packet rate average = 2.22222e-05
+	minimum = 0 (at node 1)
+	maximum = 0.0002 (at node 0)
+Accepted packet rate average = 2.22222e-05
+	minimum = 0 (at node 0)
+	maximum = 0.0001 (at node 5)
+Injected flit rate average = 2.22222e-05
+	minimum = 0 (at node 1)
+	maximum = 0.0002 (at node 0)
+Accepted flit rate average= 2.22222e-05
+	minimum = 0 (at node 0)
+	maximum = 0.0001 (at node 5)
+Injected packet length average = 1
+Accepted packet length average = 1
+Total in-flight flits = 0 (0 measured)
+latency change    = 1
+throughput change = 1
+Too many sample periods needed to converge
+Simulation unstable, ending ...
+Total run time 0.0937181
+L = 2 K = 8.1 M = 2 N = 1
+-----------------------------------------
+- OCN Power Summary
+- Completion Time:         10000
+- Flit Widths:            32
+- Channel Wire Power:      0.000246696
+- Channel Clock Power:     0.102252
+- Channel Retiming Power:  3.06507e-06
+- Channel Leakage Power:   0.0385472
+- Input Read Power:        3.26001e-06
+- Input Write Power:       3.26001e-06
+- Input Leakage Power:     0.00041472
+- Switch Power:            6.18223e-06
+- Switch Control Power:    2.60996e-06
+- Switch Leakage Power:    0.0164714
+- Output DFF Power:        1.19197e-06
+- Output Clk Power:        0.042605
+- Output Control Power:    6.15156e-07
+- Total Power:             0.200557
+-----------------------------------------
+
+-----------------------------------------
+- OCN Area Summary
+- Channel Area:  0.00766181
+- Switch  Area:  0.00589824
+- Input  Area:   0.000442368
+- Output  Area:  0.00117965
+- Total Area:    0.0151821
+-----------------------------------------
