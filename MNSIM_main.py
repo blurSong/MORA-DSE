@@ -43,7 +43,7 @@ def Data_clean():
     # print("Removed unnecessary file.")
 
 
-def main(_model='vgg16', _tile_size=[10, 10], _tile_noc_bw=256):
+def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256):
 
     home_path = os.getcwd()
     SimConfig_path = os.path.join(home_path, "rram_config.ini")
@@ -89,7 +89,7 @@ def main(_model='vgg16', _tile_size=[10, 10], _tile_noc_bw=256):
 
     # mora args
     parser.add_argument("--model", type=str, default='vgg16', help="NN model name, default: vgg16")
-    parser.add_argument("--tile_size", nargs='+', type=int, default=[10, 10], help="tile [row, col]")
+    parser.add_argument("--tile_size", nargs='+', type=int, default=[32, 32], help="tile [row, col]")
     parser.add_argument("--tile_noc_bw", type=int, default=256)
 
     args = parser.parse_args()

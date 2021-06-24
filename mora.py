@@ -15,8 +15,8 @@ import torch
 import MNSIM
 import mora
 
-# MNSIM ns um2 W nJ
-# maestro cycle  nJ
+# MNSIM    ns      um2    W    nJ
+# maestro cycle/ns um2    W    nJ
 
 
 def set_path(model):

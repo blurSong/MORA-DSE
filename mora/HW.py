@@ -56,6 +56,7 @@ class DLA(object):
             if np.median(l2_size_nd) > self.dla_dicts['glb_size']:
                 print('maestro glb size exeed.')
                 return
+            os.remove(maestro_result_csv_path)
             output_csv_dicts['layers'] = layers
             output_csv_dicts['latency'] = runtime_nd.sum()
             output_csv_dicts['energy'] = energy_nd.sum()
@@ -63,7 +64,7 @@ class DLA(object):
             output_csv_dicts['power'] = power_nd.mean()
             csv = pd.DataFrame(output_csv_dicts, index=[0])
             csv.to_csv(output_csv_path)
-            print('maestro invoked.')
+            # print('maestro invoked.')
         except FileNotFoundError:
             print('maestro invoke fatal.')
         return
@@ -105,12 +106,7 @@ class RRAM(object):
         stdout, stderr = process.communicate()
         process.wait()
         '''
-        if os.path.exists(output_csv_path):
-            print('MNSIM invoked.')
-        else:
+        if os.path.exists(output_csv_path) is False:
             print('MNSIM invoke fatal.')
             raise FileNotFoundError
         return
-
-
-# TODO: change output format and location to /output/

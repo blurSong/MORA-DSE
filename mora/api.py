@@ -39,7 +39,7 @@ def EDP(model, home_path):
     rram_out = pd.read_csv(rram_output_csv_path)
     dla_edp = float(dla_out.at[0, 'energy']) * float(dla_out.at[0, 'latency'])
     rram_edp = float(rram_out.at[0, 'energy']) * float(rram_out.at[0, 'latency'])
-    print("[mora][EDP] DLA: {}, RRAM: {}".format(dla_edp, rram_edp))
+    print("[mora][EDP] DLA: {:.4e}, RRAM: {:.4e}".format(dla_edp, rram_edp))
     return {'dla': dla_edp, 'rram': rram_edp}
 
 
@@ -53,7 +53,7 @@ def area(model, home_path):
     rram_out = pd.read_csv(rram_output_csv_path)
     dla_area = float(dla_out.at[0, 'area'])
     rram_area = float(rram_out.at[0, 'area'])
-    print("[mora][area] DLA: {}, RRAM: {}".format(dla_area, rram_area))
+    print("[mora][area] DLA: {:.4e}, RRAM: {:.4e}".format(dla_area, rram_area))
     return {'dla': dla_area, 'rram': rram_area}
 
 
