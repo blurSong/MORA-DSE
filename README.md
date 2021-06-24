@@ -15,7 +15,7 @@ git clone https://github.com/blurSong/Mora.git
 cd maestro
 scons
 ```
-3. provid original DNN .csv file on the /model folder, the csv index and DF value should be like: 
+3. provide original DNN .csv file on the /model folder, the csv index and DF value should be like: 
 ```
 mora_layer_param_dicts = {
     'O': 'output_channel',
