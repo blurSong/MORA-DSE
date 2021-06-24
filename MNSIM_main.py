@@ -110,9 +110,10 @@ def main(_model='vgg16', _tile_size=[10, 10], _tile_noc_bw=256):
     else:
         print("Quantization range: dynamic range (depends on the data distribution)")
     '''
-    args.model = _model
-    args.tile_size = _tile_size
-    args.tile_noc_bw = _tile_noc_bw
+    if __name__ != '__main__':
+        args.model = _model
+        args.tile_size = _tile_size
+        args.tile_noc_bw = _tile_noc_bw
 
     output_csv_dicts = {}
     __TestInterface = TrainTestInterface(network_module=args.model,

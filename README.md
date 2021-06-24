@@ -15,7 +15,7 @@ git clone https://github.com/blurSong/Mora.git
 cd maestro
 scons
 ```
-3. provid original DNN .csv file on the /model folder
+3. provid original DNN .csv file on the /model folder, the csv index and DF value should be like: 
 ```
 mora_layer_param_dicts = {
     'O': 'output_channel',
@@ -26,7 +26,7 @@ mora_layer_param_dicts = {
     'T': 'layer_type',
     'R': 'relu_or_relu&pooling',
     'A': 'appending index'
-}  # RP = 0:no relu, 1:relu, 2~:relu and pooling (kernel size)  A = (default 0) conv input index / fc is first layer for MNSIM
+}  # RP = 0:no relu, 1:relu, 2~:relu and pooling (kernel size)  A = (default 0) conv: input index / fc: is it the first fc layer 
 
 ```
 ```
@@ -35,6 +35,6 @@ mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: 
 4. Edit the hw_config.m to init the DSE
 5. Add the workspace folder to PYTHONPATH and run mora
 ```
-export PYTHONPATH=$PYTHONPATH:$MoraPath
+export PYTHONPATH=$PYTHONPATH:$YourMoraPath
 python mora.py --dataflow dataflow_name --model model_name
 ```
