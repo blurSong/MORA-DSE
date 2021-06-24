@@ -35,6 +35,9 @@ class DLA(object):
         # if os.path.exists(output_csv_path):
         #   print("dla outfile conflict.")
         #   raise AttributeError
+        if os.path.exists(maestro_result_csv_path):
+            os.remove(maestro_result_csv_path)
+
         print("[maestro] Result", self.dla_dicts)
         params = [self.dla_dicts['pes'], self.dla_dicts['glb_size'], self.dla_dicts['noc_bw'], mapping_path]
         command = "./maestro --num_pes={0[0]} --l2_size_cstr={0[1]} --noc_bw_cstr={0[2]} --Mapping_file='{0[3]}' --print_res=false --print_res_csv_file=true --print_log_file=false".format(
@@ -56,7 +59,6 @@ class DLA(object):
             if np.median(l2_size_nd) > self.dla_dicts['glb_size']:
                 print('maestro glb size exeed.')
                 return
-            os.remove(maestro_result_csv_path)
             output_csv_dicts['layers'] = layers
             output_csv_dicts['latency'] = runtime_nd.sum()
             output_csv_dicts['energy'] = energy_nd.sum()
