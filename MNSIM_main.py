@@ -59,7 +59,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256):
     parser.add_argument("-Weights",
                         "--weights",
                         default=weights_file_path,
-                        help="NN model weights file location & name, default:/MNSIM_Python/cifar10_vgg16_params.pth")
+                        help="NN model weights file location & name, default:/MNSIM_Python/cifar10_vgg18_params.pth")
     parser.add_argument("-DisHW", "--disable_hardware_modeling", action='store_true', default=False, help="Disable hardware modeling, default: false")
     parser.add_argument("-DisAccu", "--disable_accuracy_simulation", action='store_true', default=True, help="Disable accuracy simulation, default: false")
     parser.add_argument("-SAF", "--enable_SAF", action='store_true', default=False, help="Enable simulate SAF, default: false")

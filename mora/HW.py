@@ -43,6 +43,14 @@ class DLA(object):
         command = "./maestro --num_pes={0[0]} --l2_size_cstr={0[1]} --noc_bw_cstr={0[2]} --Mapping_file='{0[3]}' --print_res=false --print_res_csv_file=true --print_log_file=false".format(
             params)
         process = SP.Popen(command, stdout=SP.PIPE, stderr=SP.PIPE, cwd=maestro_path, shell=True)
+        '''
+        command = [
+            "./maestro", "--num_pes={}".format(self.dla_dicts['pes']), "--l2_size_cstr={}".format(self.dla_dicts['glb_size']),
+            "--noc_bw_cstr={}".format(self.dla_dicts['noc_bw']), "--Mapping_file='{}'".format(mapping_path), "--print_res=false", "--print_res_csv_file=true",
+            "--print_log_file=false"
+        ]
+        process = SP.Popen(command, stdout=SP.PIPE, stderr=SP.PIPE, cwd=maestro_path)
+        '''
         stdout, stderr = process.communicate()
         process.wait()
 

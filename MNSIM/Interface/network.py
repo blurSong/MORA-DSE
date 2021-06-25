@@ -378,12 +378,12 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10):
         assert 0, f'not support {cate}'
     '''
     for i in range(len(layer_config_list)):
-        quantize_config_list.append({'weight_bit': 16, 'activation_bit': 16, 'point_shift': -5})
+        quantize_config_list.append({'weight_bit': 9, 'activation_bit': 9, 'point_shift': -3})
         if 'input_index' in layer_config_list[i]:
             input_index_list.append(layer_config_list[i]['input_index'])
         else:
             input_index_list.append([-1])
-    input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, 224, 224)}  # 32 * 7
+    input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, 32, 32)}  # 32 * 7
     # add bn for every conv
     L = len(layer_config_list)
     for i in range(L - 1, -1, -1):
