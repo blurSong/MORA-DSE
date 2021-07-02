@@ -16,7 +16,7 @@ import MNSIM
 import mora
 
 # MNSIM    ns      um2    W    nJ
-# maestro cycle/ns um2    W    nJ
+# maestro cycle/ns um2    uW    nJ
 
 
 def set_path(model):
@@ -55,17 +55,34 @@ def hw_init(hw_config_path):
     return hw_dicts
 
 
+def max_init(hw_param_dicts):
+    expand_num = 6
+    max_hw_param_dicts = {}
+    max_hw_param_dicts['pes'] = hw_param_dicts['dla_pes'] * expand_num
+    max_hw_param_dicts['tile_size'] = hw_param_dicts['rram_tile_size'] * expand_num
+    max_hw_param_dicts['bw'] = (hw_param_dicts['dla_noc_bw'] + hw_param_dicts['rram_tile_bw'])
+    return max_hw_param_dicts
+
+
 if __name__ == "__main__":
     args = set_parser().parse_args()
     set_path(args.model)
     hw_param_dicts = hw_init(hw_config_path)
+    max_hw_param_dicts = max_init(hw_param_dicts)
     dla = mora.HW.DLA(hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(hw_param_dicts, home_path)
     mora.api.gemmv1(home_path, args.model, args.dataflow)
     dla.invoke_maestro(args.model)
+    dla.export(args.model)
     rram.invoke_MNSIM(args.model)
     edp_cons = mora.api.EDP(args.model, home_path)
     area_cons = mora.api.area(args.model, home_path)
 
-    mora.schedule.greedy_schedule(DLA=dla, RRAM=rram, model=args.model, EDP_cons=edp_cons, area_cons=area_cons)
+    mora.schedule.greedy_schedule(DLA=dla,
+                                  RRAM=rram,
+                                  model=args.model,
+                                  EDP_cons=edp_cons,
+                                  area_cons=area_cons,
+                                  hw_param_dicts=hw_param_dicts,
+                                  max_param_dicts=max_hw_param_dicts)
     # TODO:  mora.schedule.mora_schedule(DLA=dla, RRAM=rram, model=model, EDP_cons=edp_cons, area_cons=area_cons)

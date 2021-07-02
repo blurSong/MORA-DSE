@@ -28,29 +28,29 @@ MLTD = mora_layer_type_dicts
 MLPD = mora_layer_param_dicts
 
 
-def EDP(model, home_path):
+def EDP(model, home_path, indicator=0):
     # return {'dla': DLA.get_edp(model), 'rram': RRAM.get_edp(model)}
     dla_output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + model + '/' + model + '-dla.csv'))
     rram_output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + model + '/' + model + '-rram.csv'))
     if os.path.exists(dla_output_csv_path) is not True or os.path.exists(dla_output_csv_path) is not True:
         print("api.read outfile conflict.")
         raise AttributeError
-    dla_out = pd.read_csv(dla_output_csv_path)
-    rram_out = pd.read_csv(rram_output_csv_path)
+    dla_out = pd.read_csv(dla_output_csv_path, skiprows=indicator, nrows=1)
+    rram_out = pd.read_csv(rram_output_csv_path, skiprows=indicator, nrows=1)
     dla_edp = float(dla_out.at[0, 'energy']) * float(dla_out.at[0, 'latency'])
     rram_edp = float(rram_out.at[0, 'energy']) * float(rram_out.at[0, 'latency'])
     print("[mora][EDP] DLA: {:.4e}, RRAM: {:.4e}".format(dla_edp, rram_edp))
     return {'dla': dla_edp, 'rram': rram_edp}
 
 
-def area(model, home_path):
+def area(model, home_path, indicator=0):
     dla_output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + model + '/' + model + '-dla.csv'))
     rram_output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + model + '/' + model + '-rram.csv'))
     if os.path.exists(dla_output_csv_path) is not True or os.path.exists(dla_output_csv_path) is not True:
         print("api.read outfile conflict.")
         raise AttributeError
-    dla_out = pd.read_csv(dla_output_csv_path)
-    rram_out = pd.read_csv(rram_output_csv_path)
+    dla_out = pd.read_csv(dla_output_csv_path, skiprows=indicator, nrows=1)
+    rram_out = pd.read_csv(rram_output_csv_path, skiprows=indicator, nrows=1)
     dla_area = float(dla_out.at[0, 'area'])
     rram_area = float(rram_out.at[0, 'area'])
     print("[mora][area] DLA: {:.4e}, RRAM: {:.4e}".format(dla_area, rram_area))
@@ -108,4 +108,27 @@ def gemmv1(home_path, model, dataflow):
 
 def gemmv2(model):
     # generate maestro model with using keras and maestro api
+    return
+
+
+def dse_checkpoint(indicator, EDP_cons, area_cons, model, homepath):
+    # check csv result and save them
+    edp_dse = EDP(model, homepath, indicator)
+    area_dse = area(model, homepath, indicator)
+    ii = edp_dse['dla'] > EDP_cons['dla'] & edp_dse['rram'] > EDP_cons['rram']
+    jj = area_dse['dla'] > area_cons['dla'] & area_dse['rram'] > area_cons['rram']
+    # TODO: advanced checking rules
+    if ii | jj:
+        DSE_checkpoint = False
+    else:
+        DSE_checkpoint = True
+    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla.csv'))
+    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-rram.csv'))
+    dla_out_pd = pd.read_csv(dla_output_csv_path)
+    rram_out_pd = pd.read_csv(rram_output_csv_path)
+    if DSE_checkpoint is False:
+        dla_out_pd.at[indicator, 'restraint'] = 'fail'
+        rram_out_pd.at[indicator, 'restraint'] = 'fail'
+    dla_out_pd.to_csv(dla_output_csv_path)
+    rram_out_pd.to_csv(rram_output_csv_path)
     return

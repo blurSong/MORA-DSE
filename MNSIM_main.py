@@ -43,7 +43,7 @@ def Data_clean():
     # print("Removed unnecessary file.")
 
 
-def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256):
+def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0):
 
     home_path = os.getcwd()
     SimConfig_path = os.path.join(home_path, "rram_config.ini")
@@ -116,6 +116,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256):
         args.tile_noc_bw = _tile_noc_bw
 
     output_csv_dicts = {}
+    output_csv_dicts['DSE index'] = _DSE_indicator
     __TestInterface = TrainTestInterface(network_module=args.model,
                                          dataset_module='MNSIM.Interface.cifar10',
                                          SimConfig_path=args.hardware_description,
@@ -164,9 +165,13 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256):
             print("PIM-based computing accuracy:", __TestInterface.set_net_bits_evaluate(weight_2, adc_action='FIX'))
 
     # write mora csv
+    output_csv_dicts['restraint'] = 'pass'
     output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/' + args.model + '-rram.csv'))
     csv = pd.DataFrame(output_csv_dicts, index=[0])
-    csv.to_csv(output_csv_path)
+    if os.path.exists(output_csv_path):
+        csv.to_csv(output_csv_path, mode='a', header=False)
+    else:
+        csv.to_csv(output_csv_path)
 
 
 if __name__ == '__main__':
