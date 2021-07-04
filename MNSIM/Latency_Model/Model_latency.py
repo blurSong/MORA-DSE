@@ -799,7 +799,7 @@ class Model_latency():
                 print('----------------------------------------------')
         # print("Latency simulation finished!")
         latancy = max(max(self.finish_time))
-        print("Entire latency:", latancy, "ns")
+        print("RRAM Latency:", latancy, "ns")
         return latancy
 
     def layer_latency_initial(self):

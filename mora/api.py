@@ -126,9 +126,16 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, homepath):
     rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-rram.csv'))
     dla_out_pd = pd.read_csv(dla_output_csv_path)
     rram_out_pd = pd.read_csv(rram_output_csv_path)
+    assert dla_out_pd.at[indicator, 'restraint'] == 'unexamined'
+    assert rram_out_pd.at[indicator, 'restraint'] == 'unexamined'
     if DSE_checkpoint is False:
         dla_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_out_pd.at[indicator, 'restraint'] = 'fail'
+        print('dse checkpoint fail.')
+    else:
+        dla_out_pd.at[indicator, 'restraint'] = 'pass'
+        rram_out_pd.at[indicator, 'restraint'] = 'pass'
+        print('dse checkpoint pass.')
     dla_out_pd.to_csv(dla_output_csv_path)
     rram_out_pd.to_csv(rram_output_csv_path)
     return

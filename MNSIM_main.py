@@ -165,13 +165,13 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0
             print("PIM-based computing accuracy:", __TestInterface.set_net_bits_evaluate(weight_2, adc_action='FIX'))
 
     # write mora csv
-    output_csv_dicts['restraint'] = 'pass'
+    output_csv_dicts['restraint'] = 'unexamined' if _DSE_indicator != 0 else 'pass'
     output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/' + args.model + '-rram.csv'))
     csv = pd.DataFrame(output_csv_dicts, index=[0])
     if os.path.exists(output_csv_path):
-        csv.to_csv(output_csv_path, mode='a', header=False)
+        csv.to_csv(output_csv_path, mode='a', header=False, index=False)
     else:
-        csv.to_csv(output_csv_path)
+        csv.to_csv(output_csv_path, index=False)
 
 
 if __name__ == '__main__':

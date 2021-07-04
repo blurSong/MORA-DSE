@@ -113,7 +113,7 @@ class Model_inference_power():
         self.arch_total_pooling_power = sum(self.arch_pooling_power)
 
     def model_power_output(self, module_information=1, layer_information=1):
-        print("Hardware power:", self.arch_total_power, "W")
+        print("RRAM Power:", self.arch_total_power, "W")
         if module_information:
             print("		crossbar power:", self.arch_total_xbar_power, "W")
             print("		DAC power:", self.arch_total_DAC_power, "W")
@@ -136,7 +136,8 @@ class Model_inference_power():
                 layer_dict = self.NetStruct[i][0][0]
                 if layer_dict['type'] == 'element_sum':
                     print("     Hardware power (global accumulator):",
-                          self.global_add.adder_power * self.graph.global_adder_num + self.global_buf.buf_wpower * 1e-3 + self.global_buf.buf_rpower * 1e-3, "W")
+                          self.global_add.adder_power * self.graph.global_adder_num + self.global_buf.buf_wpower * 1e-3 + self.global_buf.buf_rpower * 1e-3,
+                          "W")
                 else:
                     print("     Hardware power:", self.arch_power[i], "W")
         return self.arch_total_power

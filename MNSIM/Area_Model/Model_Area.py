@@ -67,7 +67,9 @@ class Model_area():
 
     def calculate_model_area(self):  #Todo: Noc area
 
-        self.graph.tile.calculate_tile_area(SimConfig_path=self.SimConfig_path, default_inbuf_size=self.graph.max_inbuf_size, default_outbuf_size=self.graph.max_outbuf_size)
+        self.graph.tile.calculate_tile_area(SimConfig_path=self.SimConfig_path,
+                                            default_inbuf_size=self.graph.max_inbuf_size,
+                                            default_outbuf_size=self.graph.max_outbuf_size)
         self.global_buf = buffer(SimConfig_path=self.SimConfig_path, buf_level=1, default_buf_size=self.graph.global_buf_size)
         self.global_buf.calculate_buf_area()
         self.global_add = adder(SimConfig_path=self.SimConfig_path, bitwidth=self.graph.global_adder_bitwidth)
@@ -104,7 +106,7 @@ class Model_area():
         self.arch_total_pooling_area = sum(self.arch_pooling_area)
 
     def model_area_output(self, module_information=1, layer_information=1):
-        print("Hardware area:", self.arch_total_area, "um^2")
+        print("RRAM Area:", self.arch_total_area, "um^2")
         if module_information:
             print("		crossbar area:", self.arch_total_xbar_area, "um^2")
             print("		DAC area:", self.arch_total_DAC_area, "um^2")
@@ -125,7 +127,8 @@ class Model_area():
                 print("Layer", i, ":")
                 layer_dict = self.NetStruct[i][0][0]
                 if layer_dict['type'] == 'element_sum':
-                    print("     Hardware area (global accumulator):", self.global_add.adder_area * self.graph.global_adder_num + self.global_buf.buf_area, "um^2")
+                    print("     Hardware area (global accumulator):", self.global_add.adder_area * self.graph.global_adder_num + self.global_buf.buf_area,
+                          "um^2")
                 else:
                     print("     Hardware area:", self.arch_area[i], "um^2")
         return self.arch_total_area

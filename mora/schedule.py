@@ -1,26 +1,25 @@
-from MNSIM.Area_Model.Model_Area import Model_area
 import copy
 import os
 import sys
-from typing import Container
 import numpy as np
 import pandas as pd
 import subprocess as SP
 import multiprocessing as MP
-from pandas.io.parsers import read_csv
 import torch
 import MNSIM
-from mora.HW import *
-from mora.api import *
+import mora.HW
+from mora.api import dse_checkpoint
 
 
 def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
     DSE_indicator = 1
     # DSE_param_dicts = copy.deepcopy(hw_param_dicts)
-    pes = hw_param_dicts['dla_pes'] / 4
-    rts_r = hw_param_dicts['rram_tile_size'] / 4
+    pes = int(hw_param_dicts['dla_pes'] / 4)
+    rts_r = int(hw_param_dicts['rram_tile_size'] / 4)
     rts_c = rts_r
-    dbw = hw_param_dicts['dla_noc_bw'] / 4
+    dbw = int(hw_param_dicts['dla_noc_bw'] / 4)
+    # greedy
+    print('[mora] Start DSE', DSE_indicator)
     while pes <= max_param_dicts['pes']:
         pes += int(max_param_dicts['pes'] / 1024)
         while rts_r <= max_param_dicts['tile_size']:
@@ -39,6 +38,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                     maestro_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla_' + DLA.dataflow + '.csv'))
                     model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
                     rram_model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '-rram.csv'))
+                    layers = 0
                     try:
                         maestro_result_df = pd.read_csv(maestro_result_csv_path)
                         model_csv_df = pd.read_csv(model_csv_path)
@@ -58,17 +58,19 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                     except FileNotFoundError:
                         print("read maestro result fatal.")
                     # run 0: get on-dla result
+                    # print(on_RRAM_layer_index)
                     on_DLA_layer_index = []
+                    assert layers != 0
                     for lyr in range(layers):
                         on_DLA_layer_index.append(lyr) if lyr not in on_RRAM_layer_index else None
+                    # print(on_DLA_layer_index)
                     DLA.export(model, on_DLA_layer_index)
                     # run 1: run and get on-rram result
                     rram_model_df = model_csv_df.iloc[on_RRAM_layer_index].copy()
-                    rram_model_df.to_csv(rram_model_csv_path)  # replace old csv with new scheduled csv
+                    rram_model_df.to_csv(rram_model_csv_path, index=False)  # replace old csv with new scheduled csv
                     RRAM.invoke_MNSIM(model)
 
                     # set checkpoint
                     dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, homepath)
                     DSE_indicator += 1
-
     return

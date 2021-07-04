@@ -43,7 +43,7 @@ class DLA(object):
         if os.path.exists(maestro_result_csv_path):
             os.remove(maestro_result_csv_path)
 
-        print("[maestro] Result", self.dla_dicts)
+        print("[maestro] invoked", self.dla_dicts)
         params = [self.dla_dicts['pes'], self.dla_dicts['glb_size'], self.dla_dicts['noc_bw'], mapping_path]
         command = "./maestro --num_pes={0[0]} --l2_size_cstr={0[1]} --noc_bw_cstr={0[2]} --Mapping_file='{0[3]}' --print_res=false --print_res_csv_file=true --print_log_file=false".format(
             params)
@@ -67,7 +67,7 @@ class DLA(object):
         try:
             maestro_result_df = pd.read_csv(maestro_result_csv_path)
             layers = maestro_result_df.shape[0]
-            if self.DSE_indicator != 0:
+            if self.DSE_indicator == 0:
                 on_DLA_layer_index = range(layers)
             elif on_DLA_layer_index is None:
                 raise AttributeError
@@ -85,15 +85,19 @@ class DLA(object):
             output_csv_dicts['latency'] = runtime_nd.sum()
             output_csv_dicts['energy'] = energy_nd.sum()
             output_csv_dicts['area'] = area
-            output_csv_dicts['power'] = power_nd.mean()
-            output_csv_dicts['restraint'] = 'pass'
-            csv = pd.DataFrame(output_csv_dicts, index=[0])
+            output_csv_dicts['power'] = power_nd.mean()  # wrong
+            output_csv_dicts['restraint'] = 'unexamined' if self.DSE_indicator != 0 else 'pass'
+            csv = pd.DataFrame(output_csv_dicts, index=[self.DSE_indicator])
             if os.path.exists(output_csv_path):
-                csv.to_csv(output_csv_path, mode='a', header=False)
+                csv.to_csv(output_csv_path, mode='a', header=False, index=False)
             else:
-                csv.to_csv(output_csv_path)
+                csv.to_csv(output_csv_path, index=False)
         except FileNotFoundError:
             print('maestro invoke fatal.')
+        print('DLA Latency:', output_csv_dicts['latency'], 'ns')
+        print('DLA Area:', output_csv_dicts['latency'], 'um2')
+        print('DLA Energy:', output_csv_dicts['latency'], 'nJ')
+
         return
 
 
@@ -130,7 +134,7 @@ class RRAM(object):
         # if os.path.exists(output_csv_path):
         #    print("rram outfile conflict.")
         #    raise AttributeError
-        print("[MNSIM] Result", self.rram_dicts)
+        print("[MNSIM  ] invoked", self.rram_dicts)
         import_module("MNSIM_main").main(model, [self.rram_dicts['tile_row'], self.rram_dicts['tile_col']], self.rram_dicts['tile_bw'], self.DSE_indicator)
         '''
         command = [

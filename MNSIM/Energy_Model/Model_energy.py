@@ -127,7 +127,7 @@ class Model_energy():
         self.arch_total_pooling_energy = sum(self.arch_pooling_energy)
 
     def model_energy_output(self, module_information=1, layer_information=1):
-        print("Hardware energy:", self.arch_total_energy, "nJ")
+        print("RRAM Energy:", self.arch_total_energy, "nJ")
         if module_information:
             print("		crossbar energy:", self.arch_total_xbar_energy, "nJ")
             print("		DAC energy:", self.arch_total_DAC_energy, "nJ")
