@@ -12,7 +12,15 @@ import torch
 
 
 class TrainTestInterface(object):
-    def __init__(self, network_module, dataset_module, SimConfig_path, weights_file=None, device=None, tile_size=[12, 12], extra_define=None):
+    def __init__(self,
+                 network_module,
+                 dataset_module,
+                 SimConfig_path,
+                 on_RRAM_layer_index,
+                 weights_file=None,
+                 device=None,
+                 tile_size=[12, 12],
+                 extra_define=None):
         # network_module = 'lenet'
         # dataset_module = 'cifar10'
         # weights_file = './zoo/cifar10_lenet_train_params.pth'
@@ -87,7 +95,10 @@ class TrainTestInterface(object):
             self.hardware_config['input_bit'] = extra_define['dac_res']
             self.hardware_config['quantize_bit'] = extra_define['adc_res']
             self.hardware_config['xbar_size'] = extra_define['xbar_size']
-        self.net = import_module('MNSIM.Interface.network').get_net(self.hardware_config, cate=self.network_module, num_classes=num_classes)
+        self.net, self.on_RRAM_layer_index2 = import_module('MNSIM.Interface.network').get_net(self.hardware_config,
+                                                                                               cate=self.network_module,
+                                                                                               num_classes=num_classes,
+                                                                                               on_RRAM_layer_index=on_RRAM_layer_index)
         '''
         if weights_file is not None:
             print(f'load weights from {weights_file}')

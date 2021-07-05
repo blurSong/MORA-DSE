@@ -744,7 +744,7 @@ class Model_latency():
                         print(len(stall_interval))
         return
 
-    def model_latency_output(self, module_information=1, layer_information=1):
+    def model_latency_output(self, module_information=1, layer_information=1, on_RRAM_layer_index=[]):
         # print(' ')
         if (layer_information):
             for i in range(len(self.begin_time)):

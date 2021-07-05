@@ -165,7 +165,7 @@ class NetworkGraph(nn.Module):
         self.load_state_dict(tmp_state_dict)
 
 
-def get_net(hardware_config=None, cate='vgg16', num_classes=10):
+def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_index=[]):
     # initial config
     if hardware_config is None:
         hardware_config = {'xbar_size': 512, 'input_bit': 2, 'weight_bit': 1, 'quantize_bit': 10}
@@ -175,13 +175,17 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10):
     quantize_config_list = []
     input_index_list = []
     # Mora
-    model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../model/' + cate + '/' + cate + '-rram.csv'))
-    # print(model_csv_path)
-    model = pd.read_csv(model_csv_path).to_numpy()
-    model_layer_num = model.shape[0]
+    model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../model/' + cate + '/' + cate + '.csv'))
+    model_nd = pd.read_csv(model_csv_path).to_numpy()
+    model_layer_num = model_nd.shape[0]
+    on_RRAM_layer_index2 = []  # translate on_RRAM_layer_index to MNSIM on_RRAM_layer_index2
     # O	   I    F	K	S	T	R	A
+    layer_counter = 0
     for line in range(model_layer_num):
-        layer = model[line, ...]
+        if line in on_RRAM_layer_index:
+            on_RRAM_layer_index2.append(layer_counter)
+        layer_counter += 1
+        layer = model_nd[line, ...]
         if layer[5] == 1:  # conv
             layer_config_list.append({
                 'type': 'conv',
@@ -198,6 +202,8 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10):
             elif layer[6] >= 2:
                 layer_config_list.append({'type': 'relu'})
                 layer_config_list.append({'type': 'pooling', 'mode': 'MAX', 'kernel_size': int(layer[6]), 'stride': int(layer[6])})
+                on_RRAM_layer_index2.append(layer_counter) if line in on_RRAM_layer_index else None
+                layer_counter += 1
         elif layer[5] == 0:  # linear
             if layer[7] == 1:  # first fc layer
                 layer_config_list.append({'type': 'view'})
@@ -401,7 +407,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10):
     # print(input_index_list)
     # generate net
     net = NetworkGraph(hardware_config, layer_config_list, quantize_config_list, input_index_list, input_params)
-    return net
+    return net, on_RRAM_layer_index2
 
 
 if __name__ == '__main__':

@@ -129,13 +129,14 @@ class RRAM(object):
     def get_memory_capacity(self):
         return self.rram_dicts['tile_row'] * self.rram_dicts['tile_col'] * 16 * 8 * 2 * 128**2 * 2  # bit
 
-    def invoke_MNSIM(self, model):
+    def invoke_MNSIM(self, model, on_RRAM_layer_index):
         output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + model + '-rram.csv'))
         # if os.path.exists(output_csv_path):
         #    print("rram outfile conflict.")
         #    raise AttributeError
         print("[MNSIM  ] invoked", self.rram_dicts)
-        import_module("MNSIM_main").main(model, [self.rram_dicts['tile_row'], self.rram_dicts['tile_col']], self.rram_dicts['tile_bw'], self.DSE_indicator)
+        import_module("MNSIM_main").main(model, [self.rram_dicts['tile_row'], self.rram_dicts['tile_col']], self.rram_dicts['tile_bw'], self.DSE_indicator,
+                                         on_RRAM_layer_index)
         '''
         command = [
             "python", "../MNSIM.py", "--model {}".format(model), "--tile_size {} {}".format(self.rram_dicts['tile_row'], self.rram_dicts['tile_col']),

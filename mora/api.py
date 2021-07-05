@@ -60,7 +60,8 @@ def area(model, home_path, indicator=0):
 def gemmv1(home_path, model, dataflow):
     # generate maestro model using maestro api
     model_path = os.path.abspath(os.path.join(home_path, 'model/' + model))
-    maestro_model_csv_path = os.path.abspath(os.path.join(model_path, model + '-dla.csv'))
+    # maestro_model_csv_path = os.path.abspath(os.path.join(model_path, model + '-dla.csv'))
+    maestro_model_csv_path = os.path.abspath(os.path.join(model_path, model + '.csv'))
     maestro_model_path = os.path.abspath(os.path.join(model_path, model + '-dla_model.m'))
     maestro_mapping_path = os.path.abspath(os.path.join(model_path, model + '-dla_' + dataflow + '.m'))
     dataflow_path = os.path.abspath(os.path.join(home_path, 'maestro/tools/frontend/dataflow/' + dataflow + '.m'))

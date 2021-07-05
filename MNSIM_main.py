@@ -10,7 +10,10 @@ import pandas as pd
 import torch
 import collections
 import configparser
+import copy
 from importlib import import_module
+
+from torch._C import R
 from MNSIM.Interface.interface import *
 from MNSIM.Accuracy_Model.Weight_update import weight_update
 from MNSIM.Mapping_Model.Behavior_mapping import behavior_mapping
@@ -43,7 +46,7 @@ def Data_clean():
     # print("Removed unnecessary file.")
 
 
-def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0):
+def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0, _on_RRAM_layer_index=[]):
 
     home_path = os.getcwd()
     SimConfig_path = os.path.join(home_path, "rram_config.ini")
@@ -114,16 +117,27 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0
         args.model = _model
         args.tile_size = _tile_size
         args.tile_noc_bw = _tile_noc_bw
+        if _on_RRAM_layer_index:
+            on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
+        elif _DSE_indicator == 0:
+            model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '/model/' + args.model + '/' + args.model + '.csv'))
+            model_nd = pd.read_csv(model_csv_path).to_numpy()
+            model_layer_num = model_nd.shape[0]
+            on_RRAM_layer_index = range(model_layer_num)
+        else:
+            raise AttributeError
 
     output_csv_dicts = {}
     output_csv_dicts['DSE index'] = _DSE_indicator
     __TestInterface = TrainTestInterface(network_module=args.model,
                                          dataset_module='MNSIM.Interface.cifar10',
                                          SimConfig_path=args.hardware_description,
+                                         on_RRAM_layer_index=on_RRAM_layer_index,
                                          weights_file=args.weights,
                                          device=args.device,
                                          tile_size=args.tile_size)
     structure_file = __TestInterface.get_structure()
+    on_RRAM_layer_index2 = __TestInterface.on_RRAM_layer_index2
     TCG_mapping = TCG(structure_file, args.hardware_description)
     output_csv_dicts['layers'] = len(__TestInterface.net.layer_list)
 
@@ -134,15 +148,15 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0
         else:
             __latency.calculate_model_latency_nopipe()
         # print("========================Latency Results=================================")
-        output_csv_dicts['latency'] = __latency.model_latency_output(not (args.disable_module_output), not (args.disable_layer_output))
+        output_csv_dicts['latency'] = __latency.model_latency_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
 
         __area = Model_area(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping)
         # print("========================Area Results=================================")
-        output_csv_dicts['area'] = __area.model_area_output(not (args.disable_module_output), not (args.disable_layer_output))
+        output_csv_dicts['area'] = __area.model_area_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
 
         __power = Model_inference_power(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping)
         # print("========================Power Results=================================")
-        output_csv_dicts['power'] = __power.model_power_output(not (args.disable_module_output), not (args.disable_layer_output))
+        output_csv_dicts['power'] = __power.model_power_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
 
         __energy = Model_energy(NetStruct=structure_file,
                                 SimConfig_path=args.hardware_description,
@@ -150,7 +164,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0
                                 model_latency=__latency,
                                 model_power=__power)
         # print("========================Energy Results=================================")
-        output_csv_dicts['energy'] = __energy.model_energy_output(not (args.disable_module_output), not (args.disable_layer_output))
+        output_csv_dicts['energy'] = __energy.model_energy_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
 
     if not (args.disable_accuracy_simulation):
         print("======================================")
