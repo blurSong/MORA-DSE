@@ -88,7 +88,6 @@ class DLA(object):
             output_csv_dicts['power'] = power_nd.mean()  # wrong
             output_csv_dicts['restraint'] = 'unexamined' if self.DSE_indicator != 0 else 'pass'
             csv = pd.DataFrame(output_csv_dicts, index=[self.DSE_indicator])
-            print(csv)
             if os.path.exists(output_csv_path):
                 csv.to_csv(output_csv_path, mode='a', header=False, index=False)
             else:
