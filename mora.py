@@ -31,6 +31,9 @@ def set_path(model):
     # rram_model_csv_path = os.path.join(model_path, model + '/' + model + '-rram.csv')
     # SP.run("cp -f {} {}".format(model_csv_path, dla_model_csv_path), shell=True)
     # SP.run("cp -f {} {}".format(model_csv_path, rram_model_csv_path), shell=True)
+    output_path = os.path.join(home_path, 'output/' + model)
+    if os.path.exists(output_path):
+        SP.run("rm *.csv", cwd=output_path, shell=True)
     sys.path.append(home_path)
     sys.path.append(MNSIM_path)
     sys.path.append(maestro_path)

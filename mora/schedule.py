@@ -19,7 +19,6 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
     rts_c = rts_r
     dbw = int(hw_param_dicts['dla_noc_bw'] / 4)
     # greedy
-    print('[mora] Start DSE', DSE_indicator)
     while pes <= max_param_dicts['pes']:
         pes += int(max_param_dicts['pes'] / 1024)
         while rts_r <= max_param_dicts['tile_size']:
@@ -29,6 +28,8 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                 while dbw <= max_param_dicts['bw']:
                     dbw += int(max_param_dicts['bw'] / 1024)
                     rbw = max_param_dicts['bw'] - dbw
+
+                    print('[mora] Start DSE', DSE_indicator)
                     DLA.set_dse_param(pes, dbw, DSE_indicator)
                     RRAM.set_dse_param(rts_r, rts_c, rbw, DSE_indicator)
                     # run 0: all on dla
@@ -73,4 +74,5 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                     # set checkpoint
                     dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, homepath)
                     DSE_indicator += 1
+    print("[mora] DSE finish.")
     return

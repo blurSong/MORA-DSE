@@ -81,13 +81,14 @@ class DLA(object):
                 print('maestro glb size exeed.')
                 return
             output_csv_dicts['DSE index'] = self.DSE_indicator
-            output_csv_dicts['layers'] = layers
+            output_csv_dicts['layers'] = len(on_DLA_layer_index)
             output_csv_dicts['latency'] = runtime_nd.sum()
             output_csv_dicts['energy'] = energy_nd.sum()
             output_csv_dicts['area'] = area
             output_csv_dicts['power'] = power_nd.mean()  # wrong
             output_csv_dicts['restraint'] = 'unexamined' if self.DSE_indicator != 0 else 'pass'
             csv = pd.DataFrame(output_csv_dicts, index=[self.DSE_indicator])
+            print(csv)
             if os.path.exists(output_csv_path):
                 csv.to_csv(output_csv_path, mode='a', header=False, index=False)
             else:
@@ -129,12 +130,12 @@ class RRAM(object):
     def get_memory_capacity(self):
         return self.rram_dicts['tile_row'] * self.rram_dicts['tile_col'] * 16 * 8 * 2 * 128**2 * 2  # bit
 
-    def invoke_MNSIM(self, model, on_RRAM_layer_index):
+    def invoke_MNSIM(self, model, on_RRAM_layer_index=[]):
         output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + model + '-rram.csv'))
         # if os.path.exists(output_csv_path):
         #    print("rram outfile conflict.")
         #    raise AttributeError
-        print("[MNSIM  ] invoked", self.rram_dicts)
+        print("[MNSIM] invoked", self.rram_dicts)
         import_module("MNSIM_main").main(model, [self.rram_dicts['tile_row'], self.rram_dicts['tile_col']], self.rram_dicts['tile_bw'], self.DSE_indicator,
                                          on_RRAM_layer_index)
         '''

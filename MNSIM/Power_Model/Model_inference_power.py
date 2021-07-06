@@ -112,8 +112,12 @@ class Model_inference_power():
         self.arch_total_buf_w_power = sum(self.arch_buf_w_power) + self.global_buf.buf_wpower * 1e-3
         self.arch_total_pooling_power = sum(self.arch_pooling_power)
 
-    def model_power_output(self, module_information=1, layer_information=1):
-        print("RRAM Power:", self.arch_total_power, "W")
+    def model_power_output(self, module_information=1, layer_information=1, oRli2=[]):
+        mora_power = 0
+        for lyr in range(self.total_layer_num):
+            if lyr in oRli2:
+                mora_power += self.arch_power[lyr]
+        print("RRAM Power:", mora_power, '(', self.arch_total_power, ") W")
         if module_information:
             print("		crossbar power:", self.arch_total_xbar_power, "W")
             print("		DAC power:", self.arch_total_DAC_power, "W")
@@ -140,7 +144,8 @@ class Model_inference_power():
                           "W")
                 else:
                     print("     Hardware power:", self.arch_power[i], "W")
-        return self.arch_total_power
+        # return self.arch_total_power
+        return mora_power
 
 
 if __name__ == '__main__':

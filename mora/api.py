@@ -35,10 +35,10 @@ def EDP(model, home_path, indicator=0):
     if os.path.exists(dla_output_csv_path) is not True or os.path.exists(dla_output_csv_path) is not True:
         print("api.read outfile conflict.")
         raise AttributeError
-    dla_out = pd.read_csv(dla_output_csv_path, skiprows=indicator, nrows=1)
-    rram_out = pd.read_csv(rram_output_csv_path, skiprows=indicator, nrows=1)
-    dla_edp = float(dla_out.at[0, 'energy']) * float(dla_out.at[0, 'latency'])
-    rram_edp = float(rram_out.at[0, 'energy']) * float(rram_out.at[0, 'latency'])
+    dla_out = pd.read_csv(dla_output_csv_path)
+    rram_out = pd.read_csv(rram_output_csv_path)
+    dla_edp = float(dla_out.at[indicator, 'energy']) * float(dla_out.at[indicator, 'latency'])
+    rram_edp = float(rram_out.at[indicator, 'energy']) * float(rram_out.at[indicator, 'latency'])
     print("[mora][EDP] DLA: {:.4e}, RRAM: {:.4e}".format(dla_edp, rram_edp))
     return {'dla': dla_edp, 'rram': rram_edp}
 
@@ -49,10 +49,10 @@ def area(model, home_path, indicator=0):
     if os.path.exists(dla_output_csv_path) is not True or os.path.exists(dla_output_csv_path) is not True:
         print("api.read outfile conflict.")
         raise AttributeError
-    dla_out = pd.read_csv(dla_output_csv_path, skiprows=indicator, nrows=1)
-    rram_out = pd.read_csv(rram_output_csv_path, skiprows=indicator, nrows=1)
-    dla_area = float(dla_out.at[0, 'area'])
-    rram_area = float(rram_out.at[0, 'area'])
+    dla_out = pd.read_csv(dla_output_csv_path)
+    rram_out = pd.read_csv(rram_output_csv_path)
+    dla_area = float(dla_out.at[indicator, 'area'])
+    rram_area = float(rram_out.at[indicator, 'area'])
     print("[mora][area] DLA: {:.4e}, RRAM: {:.4e}".format(dla_area, rram_area))
     return {'dla': dla_area, 'rram': rram_area}
 
@@ -116,8 +116,8 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, homepath):
     # check csv result and save them
     edp_dse = EDP(model, homepath, indicator)
     area_dse = area(model, homepath, indicator)
-    ii = edp_dse['dla'] > EDP_cons['dla'] & edp_dse['rram'] > EDP_cons['rram']
-    jj = area_dse['dla'] > area_cons['dla'] & area_dse['rram'] > area_cons['rram']
+    ii = (edp_dse['dla'] > EDP_cons['dla']) & (edp_dse['rram'] > EDP_cons['rram'])
+    jj = (area_dse['dla'] > area_cons['dla']) & (area_dse['rram'] > area_cons['rram'])
     # TODO: advanced checking rules
     if ii | jj:
         DSE_checkpoint = False
@@ -137,6 +137,6 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, homepath):
         dla_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_out_pd.at[indicator, 'restraint'] = 'pass'
         print('dse checkpoint pass.')
-    dla_out_pd.to_csv(dla_output_csv_path)
-    rram_out_pd.to_csv(rram_output_csv_path)
+    dla_out_pd.to_csv(dla_output_csv_path, index=False)
+    rram_out_pd.to_csv(rram_output_csv_path, index=False)
     return

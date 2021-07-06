@@ -105,8 +105,12 @@ class Model_area():
         self.arch_total_buf_area = sum(self.arch_buf_area) + self.global_buf.buf_area
         self.arch_total_pooling_area = sum(self.arch_pooling_area)
 
-    def model_area_output(self, module_information=1, layer_information=1):
-        print("RRAM Area:", self.arch_total_area, "um^2")
+    def model_area_output(self, module_information=1, layer_information=1, oRli2=[]):
+        mora_area = 0
+        for lyr in range(self.total_layer_num):
+            if lyr in oRli2:
+                mora_area += self.arch_area[lyr]
+        print("RRAM Area:", mora_area, '(', self.arch_total_area, ") um2")
         if module_information:
             print("		crossbar area:", self.arch_total_xbar_area, "um^2")
             print("		DAC area:", self.arch_total_DAC_area, "um^2")
@@ -131,7 +135,8 @@ class Model_area():
                           "um^2")
                 else:
                     print("     Hardware area:", self.arch_area[i], "um^2")
-        return self.arch_total_area
+        # return self.arch_total_area
+        return mora_area
 
 
 if __name__ == '__main__':

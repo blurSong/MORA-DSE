@@ -744,7 +744,7 @@ class Model_latency():
                         print(len(stall_interval))
         return
 
-    def model_latency_output(self, module_information=1, layer_information=1, on_RRAM_layer_index=[]):
+    def model_latency_output(self, module_information=1, layer_information=1, oRli2=[]):
         # print(' ')
         if (layer_information):
             for i in range(len(self.begin_time)):
@@ -798,9 +798,18 @@ class Model_latency():
                           "%.2f" % (100 * self.total_tile_transfer_latency[i] / total_latency), '%)')
                 print('----------------------------------------------')
         # print("Latency simulation finished!")
+        # mora temp latancy estimation
         latancy = max(max(self.finish_time))
-        print("RRAM Latency:", latancy, "ns")
-        return latancy
+        mora_latency = 0
+        for lyr in range(len(self.begin_time)):
+            if lyr in oRli2:
+                total_latency = self.total_buffer_latency[lyr] + self.total_computing_latency[lyr] + \
+                                self.total_digital_latency[lyr] + self.total_intra_tile_latency[lyr] + \
+                                self.total_inter_tile_latency[lyr]
+                mora_latency += total_latency
+        print("RRAM Latency:", mora_latency, '(', latancy, ") ns")
+        # return latancy
+        return mora_latency
 
     def layer_latency_initial(self):
         self.begin_time.append([])

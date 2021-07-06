@@ -12,8 +12,6 @@ import collections
 import configparser
 import copy
 from importlib import import_module
-
-from torch._C import R
 from MNSIM.Interface.interface import *
 from MNSIM.Accuracy_Model.Weight_update import weight_update
 from MNSIM.Mapping_Model.Behavior_mapping import behavior_mapping
@@ -120,7 +118,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0
         if _on_RRAM_layer_index:
             on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
         elif _DSE_indicator == 0:
-            model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '/model/' + args.model + '/' + args.model + '.csv'))
+            model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'model/' + args.model + '/' + args.model + '.csv'))
             model_nd = pd.read_csv(model_csv_path).to_numpy()
             model_layer_num = model_nd.shape[0]
             on_RRAM_layer_index = range(model_layer_num)
@@ -129,6 +127,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0
 
     output_csv_dicts = {}
     output_csv_dicts['DSE index'] = _DSE_indicator
+    output_csv_dicts['layers'] = len(on_RRAM_layer_index)
     __TestInterface = TrainTestInterface(network_module=args.model,
                                          dataset_module='MNSIM.Interface.cifar10',
                                          SimConfig_path=args.hardware_description,
@@ -139,7 +138,6 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0
     structure_file = __TestInterface.get_structure()
     on_RRAM_layer_index2 = __TestInterface.on_RRAM_layer_index2
     TCG_mapping = TCG(structure_file, args.hardware_description)
-    output_csv_dicts['layers'] = len(__TestInterface.net.layer_list)
 
     if not (args.disable_hardware_modeling):
         __latency = Model_latency(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping, tile_noc_bw=args.tile_noc_bw)
@@ -181,7 +179,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=256, _DSE_indicator=0
     # write mora csv
     output_csv_dicts['restraint'] = 'unexamined' if _DSE_indicator != 0 else 'pass'
     output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/' + args.model + '-rram.csv'))
-    csv = pd.DataFrame(output_csv_dicts, index=[0])
+    csv = pd.DataFrame(output_csv_dicts, index=[_DSE_indicator])
     if os.path.exists(output_csv_path):
         csv.to_csv(output_csv_path, mode='a', header=False, index=False)
     else:
