@@ -94,9 +94,9 @@ class DLA(object):
                 csv.to_csv(output_csv_path, index=False)
         except FileNotFoundError:
             print('maestro invoke fatal.')
-        print('DLA Latency:', output_csv_dicts['latency'], 'ns')
-        print('DLA Area:', output_csv_dicts['latency'], 'um2')
-        print('DLA Energy:', output_csv_dicts['latency'], 'nJ')
+        print('       DLA Latency:', output_csv_dicts['latency'], 'ns')
+        print('       DLA Area:', output_csv_dicts['latency'], 'um2')
+        print('       DLA Energy:', output_csv_dicts['latency'], 'nJ')
 
         return
 

@@ -39,7 +39,7 @@ def EDP(model, home_path, indicator=0):
     rram_out = pd.read_csv(rram_output_csv_path)
     dla_edp = float(dla_out.at[indicator, 'energy']) * float(dla_out.at[indicator, 'latency'])
     rram_edp = float(rram_out.at[indicator, 'energy']) * float(rram_out.at[indicator, 'latency'])
-    print("[mora][EDP] DLA: {:.4e}, RRAM: {:.4e}".format(dla_edp, rram_edp))
+    print("[mora][EDP ] DLA: {:.4e}, RRAM: {:.4e}".format(dla_edp, rram_edp))
     return {'dla': dla_edp, 'rram': rram_edp}
 
 

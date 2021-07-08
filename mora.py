@@ -81,6 +81,7 @@ if __name__ == "__main__":
     rram.invoke_MNSIM(args.model)
     edp_cons = mora.api.EDP(args.model, home_path)
     area_cons = mora.api.area(args.model, home_path)
+    ''''''
     mora.schedule.greedy_schedule(DLA=dla,
                                   RRAM=rram,
                                   model=args.model,

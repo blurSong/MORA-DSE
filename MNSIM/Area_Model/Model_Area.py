@@ -110,7 +110,7 @@ class Model_area():
         for lyr in range(self.total_layer_num):
             if lyr in oRli2:
                 mora_area += self.arch_area[lyr]
-        print("RRAM Area:", mora_area, '(', self.arch_total_area, ") um2")
+        print("       RRAM Area:", mora_area, '(', self.arch_total_area, ") um2")
         if module_information:
             print("		crossbar area:", self.arch_total_xbar_area, "um^2")
             print("		DAC area:", self.arch_total_DAC_area, "um^2")

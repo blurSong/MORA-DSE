@@ -117,7 +117,7 @@ class Model_inference_power():
         for lyr in range(self.total_layer_num):
             if lyr in oRli2:
                 mora_power += self.arch_power[lyr]
-        print("RRAM Power:", mora_power, '(', self.arch_total_power, ") W")
+        # print("RRAM Power:", mora_power, '(', self.arch_total_power, ") W")
         if module_information:
             print("		crossbar power:", self.arch_total_xbar_power, "W")
             print("		DAC power:", self.arch_total_DAC_power, "W")
