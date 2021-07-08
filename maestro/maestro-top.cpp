@@ -153,7 +153,7 @@ int main(int argc, char** argv)
       );
 
     auto api = std::make_shared<maestro::APIV2>(config);
-    std::cout << "[maestro] invoked." << std::endl;
+    // std::cout << "[maestro] invoked." << std::endl;
     auto res = api->AnalyzeNeuralNetwork(option.print_res_to_screen, option.print_res_to_csv_file, option.print_log_file);
   }
   /////////////////////////////////////////////////////////////////

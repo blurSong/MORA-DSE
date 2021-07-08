@@ -15,8 +15,8 @@ import torch
 import MNSIM
 import mora
 
-# MNSIM    ns      um2    W    nJ
-# maestro cycle/ns um2    uW    nJ
+# MNSIM    ns      um2    W    nJ    bw=GByte
+# maestro cycle/ns um2    uW    nJ   bw=KByte  glb=byte
 
 
 def set_path(model):
@@ -59,11 +59,11 @@ def hw_init(hw_config_path):
 
 
 def max_init(hw_param_dicts):
-    expand_num = 6
+    expand_num = 4
     max_hw_param_dicts = {}
     max_hw_param_dicts['pes'] = hw_param_dicts['dla_pes'] * expand_num
     max_hw_param_dicts['tile_size'] = hw_param_dicts['rram_tile_size'] * expand_num
-    max_hw_param_dicts['bw'] = (hw_param_dicts['dla_noc_bw'] + hw_param_dicts['rram_tile_bw'])
+    max_hw_param_dicts['bw'] = (int(hw_param_dicts['dla_noc_bw'] / (1024 * 1024)) + hw_param_dicts['rram_tile_bw'])  # byte to GB
     return max_hw_param_dicts
 
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     dla = mora.HW.DLA(hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(hw_param_dicts, home_path)
     mora.api.gemmv1(home_path, args.model, args.dataflow)
-    print("[mora] init indicator.")
+    print("[mora] Init indicator.")
     dla.invoke_maestro(args.model)
     dla.export(args.model)
     rram.invoke_MNSIM(args.model)

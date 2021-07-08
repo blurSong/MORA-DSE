@@ -13,24 +13,25 @@ from mora.api import dse_checkpoint
 
 def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
     DSE_indicator = 1
+    shirink_num = 4
     # DSE_param_dicts = copy.deepcopy(hw_param_dicts)
-    pes = int(hw_param_dicts['dla_pes'] / 4)
-    rts_r = int(hw_param_dicts['rram_tile_size'] / 4)
+    pes = int(hw_param_dicts['dla_pes'] / shirink_num)
+    rts_r = int(hw_param_dicts['rram_tile_size'] / shirink_num)
     rts_c = rts_r
-    dbw = int(hw_param_dicts['dla_noc_bw'] / 4)
+    dbw = int(hw_param_dicts['dla_noc_bw'] / (shirink_num * 1024 * 1024))  # Kbyte to GB
     # greedy
     while pes <= max_param_dicts['pes']:
-        pes += int(max_param_dicts['pes'] / 1024)
+        pes += int(max_param_dicts['pes'] / 512)
         while rts_r <= max_param_dicts['tile_size']:
             rts_r += 2
             while rts_c <= max_param_dicts['tile_size']:
                 rts_c += 2
-                while dbw <= max_param_dicts['bw']:
-                    dbw += int(max_param_dicts['bw'] / 1024)
+                while dbw <= int(max_param_dicts['bw'] * 7 / 8):
+                    dbw += int(max_param_dicts['bw'] / 64)  # GB
                     rbw = max_param_dicts['bw'] - dbw
 
                     print('[mora] Start DSE', DSE_indicator)
-                    DLA.set_dse_param(pes, dbw, DSE_indicator)
+                    DLA.set_dse_param(pes, dbw * 1024 * 1024, DSE_indicator)
                     RRAM.set_dse_param(rts_r, rts_c, rbw, DSE_indicator)
                     # run 0: all on dla
                     DLA.invoke_maestro(model)
