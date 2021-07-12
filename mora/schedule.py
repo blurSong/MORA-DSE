@@ -20,11 +20,11 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
     rts_c = rts_r
     dbw = int(hw_param_dicts['dla_noc_bw'] / (shirink_num * 1024 * 1024))  # Kbyte to GB
     # greedy
-    rounds = ((max_param_dicts['pes'] - pes) / 256) * ((max_param_dicts['tile_size'] - rts_r) / 2)**2 * (((max_param_dicts['bw'] * 7 / 8) - dbw) / 64)
-    print('[mora] Greedy DSE, Total Rounds:', rounds)
-    assert rounds <= 27777
+    rounds = ((max_param_dicts['pes'] - pes) / 512) * ((max_param_dicts['tile_size'] - rts_r) / 2)**2 * (((max_param_dicts['bw'] * 7 / 8) - dbw) / 64)
+    print('[mora] Greedy DSE, Total Rounds:', int(rounds))
+    assert rounds <= 11451.4
     while pes <= max_param_dicts['pes']:
-        pes += int(max_param_dicts['pes'] / 256)
+        pes += int(max_param_dicts['pes'] / 512)
         while rts_r <= max_param_dicts['tile_size']:
             rts_r += 2
             while rts_c <= max_param_dicts['tile_size']:
