@@ -42,7 +42,6 @@ class DLA(object):
         #   raise AttributeError
         if os.path.exists(maestro_result_csv_path):
             os.remove(maestro_result_csv_path)
-
         print("[maestro] invoked", self.dla_dicts)
         params = [self.dla_dicts['pes'], self.dla_dicts['glb_size'], self.dla_dicts['noc_bw'], mapping_path]
         command = "./maestro --num_pes={0[0]} --l2_size_cstr={0[1]} --noc_bw_cstr={0[2]} --Mapping_file='{0[3]}' --print_res=false --print_res_csv_file=true --print_log_file=false".format(
@@ -60,7 +59,7 @@ class DLA(object):
         process.wait()
 
     def export(self, model, on_DLA_layer_index=None):
-        output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + model + '-dla.csv'))
+        output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + model + '-dla(' + self.dataflow + ').csv'))
         maestro_result_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + model + '-dla_' + self.dataflow + '.csv'))
         # maestro original maestro_result csv pisition: maestro/.
         output_csv_dicts = {}
@@ -86,6 +85,7 @@ class DLA(object):
             output_csv_dicts['energy'] = energy_nd.sum()
             output_csv_dicts['area'] = area
             output_csv_dicts['power'] = power_nd.mean()  # wrong
+            output_csv_dicts['HW (pes, bw)'] = '{} {}'.format(self.dla_dicts['pes'], int(self.dla_dicts['noc_bw'] / 1024**2))
             output_csv_dicts['restraint'] = 'unexamined' if self.DSE_indicator != 0 else 'pass'
             csv = pd.DataFrame(output_csv_dicts, index=[self.DSE_indicator])
             if os.path.exists(output_csv_path):
@@ -94,9 +94,9 @@ class DLA(object):
                 csv.to_csv(output_csv_path, index=False)
         except FileNotFoundError:
             print('maestro invoke fatal.')
-        print('       DLA Latency:', output_csv_dicts['latency'], 'ns')
-        print('       DLA Area:', output_csv_dicts['latency'], 'um2')
-        print('       DLA Energy:', output_csv_dicts['latency'], 'nJ')
+        print('DLA Latency:', output_csv_dicts['latency'], 'ns')
+        print('DLA Area:', output_csv_dicts['latency'], 'um2')
+        print('DLA Energy:', output_csv_dicts['latency'], 'nJ')
 
         return
 

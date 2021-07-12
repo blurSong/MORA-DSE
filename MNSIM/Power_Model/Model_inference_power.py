@@ -143,7 +143,7 @@ class Model_inference_power():
                           self.global_add.adder_power * self.graph.global_adder_num + self.global_buf.buf_wpower * 1e-3 + self.global_buf.buf_rpower * 1e-3,
                           "W")
                 else:
-                    print("     Hardware power:", self.arch_power[i], "W")
+                    print("Hardware power:", self.arch_power[i], "W")
         # return self.arch_total_power
         return mora_power
 

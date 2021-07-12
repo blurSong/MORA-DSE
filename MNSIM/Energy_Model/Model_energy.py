@@ -131,7 +131,7 @@ class Model_energy():
         for lyr in range(self.total_layer_num):
             if lyr in oRli2:
                 mora_energy += self.arch_energy[lyr]
-        print("       RRAM Energy:", mora_energy, '(', self.arch_total_energy, ") nJ")
+        print("RRAM Energy:", mora_energy, '(', self.arch_total_energy, ") nJ")
         if module_information:
             print("		crossbar energy:", self.arch_total_xbar_energy, "nJ")
             print("		DAC energy:", self.arch_total_DAC_energy, "nJ")

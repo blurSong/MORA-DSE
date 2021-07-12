@@ -41,7 +41,7 @@ def set_path(model):
 
 def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
-    parser.add_argument('--dataflow', type=str, default='kcp_ws')
+    parser.add_argument('--dataflow', type=str, default='kcp_ws')  # ykp_os, kcp_ws, xp_ws, rs
     parser.add_argument('--model', type=str, default='vgg16')
     return parser
 
@@ -79,8 +79,8 @@ if __name__ == "__main__":
     dla.invoke_maestro(args.model)
     dla.export(args.model)
     rram.invoke_MNSIM(args.model)
-    edp_cons = mora.api.EDP(args.model, home_path)
-    area_cons = mora.api.area(args.model, home_path)
+    edp_cons = mora.api.EDP(args.model, args.dataflow, home_path)
+    area_cons = mora.api.area(args.model, args.dataflow, home_path)
     ''''''
     mora.schedule.greedy_schedule(DLA=dla,
                                   RRAM=rram,

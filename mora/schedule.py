@@ -30,13 +30,11 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                 for dbw in range(int(hw_param_dicts['dla_noc_bw'] / (shirink_num * 1024 * 1024)), int(max_param_dicts['bw'] * 7 / 8),
                                  int(max_param_dicts['bw'] / 32)):  # Kbyte to GB
                     rbw = max_param_dicts['bw'] - dbw
-
                     print('[mora] Start DSE', DSE_indicator)
                     DLA.set_dse_param(pes, dbw * 1024 * 1024, DSE_indicator)
                     RRAM.set_dse_param(rts_r, rts_c, rbw, DSE_indicator)
                     # run 0: all on dla
                     DLA.invoke_maestro(model)
-                    # rram_model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '-rram.csv'))
                     layers = 0
                     try:
                         maestro_result_df = pd.read_csv(maestro_result_csv_path)
@@ -70,7 +68,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                     RRAM.invoke_MNSIM(model, on_RRAM_layer_index)
 
                     # set checkpoint
-                    dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, homepath)
+                    dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, DLA.dataflow, homepath)
                     DSE_indicator += 1
     print("[mora] DSE finish.")
     return

@@ -28,10 +28,10 @@ MLTD = mora_layer_type_dicts
 MLPD = mora_layer_param_dicts
 
 
-def EDP(model, home_path, indicator=0):
+def EDP(model, df, homepath, indicator=0):
     # return {'dla': DLA.get_edp(model), 'rram': RRAM.get_edp(model)}
-    dla_output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + model + '/' + model + '-dla.csv'))
-    rram_output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + model + '/' + model + '-rram.csv'))
+    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla(' + df + ').csv'))
+    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-rram.csv'))
     if os.path.exists(dla_output_csv_path) is not True or os.path.exists(dla_output_csv_path) is not True:
         print("api.read outfile conflict.")
         raise AttributeError
@@ -43,9 +43,9 @@ def EDP(model, home_path, indicator=0):
     return {'dla': dla_edp, 'rram': rram_edp}
 
 
-def area(model, home_path, indicator=0):
-    dla_output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + model + '/' + model + '-dla.csv'))
-    rram_output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + model + '/' + model + '-rram.csv'))
+def area(model, df, homepath, indicator=0):
+    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla(' + df + ').csv'))
+    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-rram.csv'))
     if os.path.exists(dla_output_csv_path) is not True or os.path.exists(dla_output_csv_path) is not True:
         print("api.read outfile conflict.")
         raise AttributeError
@@ -57,15 +57,14 @@ def area(model, home_path, indicator=0):
     return {'dla': dla_area, 'rram': rram_area}
 
 
-def gemmv1(home_path, model, dataflow):
+def gemmv1(homepath, model, dataflow):
     # generate maestro model using maestro api
-    model_path = os.path.abspath(os.path.join(home_path, 'model/' + model))
-    # maestro_model_csv_path = os.path.abspath(os.path.join(model_path, model + '-dla.csv'))
+    model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
     maestro_model_csv_path = os.path.abspath(os.path.join(model_path, model + '.csv'))
     maestro_model_path = os.path.abspath(os.path.join(model_path, model + '-dla_model.m'))
     maestro_mapping_path = os.path.abspath(os.path.join(model_path, model + '-dla_' + dataflow + '.m'))
-    dataflow_path = os.path.abspath(os.path.join(home_path, 'maestro/tools/frontend/dataflow/' + dataflow + '.m'))
-    dpt_path = os.path.abspath(os.path.join(home_path, 'maestro/tools/frontend/dataflow/dpt.m'))
+    dataflow_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/' + dataflow + '.m'))
+    dpt_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/dpt.m'))
 
     # csv to maestro model
     model_ndarray = pd.read_csv(maestro_model_csv_path).to_numpy()
@@ -84,6 +83,7 @@ def gemmv1(home_path, model, dataflow):
     print("[mora][gemmv1] Done csv to maestro model.")
 
     # maestro model to meastro mapping model
+    # maestro is suck.
     dsconv = False
     with open(dataflow_path, 'r') as fd:
         with open(dpt_path, 'r') as fdpt:
@@ -112,7 +112,7 @@ def gemmv2(model):
     return
 
 
-def dse_checkpoint(indicator, EDP_cons, area_cons, model, homepath):
+def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     # check csv result and save them
     edp_dse = EDP(model, homepath, indicator)
     area_dse = area(model, homepath, indicator)
@@ -123,7 +123,7 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, homepath):
         DSE_checkpoint = False
     else:
         DSE_checkpoint = True
-    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla.csv'))
+    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla(' + df + ').csv'))
     rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-rram.csv'))
     dla_out_pd = pd.read_csv(dla_output_csv_path)
     rram_out_pd = pd.read_csv(rram_output_csv_path)
