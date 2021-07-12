@@ -13,24 +13,24 @@ from mora.api import dse_checkpoint
 
 def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
     DSE_indicator = 1
-    shirink_num = 4
+    shirink_num = 2.5
     # DSE_param_dicts = copy.deepcopy(hw_param_dicts)
     pes = int(hw_param_dicts['dla_pes'] / shirink_num)
     rts_r = int(hw_param_dicts['rram_tile_size'] / shirink_num)
     rts_c = rts_r
     dbw = int(hw_param_dicts['dla_noc_bw'] / (shirink_num * 1024 * 1024))  # Kbyte to GB
     # greedy
-    rounds = ((max_param_dicts['pes'] - pes) / 512) * ((max_param_dicts['tile_size'] - rts_r) / 2)**2 * (((max_param_dicts['bw'] * 7 / 8) - dbw) / 64)
+    rounds = 128 * (1 - 1 / shirink_num**2) * ((max_param_dicts['tile_size'] - rts_r) / 2)**2 * 32 * (7 / 8) * (1 - 1 / shirink_num**2)
     print('[mora] Greedy DSE, Total Rounds:', int(rounds))
-    assert rounds <= 11451.4
+    assert rounds <= 114514 * 2
     while pes <= max_param_dicts['pes']:
-        pes += int(max_param_dicts['pes'] / 512)
+        pes += int(max_param_dicts['pes'] / 128)
         while rts_r <= max_param_dicts['tile_size']:
             rts_r += 2
             while rts_c <= max_param_dicts['tile_size']:
                 rts_c += 2
                 while dbw <= int(max_param_dicts['bw'] * 7 / 8):
-                    dbw += int(max_param_dicts['bw'] / 64)  # GB
+                    dbw += int(max_param_dicts['bw'] / 32)  # GB
                     rbw = max_param_dicts['bw'] - dbw
 
                     print('[mora] Start DSE', DSE_indicator)

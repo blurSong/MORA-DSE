@@ -59,7 +59,7 @@ def hw_init(hw_config_path):
 
 
 def max_init(hw_param_dicts):
-    expand_num = 4
+    expand_num = 2
     max_hw_param_dicts = {}
     max_hw_param_dicts['pes'] = hw_param_dicts['dla_pes'] * expand_num
     max_hw_param_dicts['tile_size'] = hw_param_dicts['rram_tile_size'] * expand_num
