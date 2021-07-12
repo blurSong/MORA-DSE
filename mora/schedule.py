@@ -12,25 +12,23 @@ from mora.api import dse_checkpoint
 
 
 def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
-    DSE_indicator = 1
+    assert DLA.home_path == RRAM.home_path
+    homepath = RRAM.home_path
+    maestro_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla_' + DLA.dataflow + '.csv'))
+    model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
     shirink_num = 2.5
-    # DSE_param_dicts = copy.deepcopy(hw_param_dicts)
-    pes = int(hw_param_dicts['dla_pes'] / shirink_num)
-    rts_r = int(hw_param_dicts['rram_tile_size'] / shirink_num)
-    rts_c = rts_r
-    dbw = int(hw_param_dicts['dla_noc_bw'] / (shirink_num * 1024 * 1024))  # Kbyte to GB
+    expand_num = 2
     # greedy
-    rounds = 128 * (1 - 1 / shirink_num**2) * ((max_param_dicts['tile_size'] - rts_r) / 2)**2 * 32 * (7 / 8) * (1 - 1 / shirink_num**2)
+    rounds = 128 * (1 - 1 / (shirink_num * expand_num)) * (max_param_dicts['tile_size'] *
+                                                           (1 - 1 / (shirink_num * expand_num)) / 2)**2 * 32 * (7 / 8) * (1 - 1 / (shirink_num * expand_num))
     print('[mora] Greedy DSE, Total Rounds:', int(rounds))
     assert rounds <= 114514 * 2
-    while pes <= max_param_dicts['pes']:
-        pes += int(max_param_dicts['pes'] / 128)
-        while rts_r <= max_param_dicts['tile_size']:
-            rts_r += 2
-            while rts_c <= max_param_dicts['tile_size']:
-                rts_c += 2
-                while dbw <= int(max_param_dicts['bw'] * 7 / 8):
-                    dbw += int(max_param_dicts['bw'] / 32)  # GB
+    DSE_indicator = 1
+    for pes in range(int(hw_param_dicts['dla_pes'] / shirink_num), max_param_dicts['pes'], int(max_param_dicts['pes'] / 128)):
+        for rts_r in range(int(hw_param_dicts['rram_tile_size'] / shirink_num), max_param_dicts['tile_size'], 2):
+            for rts_c in range(int(hw_param_dicts['rram_tile_size'] / shirink_num), max_param_dicts['tile_size'], 2):
+                for dbw in range(int(hw_param_dicts['dla_noc_bw'] / (shirink_num * 1024 * 1024)), int(max_param_dicts['bw'] * 7 / 8),
+                                 int(max_param_dicts['bw'] / 32)):  # Kbyte to GB
                     rbw = max_param_dicts['bw'] - dbw
 
                     print('[mora] Start DSE', DSE_indicator)
@@ -38,10 +36,6 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                     RRAM.set_dse_param(rts_r, rts_c, rbw, DSE_indicator)
                     # run 0: all on dla
                     DLA.invoke_maestro(model)
-                    assert DLA.home_path == RRAM.home_path
-                    homepath = RRAM.home_path
-                    maestro_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla_' + DLA.dataflow + '.csv'))
-                    model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
                     # rram_model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '-rram.csv'))
                     layers = 0
                     try:
