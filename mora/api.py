@@ -63,8 +63,6 @@ def gemmv1(homepath, model, dataflow):
     maestro_model_csv_path = os.path.abspath(os.path.join(model_path, model + '.csv'))
     maestro_model_path = os.path.abspath(os.path.join(model_path, model + '-dla_model.m'))
     maestro_mapping_path = os.path.abspath(os.path.join(model_path, model + '-dla_' + dataflow + '.m'))
-    dataflow_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/' + dataflow + '.m'))
-    dpt_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/dpt.m'))
 
     # csv to maestro model
     model_ndarray = pd.read_csv(maestro_model_csv_path).to_numpy()
@@ -84,6 +82,19 @@ def gemmv1(homepath, model, dataflow):
 
     # maestro model to meastro mapping model
     # maestro is suck.
+    # ykp_os, yxp_os, kcp_ws, xp_ws, rs
+    dpt_type_dict = {'ykp_os': 3, 'yxp_os': 3, 'kcp_ws': 1, 'xp_ws': 2, 'rs': 1}
+    rs1_tpye_list = ['resnet', 'resnext', 'unet', 'vgg']
+    df2 = dataflow
+    if df2 == 'rs':
+        for mod in rs1_tpye_list:
+            if re.search(mod, model):
+                df2 += '1'
+                break
+    df2 += '2' if df2 == 'rs' else None
+    dataflow_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/' + df2 + '.m'))
+    dpt_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/dpt' + dpt_type_dict[dataflow] + '.m'))
+
     dsconv = False
     with open(dataflow_path, 'r') as fd:
         with open(dpt_path, 'r') as fdpt:

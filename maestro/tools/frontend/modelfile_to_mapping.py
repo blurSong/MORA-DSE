@@ -13,22 +13,22 @@ if __name__ == "__main__":
     dsconv = 0
     base_path = '../../data/'
     if os.path.exists(base_path + 'model/' + opt.model_file):
-        with open('./dataflow/' + opt.dataflow + ".m" ,"r") as fd:
-            with open('./dataflow/'+ 'dpt.m' , "r") as fdpt:
+        with open('./dataflow/' + opt.dataflow + ".m", "r") as fd:
+            with open('./dataflow/' + 'dpt.m', "r") as fdpt:
                 with open(base_path + 'mapping/' + opt.outfile, "w") as fo:
                     with open(base_path + 'model/' + opt.model_file, "r") as fm:
                         for line in fm:
-                            if(re.search("DSCONV",line)):
+                            if (re.search("DSCONV", line)):
                                 dsconv = 1
-                            if(re.search("Dimensions",line)):
+                            if (re.search("Dimensions", line)):
                                 fo.write(line)
-                                if(dsconv):
+                                if (dsconv):
                                     fdpt.seek(0)
                                     fo.write(fdpt.read())
                                 else:
                                     fd.seek(0)
                                     fo.write(fd.read())
-                                dsconv=0
+                                dsconv = 0
                             else:
                                 fo.write(line)
 
