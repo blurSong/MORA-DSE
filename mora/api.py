@@ -1,14 +1,9 @@
-import copy
 import os
 import re
 import sys
 import numpy as np
 import pandas as pd
-import subprocess as SP
-import multiprocessing as MP
-#from mod2map import mod2map
-import torch
-import MNSIM
+# from mod2map import mod2map
 
 maestro_layer_type_ref_dicts = {"Linear": "CONV", "CONV": "CONV", "DWCONV": "DSCONV", "Residual": "DSCONV", "TRCONV": "TRCONV", "NGCONV": "NGCONV"}
 mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: "TRCONV", 5: "NGCONV"}  # DWCONV Residual is DSCONV on maestro
@@ -81,9 +76,8 @@ def gemmv1(homepath, model, dataflow):
     print("[mora][gemmv1] Done csv to maestro model.")
 
     # maestro model to meastro mapping model
-    # maestro is suck.
     # ykp_os, yxp_os, kcp_ws, xp_ws, rs
-    dpt_type_dict = {'ykp_os': 3, 'yxp_os': 3, 'kcp_ws': 1, 'xp_ws': 2, 'rs': 1}
+    dpt_type_dict = {'ykp_os': '3', 'yxp_os': '3', 'kcp_ws': '1', 'xp_ws': '2', 'rs': '1'}
     rs1_tpye_list = ['resnet', 'resnext', 'unet', 'vgg']
     df2 = dataflow
     if df2 == 'rs':
@@ -119,7 +113,7 @@ def gemmv1(homepath, model, dataflow):
 
 
 def gemmv2(model):
-    # generate maestro model with using keras and maestro api
+    # TODO: generate maestro model with using maestro orginal define
     return
 
 
