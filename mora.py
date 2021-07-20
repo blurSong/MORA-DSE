@@ -74,14 +74,13 @@ if __name__ == "__main__":
     max_hw_param_dicts = max_init(hw_param_dicts)
     dla = mora.HW.DLA(hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(hw_param_dicts, home_path)
-    mora.api.gemmv1(home_path, args.model, args.dataflow)
+    mora.api.gemm(home_path, args.model, args.dataflow)
     print("[mora] Init indicator.")
     dla.invoke_maestro(args.model)
     dla.export(args.model)
     rram.invoke_MNSIM(args.model)
     edp_cons = mora.api.EDP(args.model, args.dataflow, home_path)
     area_cons = mora.api.area(args.model, args.dataflow, home_path)
-    ''''''
     mora.schedule.greedy_schedule(DLA=dla,
                                   RRAM=rram,
                                   model=args.model,

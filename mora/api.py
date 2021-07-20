@@ -15,7 +15,7 @@ mora_layer_param_dicts = {
     'S': 'stride',
     'T': 'layer_type',
     'R': 'relu_or_relu&pooling',
-    'A': 'appending index'
+    'A': 'appending_index'
 }  # RP = 0:no relu, 1:relu, 2~:relu and pooling (kernel size)  A = (default 0) conv input index / fc is first layer for MNSIM
 
 MLTRD = maestro_layer_type_ref_dicts
@@ -52,7 +52,7 @@ def area(model, df, homepath, indicator=0):
     return {'dla': dla_area, 'rram': rram_area}
 
 
-def gemmv1(homepath, model, dataflow):
+def gemm(homepath, model, dataflow):
     # generate maestro model using maestro api
     model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
     maestro_model_csv_path = os.path.abspath(os.path.join(model_path, model + '.csv'))
@@ -73,7 +73,7 @@ def gemmv1(homepath, model, dataflow):
             fo.write("Dimensions {{ K: {0[0]}, C: {0[1]}, R: {0[2]}, S: {0[3]}, Y: {0[4]}, X: {0[5]} }}\n".format(KCRSYX))
             fo.write("}\n")
         fo.write("}")
-    print("[mora][gemmv1] Done csv to maestro model.")
+    print("[mora][gemm] done csv to maestro model.")
 
     # maestro model to meastro mapping model
     # ykp_os, yxp_os, kcp_ws, xp_ws, rs
@@ -108,7 +108,7 @@ def gemmv1(homepath, model, dataflow):
                             dsconv = False
                         else:
                             fo.write(line)
-    print("[mora][gemmv1] Done maestro model to mapping.")
+    print("[mora][gemm] done maestro model to mapping.")
     return
 
 
