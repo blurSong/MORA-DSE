@@ -2,9 +2,9 @@ import torch
 from torchvision import models, transforms, datasets
 import os
 import sys
-# sys.path.append('D:\\AIR\\Net')
-sys.path.append(os.path.dirname(__file__))
 from torchsummary import summary
+
+sys.path.append(os.path.dirname(__file__))
 
 resnet18 = models.resnet18(pretrained=True)
 resnet50 = models.resnet50(pretrained=True)
@@ -29,10 +29,6 @@ if device == 'cuda':
 summary(model, (3, 224, 224))
 print(model)
 '''
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-if device == 'cuda':
-    model = vgg16.to(device)
-    model = torch.nn.DataParallel(model)
 trans = []
 trans.append(transforms.Resize(size=224))
 trans.append(transforms.ToTensor())
