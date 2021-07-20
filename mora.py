@@ -25,10 +25,9 @@ def set_path(model, dataflow):
     hw_config_path = os.path.abspath(os.path.join(home_path, "hw_config.m"))
     MNSIM_path = os.path.abspath(os.path.join(home_path, "MNSIM"))
     maestro_path = os.path.abspath(os.path.join(home_path, "maestro"))
-    df = '[' + dataflow + ']'
     output_path = os.path.join(home_path, 'output/' + model)
     if os.path.exists(output_path):
-        SP.run('rm ' + df + '*.csv', cwd=output_path, shell=True)
+        SP.run('rm *.csv', cwd=output_path, shell=True)
     sys.path.append(home_path)
     sys.path.append(MNSIM_path)
     sys.path.append(maestro_path)
