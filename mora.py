@@ -19,21 +19,16 @@ import mora
 # maestro cycle/ns um2    uW    nJ   bw=KByte  glb=byte
 
 
-def set_path(model):
+def set_path(model, dataflow):
     global home_path, hw_config_path
     home_path = os.path.dirname(__file__)
     hw_config_path = os.path.abspath(os.path.join(home_path, "hw_config.m"))
     MNSIM_path = os.path.abspath(os.path.join(home_path, "MNSIM"))
     maestro_path = os.path.abspath(os.path.join(home_path, "maestro"))
-    # model_path = os.path.abspath(os.path.join(home_path, "model"))
-    # model_csv_path = os.path.join(model_path, model + '/' + model + '.csv')
-    # dla_model_csv_path = os.path.join(model_path, model + '/' + model + '-dla.csv')
-    # rram_model_csv_path = os.path.join(model_path, model + '/' + model + '-rram.csv')
-    # SP.run("cp -f {} {}".format(model_csv_path, dla_model_csv_path), shell=True)
-    # SP.run("cp -f {} {}".format(model_csv_path, rram_model_csv_path), shell=True)
+    df = '[' + dataflow + ']'
     output_path = os.path.join(home_path, 'output/' + model)
     if os.path.exists(output_path):
-        SP.run("rm *.csv", cwd=output_path, shell=True)
+        SP.run('rm ' + df + '*.csv', cwd=output_path, shell=True)
     sys.path.append(home_path)
     sys.path.append(MNSIM_path)
     sys.path.append(maestro_path)
@@ -41,7 +36,7 @@ def set_path(model):
 
 def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
-    parser.add_argument('--dataflow', type=str, default='kcp_ws')  # ykp_os, kcp_ws, xp_ws, rs
+    parser.add_argument('--dataflow', type=str, default='kcp_ws')  # ykp_os, yxp_os, kcp_ws, xp_ws, rs
     parser.add_argument('--model', type=str, default='vgg16')
     return parser
 
@@ -69,7 +64,7 @@ def max_init(hw_param_dicts):
 
 if __name__ == "__main__":
     args = set_parser().parse_args()
-    set_path(args.model)
+    set_path(args.model, args.dataflow)
     hw_param_dicts = hw_init(hw_config_path)
     max_hw_param_dicts = max_init(hw_param_dicts)
     dla = mora.HW.DLA(hw_param_dicts, args.dataflow, home_path)
@@ -78,7 +73,7 @@ if __name__ == "__main__":
     print("[mora] Init indicator.")
     dla.invoke_maestro(args.model)
     dla.export(args.model)
-    rram.invoke_MNSIM(args.model)
+    rram.invoke_MNSIM(args.model, args.dataflow)
     edp_cons = mora.api.EDP(args.model, args.dataflow, home_path)
     area_cons = mora.api.area(args.model, args.dataflow, home_path)
     mora.schedule.greedy_schedule(DLA=dla,

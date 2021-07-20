@@ -25,8 +25,8 @@ MLPD = mora_layer_param_dicts
 
 def EDP(model, df, homepath, indicator=0):
     # return {'dla': DLA.get_edp(model), 'rram': RRAM.get_edp(model)}
-    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla(' + df + ').csv'))
-    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-rram.csv'))
+    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_dla.csv'))
+    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_rram.csv'))
     if os.path.exists(dla_output_csv_path) is not True or os.path.exists(dla_output_csv_path) is not True:
         print("api.read outfile conflict.")
         raise AttributeError
@@ -39,8 +39,8 @@ def EDP(model, df, homepath, indicator=0):
 
 
 def area(model, df, homepath, indicator=0):
-    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla(' + df + ').csv'))
-    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-rram.csv'))
+    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_dla.csv'))
+    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_rram.csv'))
     if os.path.exists(dla_output_csv_path) is not True or os.path.exists(dla_output_csv_path) is not True:
         print("api.read outfile conflict.")
         raise AttributeError
@@ -56,8 +56,8 @@ def gemm(homepath, model, dataflow):
     # generate maestro model using maestro api
     model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
     maestro_model_csv_path = os.path.abspath(os.path.join(model_path, model + '.csv'))
-    maestro_model_path = os.path.abspath(os.path.join(model_path, model + '-dla_model.m'))
-    maestro_mapping_path = os.path.abspath(os.path.join(model_path, model + '-dla_' + dataflow + '.m'))
+    maestro_model_path = os.path.abspath(os.path.join(model_path, model + '_dla_model.m'))
+    maestro_mapping_path = os.path.abspath(os.path.join(model_path, model + '_dla_' + dataflow + '.m'))
 
     # csv to maestro model
     model_ndarray = pd.read_csv(maestro_model_csv_path).to_numpy()
@@ -85,7 +85,8 @@ def gemm(homepath, model, dataflow):
             if re.search(mod, model):
                 df2 += '1'
                 break
-    df2 += '2' if df2 == 'rs' else None
+    if df2 == 'rs':
+        df2 += '2'
     dataflow_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/' + df2 + '.m'))
     dpt_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/dpt' + dpt_type_dict[dataflow] + '.m'))
 
@@ -119,8 +120,8 @@ def gemmv2(model):
 
 def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     # check csv result and save them
-    edp_dse = EDP(model, homepath, indicator)
-    area_dse = area(model, homepath, indicator)
+    edp_dse = EDP(model, df, homepath, indicator)
+    area_dse = area(model, df, homepath, indicator)
     ii = (edp_dse['dla'] > EDP_cons['dla']) & (edp_dse['rram'] > EDP_cons['rram'])
     jj = (area_dse['dla'] > area_cons['dla']) & (area_dse['rram'] > area_cons['rram'])
     # TODO: advanced checking rules
@@ -128,8 +129,8 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
         DSE_checkpoint = False
     else:
         DSE_checkpoint = True
-    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-dla(' + df + ').csv'))
-    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '-rram.csv'))
+    dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_dla.csv'))
+    rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_rram.csv'))
     dla_out_pd = pd.read_csv(dla_output_csv_path)
     rram_out_pd = pd.read_csv(rram_output_csv_path)
     assert dla_out_pd.at[indicator, 'restraint'] == 'unexamined'
