@@ -35,7 +35,7 @@ def set_path(model, dataflow):
 
 def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
-    parser.add_argument('--dataflow', type=str, default='kcp_ws')  # ykp_os, yxp_os, kcp_ws, xp_ws, rs
+    parser.add_argument('--dataflow', type=str, default='rs')  # ykp_os, yxp_os, kcp_ws, xp_ws, rs
     parser.add_argument('--model', type=str, default='vgg16')
     return parser
 
@@ -82,4 +82,13 @@ if __name__ == "__main__":
                                   area_cons=area_cons,
                                   hw_param_dicts=hw_param_dicts,
                                   max_param_dicts=max_hw_param_dicts)
-    # TODO:  mora.schedule.mora_schedule(DLA=dla, RRAM=rram, model=model, EDP_cons=edp_cons, area_cons=area_cons)
+    # TODO: new schedule
+    '''
+    mora.schedule.mora_schedule(DLA=dla,
+                                RRAM=rram,
+                                model=args.model,
+                                EDP_cons=edp_cons,
+                                area_cons=area_cons,
+                                hw_param_dicts=hw_param_dicts,
+                                max_param_dicts=max_hw_param_dicts)
+    '''

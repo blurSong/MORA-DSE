@@ -115,6 +115,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
         args.model = _model
         args.tile_size = _tile_size
         args.tile_noc_bw = _tile_noc_bw
+        dataflow = _dataflow
         if _on_RRAM_layer_index:
             on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
         elif _DSE_indicator == 0:
@@ -179,7 +180,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
     # write mora csv
     output_csv_dicts['HW (t_rol,t col,  tile_bw)'] = '{} {} {}'.format(args.tile_size[0], args.tile_size[1], args.tile_noc_bw)
     output_csv_dicts['restraint'] = 'unexamined' if _DSE_indicator != 0 else 'pass'
-    output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/[' + _dataflow + ']' + args.model + '_rram.csv'))
+    output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/[' + dataflow + ']' + args.model + '_rram.csv'))
     csv = pd.DataFrame(output_csv_dicts, index=[_DSE_indicator])
     if os.path.exists(output_csv_path):
         csv.to_csv(output_csv_path, mode='a', header=False, index=False)
