@@ -19,17 +19,16 @@ class DLA(object):
 
     def set_dla(self):
         dla_dicts = {}
-        dla_dicts['pes'] = self.hw_param_dicts['dla_pes']
-        dla_dicts['glb_size'] = self.hw_param_dicts['glb_size']
-        # dla_dicts['l1_size'] = self.hw_param_dicts['dla_l1_size']
-        dla_dicts['noc_bw'] = self.hw_param_dicts['dla_noc_bw']
+        dla_dicts['pes'] = self.hw_param_dicts['pes']
+        dla_dicts['glb_size'] = self.hw_param_dicts['glb_size'] * 1024 * 1000
+        dla_dicts['noc_bw'] = self.hw_param_dicts['bw'] * 1024 * 1024
         # dla_dicts['offchip_bw'] = self.hw_param_dicts['offchip_bw']
         dla_dicts['dataflow'] = self.dataflow
         return dla_dicts
 
     def set_dse_param(self, pes, noc_bw, indicator):
         self.dla_dicts['pes'] = pes
-        self.dla_dicts['noc_bw'] = noc_bw
+        self.dla_dicts['noc_bw'] = noc_bw * 1024 * 1024
         self.DSE_indicator = indicator
 
     def invoke_maestro(self, model):
@@ -46,6 +45,7 @@ class DLA(object):
         params = [self.dla_dicts['pes'], self.dla_dicts['glb_size'], self.dla_dicts['noc_bw'], mapping_path]
         command = "./maestro --num_pes={0[0]} --l2_size_cstr={0[1]} --noc_bw_cstr={0[2]} --Mapping_file='{0[3]}' --print_res=false --print_res_csv_file=true --print_log_file=false".format(
             params)
+        print(command)
         process = SP.Popen(command, stdout=SP.PIPE, stderr=SP.PIPE, cwd=maestro_path, shell=True)
         '''
         command = [
@@ -113,10 +113,10 @@ class RRAM(object):
 
     def set_rram(self):
         rram_dicts = {}
-        rram_dicts['tile_row'] = self.hw_param_dicts['rram_tile_size']
-        rram_dicts['tile_col'] = self.hw_param_dicts['rram_tile_size']
+        rram_dicts['tile_row'] = self.hw_param_dicts['tile_size']
+        rram_dicts['tile_col'] = self.hw_param_dicts['tile_size']
         rram_dicts['glb_size'] = self.hw_param_dicts['glb_size']
-        rram_dicts['tile_bw'] = self.hw_param_dicts['rram_tile_bw']
+        rram_dicts['tile_bw'] = self.hw_param_dicts['bw']
         return rram_dicts
 
     def set_dse_param(self, row, col, tile_bw, indicator):

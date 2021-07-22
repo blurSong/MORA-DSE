@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import subprocess as SP
 import multiprocessing as MP
+from math import ceil
 import torch
 import MNSIM
 import mora.HW
@@ -16,22 +17,20 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
     homepath = RRAM.home_path
     maestro_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '_dla_' + DLA.dataflow + '.csv'))
     model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
-    shirink_num = 2.5
-    expand_num = 2
     # greedy
-    rounds = 128 * (1 - 1 / (shirink_num * expand_num)) * (max_param_dicts['tile_size'] *
-                                                           (1 - 1 / (shirink_num * expand_num)) / 2)**2 * 32 * (7 / 8) * (1 - 1 / (shirink_num * expand_num))
+    rounds = ((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) * (
+        (max_param_dicts['tile_size'] - hw_param_dicts['tile_size']) / 2)**2 * ((
+            (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
     print('[mora] Greedy DSE, Total Rounds:', int(rounds))
-    assert rounds <= 114514 * 1.810
+    assert rounds <= 114514, 'too many dse rounds.'
     DSE_indicator = 1
-    for pes in range(int(hw_param_dicts['dla_pes'] / shirink_num), max_param_dicts['pes'], int(max_param_dicts['pes'] / 128)):
-        for rts_r in range(int(hw_param_dicts['rram_tile_size'] / shirink_num), max_param_dicts['tile_size'], 2):
-            for rts_c in range(int(hw_param_dicts['rram_tile_size'] / shirink_num), max_param_dicts['tile_size'], 2):
-                for dbw in range(int(hw_param_dicts['dla_noc_bw'] / (shirink_num * 1024 * 1024)), int(max_param_dicts['bw'] * 7 / 8),
-                                 int(max_param_dicts['bw'] / 32)):  # Kbyte to GB
+    for pes in range(hw_param_dicts['pes'], max_param_dicts['pes'], int(max_param_dicts['pes'] / 128)):
+        for rts_r in range(hw_param_dicts['tile_size'], max_param_dicts['tile_size'], 2):
+            for rts_c in range(hw_param_dicts['tile_size'], max_param_dicts['tile_size'], 2):
+                for dbw in range(hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 7 / 8), ceil(max_param_dicts['bw'] / 32)):
                     rbw = max_param_dicts['bw'] - dbw
                     print('[mora] Start DSE', DSE_indicator)
-                    DLA.set_dse_param(pes, dbw * 1024 * 1024, DSE_indicator)
+                    DLA.set_dse_param(pes, dbw, DSE_indicator)
                     RRAM.set_dse_param(rts_r, rts_c, rbw, DSE_indicator)
                     # run 0: all on dla
                     DLA.invoke_maestro(model)

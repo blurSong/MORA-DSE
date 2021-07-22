@@ -17,6 +17,7 @@ import mora
 
 # MNSIM    ns      um2    W    nJ    bw=GByte
 # maestro cycle/ns um2    uW    nJ   bw=KByte  glb=byte
+# HW       L2 MiB    NOC GB/s
 
 
 def set_path(model, dataflow):
@@ -35,8 +36,9 @@ def set_path(model, dataflow):
 
 def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
-    parser.add_argument('--dataflow', type=str, default='rs')  # ykp_os, yxp_os, kcp_ws, xp_ws, rs
+    parser.add_argument('--dataflow', type=str, default='kcp_ws', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
     parser.add_argument('--model', type=str, default='vgg16')
+    parser.add_argument('--scenario', type=str, default='edge', choices=['edge', 'mobile', 'cloud'])  #puma
     return parser
 
 
@@ -52,12 +54,33 @@ def hw_init(hw_config_path):
     return hw_dicts
 
 
-def max_init(hw_param_dicts):
-    expand_num = 2
+def set_hw_range(scenario):
+    if scenario == 'edge':
+        mpes = 1024
+        mtile_size = 12
+        mglb_size = 6  # MiB
+        mbw = 16  # GB/s
+    elif scenario == 'mobile':
+        mpes = 4096
+        mtile_size = 24
+        mglb_size = 10
+        mbw = 64
+    else:
+        mpes = 16384
+        mtile_size = 64
+        mglb_size = 20
+        mbw = 256
     max_hw_param_dicts = {}
+    '''
+    expand_num = 2
     max_hw_param_dicts['pes'] = hw_param_dicts['dla_pes'] * expand_num
     max_hw_param_dicts['tile_size'] = hw_param_dicts['rram_tile_size'] * expand_num
-    max_hw_param_dicts['bw'] = (int(hw_param_dicts['dla_noc_bw'] / (1024 * 1024)) + hw_param_dicts['rram_tile_bw'])  # byte to GB
+    max_hw_param_dicts['bw'] = (int(hw_param_dicts['dla_noc_bw'] / (1024 * 1024)) + hw_param_dicts['rram_tile_bw'])
+    '''
+    max_hw_param_dicts['pes'] = mpes
+    max_hw_param_dicts['tile_size'] = mtile_size
+    max_hw_param_dicts['glb_size'] = mglb_size
+    max_hw_param_dicts['bw'] = mbw
     return max_hw_param_dicts
 
 
@@ -65,9 +88,9 @@ if __name__ == "__main__":
     args = set_parser().parse_args()
     set_path(args.model, args.dataflow)
     hw_param_dicts = hw_init(hw_config_path)
-    max_hw_param_dicts = max_init(hw_param_dicts)
-    dla = mora.HW.DLA(hw_param_dicts, args.dataflow, home_path)
-    rram = mora.HW.RRAM(hw_param_dicts, home_path)
+    max_hw_param_dicts = set_hw_range(args.scenario)
+    dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
+    rram = mora.HW.RRAM(max_hw_param_dicts, home_path)
     mora.api.gemm(home_path, args.model, args.dataflow)
     print("[mora] Init indicator.")
     dla.invoke_maestro(args.model)
