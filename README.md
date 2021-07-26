@@ -36,5 +36,5 @@ mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: 
 5. Add the workspace folder to PYTHONPATH and run mora
 ```
 export PYTHONPATH=$PYTHONPATH:$YourMoraPath
-python mora.py --dataflow dataflow_name --model model_name
+python mora.py --dataflow dataflow_name --model model_name --scenario scenario_str
 ```

@@ -18,15 +18,15 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
     maestro_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '_dla_' + DLA.dataflow + '.csv'))
     model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
     # greedy
-    rounds = ((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) * (
-        (max_param_dicts['tile_size'] - hw_param_dicts['tile_size']) / 2)**2 * ((
+    rounds = (int((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) + 1) * ((
+        (max_param_dicts['tile_size'] - hw_param_dicts['tile_size']) / 2) + 1)**2 * ((
             (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
     print('[mora] Greedy DSE, Total Rounds:', int(rounds))
     assert rounds <= 114514, 'too many dse rounds.'
     DSE_indicator = 1
-    for pes in range(hw_param_dicts['pes'], max_param_dicts['pes'], int(max_param_dicts['pes'] / 128)):
-        for rts_r in range(hw_param_dicts['tile_size'], max_param_dicts['tile_size'], 2):
-            for rts_c in range(hw_param_dicts['tile_size'], max_param_dicts['tile_size'], 2):
+    for pes in range(hw_param_dicts['pes'], max_param_dicts['pes'] + 4, int(max_param_dicts['pes'] / 128)):
+        for rts_r in range(hw_param_dicts['tile_size'], max_param_dicts['tile_size'] + 2, 2):
+            for rts_c in range(hw_param_dicts['tile_size'], max_param_dicts['tile_size'] + 2, 2):
                 for dbw in range(hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 7 / 8), ceil(max_param_dicts['bw'] / 32)):
                     rbw = max_param_dicts['bw'] - dbw
                     print('[mora] Start DSE', DSE_indicator)

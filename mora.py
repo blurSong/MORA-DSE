@@ -38,7 +38,7 @@ def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
     parser.add_argument('--dataflow', type=str, default='kcp_ws', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
     parser.add_argument('--model', type=str, default='vgg16')
-    parser.add_argument('--scenario', type=str, default='edge', choices=['edge', 'mobile', 'cloud'])  #puma
+    parser.add_argument('--scenario', type=str, default='edge', choices=['edge', 'mobile', 'cloud'])  # see puma and maes
     return parser
 
 
@@ -65,7 +65,7 @@ def set_hw_range(scenario):
         mtile_size = 24
         mglb_size = 10
         mbw = 64
-    else:
+    elif scenario == 'cloud':
         mpes = 16384
         mtile_size = 64
         mglb_size = 20
