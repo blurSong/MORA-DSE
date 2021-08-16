@@ -74,7 +74,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
     parser.add_argument("-DisPipe",
                         "--disable_inner_pipeline",
                         action='store_true',
-                        default=False,
+                        default=True,
                         help="Disable inner layer pipeline in latency modeling, default: false")
     parser.add_argument("-D", "--device", default=1, help="Determine hardware device for simulation, default: CPU")
     parser.add_argument("-DisModOut",
@@ -139,7 +139,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
                                          tile_size=args.tile_size)
     structure_file = __TestInterface.get_structure()
     on_RRAM_layer_index2 = __TestInterface.on_RRAM_layer_index2
-    TCG_mapping = TCG(structure_file, args.hardware_description)
+    TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline)
 
     if not (args.disable_hardware_modeling):
         __latency = Model_latency(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping, tile_noc_bw=args.tile_noc_bw)

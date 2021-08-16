@@ -1,3 +1,3 @@
-num_pes: 256
-l2_size_cstr: 1024000
-noc_bw_cstr: 2147483649
+num_pes: 264
+l2_size_cstr: 6144000
+noc_bw_cstr: 9437184
