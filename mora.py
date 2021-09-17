@@ -92,6 +92,8 @@ if __name__ == "__main__":
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(max_hw_param_dicts, home_path)
     mora.api.gemm(home_path, args.model, args.dataflow)
+    # TODO: new workload
+
     print("[mora] Init indicator.")
     dla.invoke_maestro(args.model)
     dla.export(args.model)

@@ -26,15 +26,19 @@ mora_layer_param_dicts = {
     'T': 'layer_type',
     'R': 'relu_or_relu&pooling',
     'A': 'appending index'
-}  # RP = 0:no relu, 1:relu, 2~:relu and pooling (kernel size)  A = (default 0) conv: input index / fc: is it the first fc layer 
+}  
+# R = 0:no relu/ 1:relu/ >2:relu and pooling (kernel size)  
+# A = (default 0) conv: input index/ fc: is it the first fc layer 
 
 ```
 ```
-mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: "TRCONV", 5: "NGCONV"}  # DWCONV Residual is DSCONV on maestro
+mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: "TRCONV", 5: "NGCONV"}  
+# DWCONV Residual is DSCONV on maestro
+scenario = {edge, mobile, cloud}
 ```
 4. Edit the hw_config.m to init the DSE
 5. Add the workspace folder to PYTHONPATH and run mora
 ```
-export PYTHONPATH=$PYTHONPATH:$YourMoraPath
-python mora.py --dataflow dataflow_name --model model_name --scenario scenario_str
+export PYTHONPATH=$PYTHONPATH:$MORAPATH
+python mora.py --dataflow dataflow_name --model model_name --scenario scenario_name
 ```
