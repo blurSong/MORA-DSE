@@ -5,6 +5,7 @@
   
   maestro forked from https://github.com/maestro-project/maestro
 
+
 ## build
 1. clone the repositories.  
 ```
@@ -34,11 +35,11 @@ mora_layer_param_dicts = {
 ```
 mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: "TRCONV", 5: "NGCONV"}  
 # DWCONV Residual is DSCONV on maestro
-scenario = {edge, mobile, cloud}
+scenario = {embedded, edge, cloud}
 ```
 4. Edit the hw_config.m to init the DSE
 5. Add the workspace folder to PYTHONPATH and run mora
 ```
 export PYTHONPATH=$PYTHONPATH:$MORAPATH
-python mora.py --dataflow dataflow_name --model model_name --scenario scenario_name
+python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
 ```

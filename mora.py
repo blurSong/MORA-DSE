@@ -55,12 +55,12 @@ def hw_init(hw_config_path):
 
 
 def set_hw_range(scenario):
-    if scenario == 'edge':
+    if scenario == 'embedded':
         mpes = 1024
         mtile_size = 12
         mglb_size = 6  # MiB
         mbw = 16  # GB/s
-    elif scenario == 'mobile':
+    elif scenario == 'edge':
         mpes = 4096
         mtile_size = 24
         mglb_size = 10
