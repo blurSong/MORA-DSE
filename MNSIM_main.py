@@ -112,6 +112,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
     else:
         print("Quantization range: dynamic range (depends on the data distribution)")
     '''
+
     if __name__ != '__main__':
         args.model = _model
         args.tile_size = _tile_size

@@ -71,3 +71,11 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                     DSE_indicator += 1
     print("[mora] DSE finish.")
     return
+
+
+def preference_based_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
+    return
+
+
+def advanced_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
+    return
