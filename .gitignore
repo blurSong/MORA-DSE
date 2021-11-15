@@ -1,0 +1,12 @@
+__pycache__/
+MNSIM/__pycache__/
+MNSIM/Accuracy_Model/__pycache__/
+MNSIM/Area_Model/__pycache__/
+MNSIM/Energy_Model/__pycache__/
+MNSIM/Hardware_Model/__pycache__/
+MNSIM/Interface/__pycache__/
+MNSIM/Latency_Model/__pycache__/
+MNSIM/Mapping_Model/__pycache__/
+MNSIM/NoC/__pycache__/
+MNSIM/Power_Model/__pycache__/
+mora/__pycache__/
