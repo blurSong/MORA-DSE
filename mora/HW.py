@@ -80,7 +80,7 @@ class DLA(object):
                 return
             output_csv_dicts['DSE index'] = self.DSE_indicator
             output_csv_dicts['layers'] = len(on_DLA_layer_index)
-            output_csv_dicts['latency'] = runtime_nd.sum()
+            output_csv_dicts['latency'] = runtime_nd.sum() * (1000 / 800)
             output_csv_dicts['energy'] = energy_nd.sum()
             output_csv_dicts['area'] = area
             output_csv_dicts['power'] = power_nd.mean()  # wrong

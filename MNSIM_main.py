@@ -180,7 +180,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
             print("PIM-based computing accuracy:", __TestInterface.set_net_bits_evaluate(weight_2, adc_action='FIX'))
 
     # write mora csv
-    output_csv_dicts['HW (t_rol,t col,  tile_bw)'] = '{} {} {}'.format(args.tile_size[0], args.tile_size[1], args.tile_noc_bw)
+    output_csv_dicts['HW (t_rol,t_col,  tile_bw)'] = '{} {} {}'.format(args.tile_size[0], args.tile_size[1], args.tile_noc_bw)
     output_csv_dicts['restraint'] = 'unexamined' if _DSE_indicator != 0 else 'pass'
     output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/[' + args.dataflow + ']' + args.model + '_rram.csv'))
     csv = pd.DataFrame(output_csv_dicts, index=[_DSE_indicator])
