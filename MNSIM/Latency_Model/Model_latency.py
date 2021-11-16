@@ -812,7 +812,7 @@ class Model_latency():
                                 self.total_digital_latency[lyr] + self.total_intra_tile_latency[lyr] + \
                                 self.total_inter_tile_latency[lyr]
                 mora_latency += total_latency
-        print("RRAM Latency:", mora_latency, '(', latancy, ") ns")
+        print("RRAM Latency:", mora_latency, '(MNSIM latancy ', latancy, ") ns")
         # return latancy
         return mora_latency
 

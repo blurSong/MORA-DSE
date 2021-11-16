@@ -2,6 +2,7 @@ import copy
 import os
 import sys
 import numpy as np
+from enum import Enum
 import pandas as pd
 import subprocess as SP
 import multiprocessing as MP
@@ -149,3 +150,28 @@ class RRAM(object):
             print('MNSIM invoke fatal.')
             raise FileNotFoundError
         return
+
+
+class Direction(Enum):
+    NOTRANS = 0
+    DLA2DLA = 1
+    RRAM2RRAM = 2
+    DLA2RRAM = 3
+    RRAM2DLA = 4
+
+
+class SMU(object):
+    def __init__(self, home_path) -> None:
+        super(SMU, self).__init__()
+        self.homepath = home_path
+        self.dlatype = 'kcp_ws'
+        self.layeridx = 0
+        self.direction = Direction.NOTRANS
+
+    def get_info(self, layeridx, direction, dla_type):
+        self.layeridx = layeridx
+        self.direction = direction
+        self.dlatype = dla_type
+
+    def SMU_stall(self):  #based on maestro
+
