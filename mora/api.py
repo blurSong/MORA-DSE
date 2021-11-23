@@ -16,7 +16,9 @@ mora_layer_param_dicts = {
     'T': 'layer_type',
     'R': 'relu_or_relu&pooling',
     'A': 'appending_index'
-}  # RP = 0:no relu, 1:relu, 2~:relu and pooling (kernel size)  A = (default 0) conv input index / fc is first layer for MNSIM
+}
+# R = 0:no relu, 1:relu, 2以上:有relu,填pooling 的 kernel size
+# A = (default 0) 如果是残差： input index ( 一个是-1， 一个是另一个之前层的index) / 如果是fc： 是不是first layer for MNSIM （是=1， 不是=0）
 
 MLTRD = maestro_layer_type_ref_dicts
 MLTD = mora_layer_type_dicts
@@ -114,7 +116,7 @@ def gemm(homepath, model, dataflow):
 
 
 def gemmv2(model):
-    # TODO: generate maestro model with using maestro orginal define
+    # TODO: generate maestro model with using maestro orginal def
     return
 
 
@@ -140,11 +142,11 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     if DSE_checkpoint is False:
         dla_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_out_pd.at[indicator, 'restraint'] = 'fail'
-        print('dse checkpoint fail.')
+        print('dse checkpoint failed.')
     else:
         dla_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_out_pd.at[indicator, 'restraint'] = 'pass'
-        print('dse checkpoint pass.')
+        print('dse checkpoint passed.')
     dla_out_pd.to_csv(dla_output_csv_path, index=False)
     rram_out_pd.to_csv(rram_output_csv_path, index=False)
     return

@@ -4,6 +4,7 @@ import sys
 import numpy as np
 from enum import Enum
 import pandas as pd
+import configparser as cp
 import subprocess as SP
 import multiprocessing as MP
 from importlib import import_module
@@ -127,7 +128,10 @@ class RRAM(object):
         self.DSE_indicator = indicator
 
     def get_memory_capacity(self):
-        return self.rram_dicts['tile_row'] * self.rram_dicts['tile_col'] * 16 * 8 * 2 * 128**2 * 2  # bit
+        configer = cp.ConfigParser()
+        configer.read(self.rram_config_path, encoding='UTF-8')
+        xbar_polarity = int(configer.get('Process element level', 'Xbar_Polarity'))
+        return self.rram_dicts['tile_row'] * self.rram_dicts['tile_col'] * 16 * 8 * xbar_polarity * 128**2 * 2  # bits
 
     def invoke_MNSIM(self, model, dataflow, on_RRAM_layer_index=[]):
         output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/[' + dataflow + ']' + model + '_rram.csv'))
