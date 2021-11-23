@@ -28,8 +28,10 @@ mora_layer_param_dicts = {
     'R': 'relu_or_relu&pooling',
     'A': 'appending index'
 }  
-# R = 0:no relu/ 1:relu/ >2:relu and pooling (kernel size)  
-# A = (default 0) conv: input index/ fc: is it the first fc layer 
+# R = 0: no relu     1: relu but no pooling      2 and above: pooling kernel size
+# A = for conv layer： default 0 
+#     for residual layer： residual input index ( one is -1， the other is the pre layer index) 
+      for fc layer ： whether it is the first fc layer （yes=1， no=0）
 
 ```
 ```
