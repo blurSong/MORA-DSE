@@ -3,22 +3,41 @@ import re
 import sys
 import numpy as np
 import pandas as pd
+from torch.nn.modules import batchnorm
 # from mod2map import mod2map
 
 maestro_layer_type_ref_dicts = {"Linear": "CONV", "CONV": "CONV", "DWCONV": "DSCONV", "Residual": "DSCONV", "TRCONV": "TRCONV", "NGCONV": "NGCONV"}
-mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: "TRCONV", 5: "NGCONV"}  # DWCONV Residual is DSCONV on maestro
+mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: "Batchnorm", 5: "TRCONV", 6: "NGCONV"}  # DWCONV is DSCONV on maestro
 mora_layer_param_dicts = {
-    'O': 'output_channel',
-    'I': 'input_channel',
-    'F': 'feature_size',
-    'K': 'kernel_size',
-    'S': 'stride',
-    'T': 'layer_type',
-    'R': 'relu_or_relu&pooling',
-    'A': 'appending_index'
+    'IC': 'input_channel',
+    'OC': 'output_channel',
+    'FS': 'feature_size',
+    'KS': 'kernel_size',
+    'STD': 'stride',
+    'TYP': 'layer_type',
+    'RP': 'relu_or_relu&pooling',
+    'APD': 'appending_index',
 }
-# R = 0:no relu, 1:relu, 2以上:有relu,填pooling 的 kernel size
-# A = (default 0) 如果是残差： input index ( 一个是-1， 一个是另一个之前层的index) / 如果是fc： 是不是first layer for MNSIM （是=1， 不是=0）
+# ====================================== mora ====================================================================
+# 1. define the layer type TYP using mora_layer_type_dicts
+#     fix on 11.24: just fill in the string "Linear""CONV" DWCONV""Residual""Batchnorm""TRCONV""NGCONV"
+# 2. HOW TO FILL PARAMS [IC OC FS KS STD]
+#           CONV : fill all
+#           Linear  : fill IC OC
+#           DWCONV  : fill all (Do make sure IC = OC)
+#           Residual : fill IC (Do note that res layers wonnt be shown in pytorch print models）
+#           Batchnorm ： fill IC OC FS (Do make sure IC = OC)
+#           TRCONV / NGCONV : TODO
+# 3. HOW TO FILL RP AND APD
+#           RP
+#                   0 : no relu OR not conv linear layers
+#                   1 : relu but no pooling
+#                   2 and above : relu and pooling, fill the pooling kernel size
+#           APD
+#                   for residual layer ： residual input index (one is -1， the other is the pre layer index) for MNSIM
+#                   for fc layer ： whether it is the first fc layer （yes=1， no=0） for MNSIM
+#                   for other layers : default 0
+# ==================================================================================================================
 
 MLTRD = maestro_layer_type_ref_dicts
 MLTD = mora_layer_type_dicts
