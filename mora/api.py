@@ -27,6 +27,7 @@ mora_layer_param_dicts = {
 #           DWCONV  : fill all (Do make sure IC = OC)
 #           Residual : fill IC (Do note that res layers wonnt be shown in pytorch print models）
 #           Batchnorm ： fill IC OC FS (Do make sure IC = OC)
+#           PWCONV : use 1x1 CONV
 #           TRCONV / NGCONV : TODO
 # 3. HOW TO FILL RP AND APD
 #           RP
@@ -37,6 +38,7 @@ mora_layer_param_dicts = {
 #                   for residual layer ： residual input index (one is -1， the other is the pre layer index) for MNSIM
 #                   for fc layer ： whether it is the first fc layer （yes=1， no=0） for MNSIM
 #                   for other layers : default 0
+# 4. leave all other params blanks ： 0 or NaN
 # ==================================================================================================================
 
 MLTRD = maestro_layer_type_ref_dicts
