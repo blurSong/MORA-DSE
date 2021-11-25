@@ -40,6 +40,7 @@ mora_layer_type_dicts = {
     7: "VDP",
     8: "VADD"
 }  # DWCONV is DSCONV for maestro
+
 # ====================================== mora ====================================================================
 # 0. model csv name: model_mora.csv
 #
