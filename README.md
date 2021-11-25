@@ -17,6 +17,7 @@ cd maestro
 scons
 ```
 3. provide original DNN .csv file on the /model folder, the csv index and DF value should be like: 
+   
 ```
 mora_layer_param_dicts = {
     'IC': 'input_channel',
@@ -28,8 +29,20 @@ mora_layer_param_dicts = {
     'RP': 'relu_or_relu&pooling',
     'APD': 'appending_index',
 }
+mora_layer_type_dicts = {
+    0: "Linear",
+    1: "CONV",
+    2: "DWCONV",
+    3: "Residual",
+    4: "Batchnorm",
+    5: "TRCONV",
+    6: "NGCONV",
+    7: "VDP",
+    8: "VADD"
+}  # DWCONV is DSCONV for maestro
 # ====================================== mora ====================================================================
 # 0. model csv name: model_mora.csv
+#
 # 1. define the layer type TYP using mora_layer_type_dicts
 #
 # 2. HOW TO FILL PARAMS [IC OC FS KS STR]
@@ -55,18 +68,6 @@ mora_layer_param_dicts = {
 
 ```
 ```
-mora_layer_type_dicts = {
-    0: "Linear",
-    1: "CONV",
-    2: "DWCONV",
-    3: "Residual",
-    4: "Batchnorm",
-    5: "TRCONV",
-    6: "NGCONV",
-    7: "VDP",
-    8: "VADD"
-}  # DWCONV is DSCONV for maestro
-
 scenario = {embedded, edge, cloud}
 ```
 4. Edit the hw_config.m to init the DSE
