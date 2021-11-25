@@ -29,7 +29,7 @@ mora_layer_param_dicts = {
     'APD': 'appending_index',
 }
 # ====================================== mora ====================================================================
-#                                                                                  model csv name: model_mora.csv
+# 0. model csv name: model_mora.csv
 # 1. define the layer type TYP using mora_layer_type_dicts
 #
 # 2. HOW TO FILL PARAMS [IC OC FS KS STR]
@@ -37,7 +37,7 @@ mora_layer_param_dicts = {
 #           Linear  : fill IC OC, keep FS KS STR = 1
 #           DWCONV  : fill all (Do make sure IC = OC)
 #           Residual : fill IC FS, keep KS OC STR = 1 (OC must be 1 for maestro)
-#                      (Do note that res layers wonnt be shown in pytorch print models）
+#                      (Do note that res layers wonnt be shown in pytorch print models)
 #           Batchnorm ： fill IC OC FS, keep KS STR =1 (Do make sure IC = OC)
 #           PWCONV : use 1x1 CONV
 #           TRCONV / NGCONV : TODO
@@ -48,15 +48,25 @@ mora_layer_param_dicts = {
 #                   2 and above : relu and pooling, fill the pooling kernel size
 #           APD
 #                   for residual layer ： residual input index (one is -1， the other is the pre layer index) for MNSIM
-#                   for fc layer ： whether it is the first fc layer （yes=1， no=0） for MNSIM
+#                   for fc layer ： whether it is the first fc layer (yes=1， no=0) for MNSIM
 #                   for other layers : default 0
 # 4. leave all other param blanks ： 0 or NaN
 # ==================================================================================================================
 
 ```
 ```
-mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: "Batchnorm", 5: "TRCONV", 6: "NGCONV"}  # DWCONV is DSCONV on maestro
-# DWCONV Residual is DSCONV on maestro
+mora_layer_type_dicts = {
+    0: "Linear",
+    1: "CONV",
+    2: "DWCONV",
+    3: "Residual",
+    4: "Batchnorm",
+    5: "TRCONV",
+    6: "NGCONV",
+    7: "VDP",
+    8: "VADD"
+}  # DWCONV is DSCONV for maestro
+
 scenario = {embedded, edge, cloud}
 ```
 4. Edit the hw_config.m to init the DSE
