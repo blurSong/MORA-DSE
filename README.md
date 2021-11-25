@@ -23,20 +23,22 @@ mora_layer_param_dicts = {
     'OC': 'output_channel',
     'FS': 'feature_size',
     'KS': 'kernel_size',
-    'STD': 'stride',
+    'STR': 'stride',
     'TYP': 'layer_type',
     'RP': 'relu_or_relu&pooling',
     'APD': 'appending_index',
 }
 # ====================================== mora ====================================================================
+#                                                                                  model csv name: model_mora.csv
 # 1. define the layer type TYP using mora_layer_type_dicts
-#     fix on 11.24: just fill in the string "Linear""CONV" DWCONV""Residual""Batchnorm""TRCONV""NGCONV"
-# 2. HOW TO FILL PARAMS [IC OC FS KS STD]
+#
+# 2. HOW TO FILL PARAMS [IC OC FS KS STR]
 #           CONV : fill all
-#           Linear  : fill IC OC
+#           Linear  : fill IC OC, keep FS KS STR = 1
 #           DWCONV  : fill all (Do make sure IC = OC)
-#           Residual : fill IC (Do note that res layers wonnt be shown in pytorch print models）
-#           Batchnorm ： fill IC OC FS (Do make sure IC = OC)
+#           Residual : fill IC FS, keep KS OC STR = 1 (OC must be 1 for maestro)
+#                      (Do note that res layers wonnt be shown in pytorch print models）
+#           Batchnorm ： fill IC OC FS, keep KS STR =1 (Do make sure IC = OC)
 #           PWCONV : use 1x1 CONV
 #           TRCONV / NGCONV : TODO
 # 3. HOW TO FILL RP AND APD
@@ -48,7 +50,7 @@ mora_layer_param_dicts = {
 #                   for residual layer ： residual input index (one is -1， the other is the pre layer index) for MNSIM
 #                   for fc layer ： whether it is the first fc layer （yes=1， no=0） for MNSIM
 #                   for other layers : default 0
-# 4. leave all other params blanks ： 0 or NaN
+# 4. leave all other param blanks ： 0 or NaN
 # ==================================================================================================================
 
 ```

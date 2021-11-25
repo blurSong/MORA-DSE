@@ -91,6 +91,7 @@ if __name__ == "__main__":
     max_hw_param_dicts = set_hw_range(args.scenario)
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(max_hw_param_dicts, home_path)
+    mora.api.remove_csv_bn(home_path, args.model)
     mora.api.gemm(home_path, args.model, args.dataflow)
     # TODO: new workload
 

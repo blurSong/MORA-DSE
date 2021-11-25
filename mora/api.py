@@ -3,30 +3,50 @@ import re
 import sys
 import numpy as np
 import pandas as pd
-from torch.nn.modules import batchnorm
 # from mod2map import mod2map
 
-maestro_layer_type_ref_dicts = {"Linear": "CONV", "CONV": "CONV", "DWCONV": "DSCONV", "Residual": "DSCONV", "TRCONV": "TRCONV", "NGCONV": "NGCONV"}
-mora_layer_type_dicts = {0: "Linear", 1: "CONV", 2: "DWCONV", 3: "Residual", 4: "Batchnorm", 5: "TRCONV", 6: "NGCONV"}  # DWCONV is DSCONV on maestro
+maestro_layer_type_ref_dicts = {
+    "Linear": "CONV",
+    "CONV": "CONV",
+    "DWCONV": "DSCONV",
+    "Residual": "DSCONV",
+    "TRCONV": "TRCONV",
+    "NGCONV": "NGCONV",
+    "VDP": "CONV",
+    "VADD": "DSCONV"
+}
+mora_layer_type_dicts = {
+    0: "Linear",
+    1: "CONV",
+    2: "DWCONV",
+    3: "Residual",
+    4: "Batchnorm",
+    5: "TRCONV",
+    6: "NGCONV",
+    7: "VDP",
+    8: "VADD"
+}  # DWCONV is DSCONV for maestro
 mora_layer_param_dicts = {
     'IC': 'input_channel',
     'OC': 'output_channel',
     'FS': 'feature_size',
     'KS': 'kernel_size',
-    'STD': 'stride',
+    'STR': 'stride',
     'TYP': 'layer_type',
     'RP': 'relu_or_relu&pooling',
     'APD': 'appending_index',
 }
 # ====================================== mora ====================================================================
+# model csv name: model_mora.csv
 # 1. define the layer type TYP using mora_layer_type_dicts
-#     fix on 11.24: just fill in the string "Linear""CONV" DWCONV""Residual""Batchnorm""TRCONV""NGCONV"
-# 2. HOW TO FILL PARAMS [IC OC FS KS STD]
+#
+# 2. HOW TO FILL PARAMS [IC OC FS KS STR]
 #           CONV : fill all
-#           Linear  : fill IC OC
+#           Linear  : fill IC OC, keep FS KS STR = 1
 #           DWCONV  : fill all (Do make sure IC = OC)
-#           Residual : fill IC (Do note that res layers wonnt be shown in pytorch print models）
-#           Batchnorm ： fill IC OC FS (Do make sure IC = OC)
+#           Residual : fill IC FS, keep KS OC STR = 1 (OC must be 1 for maestro)
+#                      (Do note that res layers wonnt be shown in pytorch print models）
+#           Batchnorm ： fill IC OC FS, keep KS STR =1 (Do make sure IC = OC)
 #           PWCONV : use 1x1 CONV
 #           TRCONV / NGCONV : TODO
 # 3. HOW TO FILL RP AND APD
@@ -38,7 +58,7 @@ mora_layer_param_dicts = {
 #                   for residual layer ： residual input index (one is -1， the other is the pre layer index) for MNSIM
 #                   for fc layer ： whether it is the first fc layer （yes=1， no=0） for MNSIM
 #                   for other layers : default 0
-# 4. leave all other params blanks ： 0 or NaN
+# 4. leave all other param blanks ： 0 or NaN
 # ==================================================================================================================
 
 MLTRD = maestro_layer_type_ref_dicts
@@ -75,6 +95,16 @@ def area(model, df, homepath, indicator=0):
     return {'dla': dla_area, 'rram': rram_area}
 
 
+def remove_csv_bn(homepath, model):
+    model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
+    model_csv_path = os.path.abspath(os.path.join(model_path, model + '_mora.csv'))
+    model_csv_path_nobn = os.path.abspath(os.path.join(model_path, model + '.csv'))
+    model_df = pd.read_csv(model_csv_path)
+    model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
+    model_df.to_csv(model_csv_path_nobn)
+    return
+
+
 def gemm(homepath, model, dataflow):
     # generate maestro model using maestro api
     model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
@@ -89,7 +119,8 @@ def gemm(homepath, model, dataflow):
         fo.write("Network {} {{\n".format(model))
         for line in range(model_layer_num):
             layer = model_ndarray[line, ...]
-            KCRSYX = [layer[0], layer[1], layer[3], layer[3], layer[2], layer[2]]
+            assert layer[5] != 4  # check bn at gemm
+            KCRSYX = [layer[1], layer[0], layer[3], layer[3], layer[2], layer[2]]
             fo.write("Layer L{} {{\n".format(line))
             fo.write("Type: {} \n".format(MLTRD[MLTD[layer[5]]]))
             fo.write("Stride {{ X: {}, Y: {} }}\n".format(layer[4], layer[4]))
@@ -101,10 +132,10 @@ def gemm(homepath, model, dataflow):
     # maestro model to meastro mapping model
     # ykp_os, yxp_os, kcp_ws, xp_ws, rs
     dpt_type_dict = {'ykp_os': '3', 'yxp_os': '3', 'kcp_ws': '1', 'xp_ws': '2', 'rs': '1'}
-    rs1_tpye_list = ['resnet', 'resnext', 'unet', 'vgg']
+    rs1_type_list = ['resnet', 'resnext', 'unet', 'vgg']
     df2 = dataflow
     if df2 == 'rs':
-        for mod in rs1_tpye_list:
+        for mod in rs1_type_list:
             if re.search(mod, model):
                 df2 += '1'
                 break

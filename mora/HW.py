@@ -78,7 +78,7 @@ class DLA(object):
             power_nd = maestro_result_df[' Power'].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
             l2_size_nd = maestro_result_df["  L2 SRAM Size Req (Bytes)"].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
             if np.median(l2_size_nd) > self.dla_dicts['glb_size']:
-                print('maestro glb size exeed.')
+                print('maestro glb size exceed.')
                 return
             output_csv_dicts['DSE index'] = self.DSE_indicator
             output_csv_dicts['layers'] = len(on_DLA_layer_index)
