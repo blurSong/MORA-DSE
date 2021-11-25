@@ -6,7 +6,7 @@
   maestro forked from https://github.com/maestro-project/maestro
 
 
-## build
+## run DSE
 1. clone the repositories.  
 ```
 git clone https://github.com/blurSong/Mora.git
@@ -77,3 +77,4 @@ scenario = {embedded, edge, cloud}
 export PYTHONPATH=$PYTHONPATH:$MORAPATH
 python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
 ```
+# LINK
