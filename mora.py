@@ -95,7 +95,7 @@ if __name__ == "__main__":
     mora.api.gemm(home_path, args.model, args.dataflow)
     # TODO: new workload
 
-    print("[mora] Init indicator.")
+    print("[mora] init indicator.")
     dla.invoke_maestro(args.model)
     dla.export(args.model)
     rram.invoke_MNSIM(args.model, args.dataflow)
@@ -109,12 +109,11 @@ if __name__ == "__main__":
                                   hw_param_dicts=hw_param_dicts,
                                   max_param_dicts=max_hw_param_dicts)
     # TODO: new schedule
-    '''
-    mora.schedule.mora_schedule(DLA=dla,
+
+    mora.schedule.fifo_schedule(DLA=dla,
                                 RRAM=rram,
                                 model=args.model,
                                 EDP_cons=edp_cons,
                                 area_cons=area_cons,
                                 hw_param_dicts=hw_param_dicts,
                                 max_param_dicts=max_hw_param_dicts)
-    '''

@@ -176,9 +176,10 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     # check csv result and save them
     edp_dse = EDP(model, df, homepath, indicator)
     area_dse = area(model, df, homepath, indicator)
-    ii = (edp_dse['dla'] > EDP_cons['dla'] * 0.75) & (edp_dse['rram'] > EDP_cons['rram'] * 0.75)
-    jj = (area_dse['dla'] > area_cons['dla'] * 0.75) & (area_dse['rram'] > area_cons['rram'] * 0.75)
-    # TODO: advanced checking rules
+    # ii = (edp_dse['dla'] > EDP_cons['dla'] * 0.75) & (edp_dse['rram'] > EDP_cons['rram'] * 0.75)
+    # jj = (area_dse['dla'] > area_cons['dla'] * 0.75) & (area_dse['rram'] > area_cons['rram'] * 0.75)
+    ii = (edp_dse['dla'] + edp_dse['rram']) > (EDP_cons['dla'] + EDP_cons['rram']) * 0.75
+    jj = (area_dse['dla'] + area_dse['rram']) > (area_cons['dla'] + area_cons['rram']) * 0.75
     if edp_dse['dla'] == 0 or area_dse['dla'] == 0:
         DSE_checkpoint = False
     elif ii | jj:
