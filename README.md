@@ -61,6 +61,7 @@ mora_layer_type_dicts = {
 #                   1 : relu but no pooling
 #                   2 and above : relu and pooling, fill the pooling kernel size
 #           APD
+#                   for concat layer : concated layers index (one is -1， the other is the pre layer index)
 #                   for residual layer ： residual input index (one is -1， the other is the pre layer index) for MNSIM
 #                   for fc layer ： whether it is the first fc layer (yes=1， no=0) for MNSIM
 #                   for other layers : default 0
