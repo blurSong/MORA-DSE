@@ -88,7 +88,7 @@ Network UNet {
 
 	Layer TRCONV2 {
 		Type: TRCONV
-		Dimensions { K: 512, C: 512, R: 2, S: 2, Y: 52, X: 52 }
+		Dimensions { K: 256, C: 512, R: 2, S: 2, Y: 52, X: 52 }
 	}
 
 	Layer CONV3_3 {
