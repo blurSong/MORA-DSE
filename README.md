@@ -47,8 +47,8 @@ mora_layer_type_dicts = {
 ```
 scenario = {embedded, edge, cloud}
 ```
-1. Edit the hw_config.m to init the DSE
-2. Add the workspace folder to PYTHONPATH and run mora
+4. Edit the hw_config.m to init the DSE
+5. Add the workspace folder to PYTHONPATH and run mora
 ```
 export PYTHONPATH=$PYTHONPATH:$MORAPATH
 python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
@@ -80,7 +80,7 @@ python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
           **[APD]**  
                   linear ： whether it is the first fc layer (yes=1， no=0) 
                   multi-input layers (concat conv, residual, VDP, VADD, VMUL, GEMM, etc): input index 2  
-                  TRCONV : dilation
+                  TRCONV : dilation  
                   NGCONV : group number  
                   others : default 0  
 4. All default blanks could be ： default value or NaN(blank)
