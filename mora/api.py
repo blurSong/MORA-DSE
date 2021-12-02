@@ -24,7 +24,9 @@ mora_layer_type_dicts = {
     5: "TRCONV",
     6: "NGCONV",
     7: "VDP",
-    8: "VADD"
+    8: "VADD"，
+    9: "VMUL",
+    10："GEMM"
 }  # DWCONV is DSCONV for maestro
 mora_layer_param_dicts = {
     'IC': 'input_channel',
@@ -34,32 +36,9 @@ mora_layer_param_dicts = {
     'STR': 'stride',
     'TYP': 'layer_type',
     'RP': 'relu_or_relu&pooling',
-    'APD': 'appending_index',
+    'IDX': 'input index',
+    'APD': 'appending_index'
 }
-# ====================================== mora ====================================================================
-# model csv name: model_mora.csv
-# 1. define the layer type TYP using mora_layer_type_dicts
-#
-# 2. HOW TO FILL PARAMS [IC OC FS KS STR]
-#           CONV : fill all
-#           Linear  : fill IC OC, keep FS KS STR = 1
-#           DWCONV  : fill all (Do make sure IC = OC)
-#           Residual : fill IC FS, keep KS OC STR = 1 (OC must be 1 for maestro)
-#                      (Do note that res layers wonnt be shown in pytorch print models）
-#           Batchnorm ： fill IC OC FS, keep KS STR =1 (Do make sure IC = OC)
-#           PWCONV : use 1x1 CONV
-#           TRCONV / NGCONV : TODO
-# 3. HOW TO FILL RP AND APD
-#           RP
-#                   0 : no relu OR not conv linear layers
-#                   1 : relu but no pooling
-#                   2 and above : relu and pooling, fill the pooling kernel size
-#           APD
-#                   for residual layer ： residual input index (one is -1， the other is the pre layer index) for MNSIM
-#                   for fc layer ： whether it is the first fc layer （yes=1， no=0） for MNSIM
-#                   for other layers : default 0
-# 4. leave all other param blanks ： 0 or NaN
-# ==================================================================================================================
 
 MLTRD = maestro_layer_type_ref_dicts
 MLTD = mora_layer_type_dicts
@@ -100,6 +79,7 @@ def remove_csv_bn(homepath, model):
     model_csv_path = os.path.abspath(os.path.join(model_path, model + '_mora.csv'))
     model_csv_path_nobn = os.path.abspath(os.path.join(model_path, model + '.csv'))
     model_df = pd.read_csv(model_csv_path)
+    # todo: bn RELU WRONG!
     model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
     model_df.to_csv(model_csv_path_nobn)
     return
