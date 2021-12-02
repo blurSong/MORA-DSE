@@ -44,6 +44,15 @@ mora_layer_type_dicts = {
     10: "GEMM" 
 }  # DWCONV is DSCONV for maestro
 ```
+```
+scenario = {embedded, edge, cloud}
+```
+1. Edit the hw_config.m to init the DSE
+2. Add the workspace folder to PYTHONPATH and run mora
+```
+export PYTHONPATH=$PYTHONPATH:$MORAPATH
+python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
+```
 ##  How to define model csv
 
 0. Model csv name: **model_mora.csv**
@@ -56,10 +65,10 @@ mora_layer_type_dicts = {
     **DWCONV**  : fill all (Do make sure IC = OC)  
    **Residual** : fill IC FS, keep KS OC STR = 1 (OC must be 1 for maestro)
             (Do note that res layers wonnt be shown in pytorch print models)  
-    **Batchnorm** ： fill IC OC FS, keep KS STR =1 (Do make sure IC = OC)  
-    **PWCONV** : use 1x1 CONV
+    **Batchnorm** ： fill IC OC FS, keep KS STR =1 (Do make sure IC = OC)   
+    **PWCONV** : use 1x1 CONV  
     **TRCONV** : fill all  
-    **NGCONV** :  fill all 
+    **NGCONV** :  fill all  
 3. How to fill **[RP] [IDX] [APD]**  
           **[RP]**  
                    0 : **this layer**  has no relu next  
@@ -73,7 +82,7 @@ mora_layer_type_dicts = {
                   multi-input layers (concat conv, residual, VDP, VADD, VMUL, GEMM, etc): input index 2  
                   TRCONV : dilation
                   NGCONV : group number  
-                  others ： default 0  
+                  others : default 0  
 4. All default blanks could be ： default value or NaN(blank)
 
 | base layer    | IC  | OC  | FS  | KS  | STR | RP  | IDX | APD                                                  | Note               |
@@ -91,13 +100,4 @@ mora_layer_type_dicts = {
 | GEMM [10]     | M   | N   | K   | 1   | 1   | RP  | IDX | input index 2                                        | MK * KN            |
 
 
-```
-scenario = {embedded, edge, cloud}
-```
-1. Edit the hw_config.m to init the DSE
-2. Add the workspace folder to PYTHONPATH and run mora
-```
-export PYTHONPATH=$PYTHONPATH:$MORAPATH
-python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
-```
-# LINK
+## LINK
