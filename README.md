@@ -90,7 +90,7 @@ python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
 | Linear  [0]   | IC  | OC  | 1   | 1   | 1   | RP  | IDX | 1 (is first fc layer) <br> 0 (is not first fc layer) |                    |
 | CONV    [1]   | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0 (default) <br> -x (input index 2 for concat)       |                    |
 | DWCONV [2]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0                                                    | IC = OC            |
-| Residual [3]  | IC  | 1   | FS  | 1   | 1   | 0   | IDX | input index 2                                        | OC = 1 for maestro |
+| Residual [3]  | IC  | 1   | FS  | 1   | 1   | RP  | IDX | input index 2                                        | OC = 1 for maestro |
 | Batchnorm [4] | IC  | OC  | FS  | 1   | 1   | RP  | IDX | 0                                                    |                    |
 | TRCONV [5]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | dilation                                             |                    |
 | NGCONV [6]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | group number                                         |                    |
