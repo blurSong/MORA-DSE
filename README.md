@@ -71,19 +71,19 @@ python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
     **NGCONV** :  fill all  
 3. How to fill **[RP] [IDX] [APD]**  
           **[RP]**  
-                   0 : **this layer**  has no relu next  
-                   1 : **this layer**  has relu but no pooling next  
-                   2 and above : **this layer has**  relu and pooling next, fill in the pooling kernel size    
+                   0: **this layer**  has no relu next  
+                   1: **this layer**  has relu but no pooling next  
+                   2 and above: **this layer has**  relu and pooling next, fill in the pooling kernel size    
           **[IDX]**      
                    default and usually -1, i.e. the previous layer. the index is **just the layer order in our csv**  
                    for multi-input layers (concat conv, residual, batchnorm, VDP, VADD, GEMM, etc), fill one index in **IDX**, the other in **APD**  
           **[APD]**  
-                  linear ： whether it is the first fc layer (yes=1， no=0) 
+                  linear： whether it is the first fc layer (yes=1， no=0)   
                   multi-input layers (concat conv, residual, VDP, VADD, VMUL, GEMM, etc): input index 2  
-                  TRCONV : dilation  
-                  NGCONV : group number  
-                  others : default 0  
-4. All default blanks could be ： default value or NaN(blank)
+                  TRCONV: dilation  
+                  NGCONV: group number  
+                  others: default 0  
+4. All default blank could be： default value or NaN(blank)
 
 | base layer    | IC  | OC  | FS  | KS  | STR | RP  | IDX | APD                                                  | Note               |
 | ------------- | --- | --- | --- | --- | --- | --- | --- | ---------------------------------------------------- | ------------------ |
