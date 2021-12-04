@@ -13,7 +13,9 @@ maestro_layer_type_ref_dicts = {
     "TRCONV": "TRCONV",
     "NGCONV": "NGCONV",
     "VDP": "CONV",
-    "VADD": "DSCONV"
+    "VADD": "DSCONV",
+    "VMUL": "VMUL",
+    "GEMM": "GEMM"
 }
 mora_layer_type_dicts = {
     0: "Linear",
@@ -24,9 +26,9 @@ mora_layer_type_dicts = {
     5: "TRCONV",
     6: "NGCONV",
     7: "VDP",
-    8: "VADD"，
+    8: "VADD",
     9: "VMUL",
-    10："GEMM"
+    10: "GEMM"
 }  # DWCONV is DSCONV for maestro
 mora_layer_param_dicts = {
     'IC': 'input_channel',
@@ -75,13 +77,14 @@ def area(model, df, homepath, indicator=0):
 
 
 def remove_csv_bn(homepath, model):
+    # remove bn layer and reconstruct csv for 2 simulators
     model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
     model_csv_path = os.path.abspath(os.path.join(model_path, model + '_mora.csv'))
     model_csv_path_nobn = os.path.abspath(os.path.join(model_path, model + '.csv'))
     model_df = pd.read_csv(model_csv_path)
-    # todo: bn RELU WRONG!
+    # todo: 1. refill ReLU pooling to previous layer  2. refill index to next layer
     model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
-    model_df.to_csv(model_csv_path_nobn)
+    model_df.to_csv(model_csv_path_nobn, index=False)
     return
 
 

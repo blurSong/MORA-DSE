@@ -107,9 +107,9 @@ class RRAM(object):
         super(RRAM, self).__init__()
         self.hw_param_dicts = hw_param_dicts
         self.rram_dicts = self.set_rram()
-        self.mem_capacity = self.get_memory_capacity()
         self.home_path = home_path
         self.rram_config_path = os.path.abspath(os.path.join(home_path, "rram_config.ini"))
+        self.mem_capacity = self.get_memory_capacity()
         self.DSE_indicator = 0
 
     def set_rram(self):
@@ -177,5 +177,5 @@ class SMU(object):
         self.direction = direction
         self.dlatype = dla_type
 
-    def SMU_stall(self):  #based on maestro
-
+    def SMU_stall(self):  # based on maestro
+        return
