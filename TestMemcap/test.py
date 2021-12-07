@@ -29,7 +29,7 @@ if device == 'cuda':
     model = torch.nn.DataParallel(model)
 
 summary(model, (3, 224, 224))
-print(model)
+# print(model)
 '''
 trans = []
 trans.append(transforms.Resize(size=224))

@@ -11,3 +11,4 @@ MNSIM/NoC/__pycache__/
 MNSIM/Power_Model/__pycache__/
 mora/__pycache__/
 /.vscode/
+/TestMemcap/torchsummary/__pycache__/

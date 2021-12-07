@@ -84,10 +84,10 @@ def summary(model, input_size, batch_size=1, device="cuda"):
     for h in hooks:
         h.remove()
 
-    print("----------------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------")
     line_new = "{:>20} {:>25} {:>15} {:>10}".format("Layer (type)", "Input Shape", "Param #", "Xbar #")
     print(line_new)
-    print("================================================================")
+    print("===================================================================================")
     total_params = 0
     total_output = 0
     total_xbars = 0
@@ -118,21 +118,23 @@ def summary(model, input_size, batch_size=1, device="cuda"):
     total_memcap = total_xbars * 128**2 * 2.0 / (1024 * 1024)
     total_pes = total_xbars / 8
     total_tiles = total_pes / 12
+    total_chips = total_tiles / 168
 
-    print("================================================================")
+    print("===================================================================================")
     print("Total params: {0:,}".format(total_params))
     print("Trainable params: {0:,}".format(trainable_params))
     print("Non-trainable params: {0:,}".format(total_params - trainable_params))
-    print("----------------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------")
     print("Input size fp32 (MB): %0.2f" % total_input_size)
     print("Forward/backward pass size (MB): %0.2f" % total_output_size)
     print("Params size fp32 (MB): %0.2f" % total_params_size)
     print("Estimated Total Size fp32 (MB): %0.2f" % total_size)
-    print("----------------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------")
     print("Total RRAM MemCaps int16 (MB) : %0.2f" % total_memcap)
     print("Total Xbars: ", int(total_xbars))
     print("Total RRAM PEs :", int(total_pes))
     print("Total RRAM Tiles :", int(total_tiles))
-    print("----------------------------------------------------------------")
+    print("Total RRAM Chips :", int(total_chips))
+    print("-----------------------------------------------------------------------------------")
 
     return
