@@ -22,7 +22,7 @@ resnext50_32x4d = models.resnext50_32x4d(pretrained=False)
 wide_resnet50_2 = models.wide_resnet50_2(pretrained=False)
 mnasnet = models.mnasnet1_0(pretrained=False)
 
-model = mobilenet_v2
+model = resnet18
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 if device == 'cuda':
     model = model.to(device)

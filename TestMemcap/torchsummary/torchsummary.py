@@ -116,9 +116,9 @@ def summary(model, input_size, batch_size=1, device="cuda"):
 
     # mora int16
     total_memcap = total_xbars * 128**2 * 2.0 / (1024 * 1024)
-    total_pes = total_xbars / 8
-    total_tiles = total_pes / 12
-    total_chips = total_tiles / 168
+    total_pes = total_xbars / 8.0
+    total_tiles = total_pes / 12.0
+    total_chips = total_tiles * 1.0 / 168
 
     print("===================================================================================")
     print("Total params: {0:,}".format(total_params))
@@ -131,10 +131,10 @@ def summary(model, input_size, batch_size=1, device="cuda"):
     print("Estimated Total Size fp32 (MB): %0.2f" % total_size)
     print("-----------------------------------------------------------------------------------")
     print("Total RRAM MemCaps int16 (MB) : %0.2f" % total_memcap)
-    print("Total Xbars: ", int(total_xbars))
-    print("Total RRAM PEs :", int(total_pes))
-    print("Total RRAM Tiles :", int(total_tiles))
-    print("Total RRAM Chips :", int(total_chips))
+    print("Total Xbars: ", total_xbars)
+    print("Total RRAM PEs :", total_pes)
+    print("Total RRAM Tiles :", total_tiles)
+    print("Total RRAM Chips : {0:.3}".format(total_chips))
     print("-----------------------------------------------------------------------------------")
 
     return
