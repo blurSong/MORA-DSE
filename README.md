@@ -46,12 +46,13 @@ mora_layer_type_dicts = {
 ```
 ```
 HW variable params:
--------------------------------------------------------------------------------------------------------
-Simu     |  latancy      area      power     energy    |
-MNSIM    |  ns           um2       W         nJ        |   ①tile bw = GByte     ②tile size (of a chip)
-maestro  |  cycles/ns    um2       uW        nJ        |   ①noc bw =  KByte     ②pe nums
-mora     |  ns           um2       W         nJ        |   L2 = MB    BW = GB/s
--------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------
+HW       |  latancy      area      power     energy    |
+MNSIM    |  ns           um2       W         nJ        |   ①Tile BW = GB/s                ②Tile nums(1d, of a chip)
+maestro  |  cycles/ns    um2       uW        nJ        |   ①NOC BW  = KB/s   L2 = Byte    ②PE nums
+mora     |  ns           um2       W         nJ        |         BW = GB/s    L2 = MB
+---------------------------------------------------------------------------------------------------------------------
+
 Scenarios:
 -----------------------------------------------------------------------
 Scenario     |  PES       Tile Size      NOCBW/GB/s     L2(GLB)/MB
