@@ -65,13 +65,13 @@ def inoutsize_conversion(kernelsize, padding, stride, outputsize):
 
 
 class Model_latency():
-    def __init__(self, NetStruct, SimConfig_path, multiple=None, TCG_mapping=None, tile_noc_bw=256):
+    def __init__(self, NetStruct, SimConfig_path, multiple=None, TCG_mapping=None, inter_tile_bandwidth=256):
         modelL_config = cp.ConfigParser()
         modelL_config.read(SimConfig_path, encoding='UTF-8')
         NoC_Compute = int(modelL_config.get('Algorithm Configuration', 'NoC_enable'))
         # self.inter_tile_bandwidth = float(modelL_config.get('Tile level', 'Inter_Tile_Bandwidth'))
         # mora
-        self.inter_tile_bandwidth = float(tile_noc_bw)
+        self.inter_tile_bandwidth = float(inter_tile_bandwidth)
         self.NetStruct = NetStruct
         if multiple is None:
             multiple = [1] * len(self.NetStruct)

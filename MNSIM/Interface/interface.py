@@ -12,15 +12,7 @@ import torch
 
 
 class TrainTestInterface(object):
-    def __init__(self,
-                 network_module,
-                 dataset_module,
-                 SimConfig_path,
-                 on_RRAM_layer_index,
-                 weights_file=None,
-                 device=None,
-                 tile_size=[12, 12],
-                 extra_define=None):
+    def __init__(self, network_module, dataset_module, SimConfig_path, on_RRAM_layer_index, weights_file=None, device=None, extra_define=None):
         # network_module = 'lenet'
         # dataset_module = 'cifar10'
         # weights_file = './zoo/cifar10_lenet_train_params.pth'
@@ -74,9 +66,7 @@ class TrainTestInterface(object):
         self.hardware_config['quantize_bit'] = self.quantize_bit
         # group num
         self.pe_group_num = int(xbar_config.get('Process element level', 'Group_Num'))
-        # mora
-        # self.tile_size = list(map(int, xbar_config.get('Tile level', 'PE_Num').split(',')))
-        self.tile_size = tile_size
+        self.tile_size = list(map(int, xbar_config.get('Tile level', 'PE_Num').split(',')))
         self.tile_row = self.tile_size[0]
         self.tile_column = self.tile_size[1]
         # net and weights
@@ -106,7 +96,7 @@ class TrainTestInterface(object):
         '''
 
     def origin_evaluate(self, method='SINGLE_FIX_TEST', adc_action='SCALE'):
-        if self.test_loader == None:
+        if self.test_loader is None:
             self.test_loader = import_module(self.dataset_module).get_dataloader()[1]
         self.net.to(self.device)
         self.net.eval()

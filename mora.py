@@ -1,6 +1,22 @@
 '''
-Mora dse
-a greedy and singel model version
+Mora-DSE BLURSONG 2021
+A greedy and singel model version
+
+HW variable params:
+---------------------------------------------------------------------------------------------------------------------
+HW       |  latancy      area      power     energy    |
+MNSIM    |  ns           um2       W         nJ        |   ①Tile BW = GB/s                ②Tile nums(1d, of a chip)
+maestro  |  cycles/ns    um2       uW        nJ        |   ①NOC BW  = KB/s   L2 = Byte    ②PE nums
+mora     |  ns           um2       W         nJ        |         BW = GB/s    L2 = MB
+---------------------------------------------------------------------------------------------------------------------
+Scenarios:
+---------------------------------------------------------------------
+Scenario     |  PEs       Tiles         NOCBW/GB/s      L2(GLB)/MB
+embedded     |  1024      16 * 16       16              4
+edge         |  4096      32 * 32       64              8
+cloud        |  16384     64 * 64       256             16
+---------------------------------------------------------------------
+
 '''
 import copy
 import os
@@ -14,10 +30,6 @@ import multiprocessing as MP
 import torch
 import MNSIM
 import mora
-
-# MNSIM    ns      um2    W    nJ    bw=GByte
-# maestro cycle/ns um2    uW    nJ   bw=KByte  glb=byte
-# HW       L2 MiB    NOC GB/s
 
 
 def set_path(model, dataflow):
@@ -38,7 +50,7 @@ def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
     parser.add_argument('--dataflow', type=str, default='kcp_ws', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
     parser.add_argument('--model', type=str, default='vgg16')
-    parser.add_argument('--scenario', type=str, default='edge', choices=['edge', 'mobile', 'cloud'])  # see puma and maes
+    parser.add_argument('--scenario', type=str, default='edge', choices=['embedded', 'edge', 'cloud'])
     return parser
 
 
@@ -57,28 +69,22 @@ def hw_init(hw_config_path):
 def set_hw_range(scenario):
     if scenario == 'embedded':
         mpes = 1024
-        mtile_size = 12
-        mglb_size = 6  # MiB
+        mtiles = 16
+        mglb_size = 6  # MB
         mbw = 16  # GB/s
     elif scenario == 'edge':
         mpes = 4096
-        mtile_size = 24
+        mtiles = 32
         mglb_size = 10
         mbw = 64
     elif scenario == 'cloud':
         mpes = 16384
-        mtile_size = 64
+        mtiles = 64
         mglb_size = 20
         mbw = 256
     max_hw_param_dicts = {}
-    '''
-    expand_num = 2
-    max_hw_param_dicts['pes'] = hw_param_dicts['dla_pes'] * expand_num
-    max_hw_param_dicts['tile_size'] = hw_param_dicts['rram_tile_size'] * expand_num
-    max_hw_param_dicts['bw'] = (int(hw_param_dicts['dla_noc_bw'] / (1024 * 1024)) + hw_param_dicts['rram_tile_bw'])
-    '''
     max_hw_param_dicts['pes'] = mpes
-    max_hw_param_dicts['tile_size'] = mtile_size
+    max_hw_param_dicts['tiles'] = mtiles
     max_hw_param_dicts['glb_size'] = mglb_size
     max_hw_param_dicts['bw'] = mbw
     return max_hw_param_dicts

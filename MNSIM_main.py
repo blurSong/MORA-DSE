@@ -44,7 +44,7 @@ def Data_clean():
     # print("Removed unnecessary file.")
 
 
-def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0, _dataflow='kcp_ws', _on_RRAM_layer_index=[]):
+def main(_model='vgg16', _tiles=[16, 16], _noc_bw=64, _DSE_indicator=0, _dataflow='kcp_ws', _on_RRAM_layer_index=[]):
 
     home_path = os.getcwd()
     SimConfig_path = os.path.join(home_path, "rram_config.ini")
@@ -56,7 +56,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
     parser.add_argument("-HWdes",
                         "--hardware_description",
                         default=SimConfig_path,
-                        help="Hardware description file location & name, default:/MNSIM_Python/SimConfig.ini")
+                        help="Hardware description file location & name, default:/mora/rram_config.ini")
     parser.add_argument("-Weights",
                         "--weights",
                         default=weights_file_path,
@@ -90,8 +90,8 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
 
     # mora args
     parser.add_argument("--model", type=str, default='vgg16', help="NN model name, default: vgg16")
-    parser.add_argument("--tile_size", nargs='+', type=int, default=[32, 32], help="tile [row, col]")
-    parser.add_argument("--tile_noc_bw", type=int, default=256)
+    parser.add_argument("--tiles", nargs='+', type=int, default=[16, 16], help="tiles [row, col] of a chip")
+    parser.add_argument("--noc_bw", type=int, default=16)
     parser.add_argument("--dataflow", type=str, default='kcp_ws')
 
     args = parser.parse_args()
@@ -115,8 +115,8 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
 
     if __name__ != '__main__':
         args.model = _model
-        args.tile_size = _tile_size
-        args.tile_noc_bw = _tile_noc_bw
+        args.tiles = _tiles
+        args.noc_bw = _noc_bw
         args.dataflow = _dataflow
         if _on_RRAM_layer_index:
             on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
@@ -136,14 +136,13 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
                                          SimConfig_path=args.hardware_description,
                                          on_RRAM_layer_index=on_RRAM_layer_index,
                                          weights_file=args.weights,
-                                         device=args.device,
-                                         tile_size=args.tile_size)
+                                         device=args.device)
     structure_file = __TestInterface.get_structure()
     on_RRAM_layer_index2 = __TestInterface.on_RRAM_layer_index2
-    TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline)
+    TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline, args.tiles)
 
     if not (args.disable_hardware_modeling):
-        __latency = Model_latency(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping, tile_noc_bw=args.tile_noc_bw)
+        __latency = Model_latency(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping, inter_tile_bandwidth=args.noc_bw)
         if not (args.disable_inner_pipeline):
             __latency.calculate_model_latency(mode=1)
         else:
@@ -180,7 +179,7 @@ def main(_model='vgg16', _tile_size=[32, 32], _tile_noc_bw=64, _DSE_indicator=0,
             print("PIM-based computing accuracy:", __TestInterface.set_net_bits_evaluate(weight_2, adc_action='FIX'))
 
     # write mora csv
-    output_csv_dicts['HW (t_rol,t_col,  tile_bw)'] = '{} {} {}'.format(args.tile_size[0], args.tile_size[1], args.tile_noc_bw)
+    output_csv_dicts['HW (t_rol,t_col,  tile_bw)'] = '{} {} {}'.format(args.tiles[0], args.tiles[1], args.noc_bw)
     output_csv_dicts['restraint'] = 'unexamined' if _DSE_indicator != 0 else 'pass'
     output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/[' + args.dataflow + ']' + args.model + '_rram.csv'))
     csv = pd.DataFrame(output_csv_dicts, index=[_DSE_indicator])

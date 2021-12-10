@@ -22,8 +22,8 @@ class DLA(object):
     def set_dla(self):
         dla_dicts = {}
         dla_dicts['pes'] = self.hw_param_dicts['pes']
-        dla_dicts['glb_size'] = self.hw_param_dicts['glb_size'] * 1024 * 1000
-        dla_dicts['noc_bw'] = self.hw_param_dicts['bw'] * 1024 * 1024
+        dla_dicts['glb_size'] = self.hw_param_dicts['glb_size'] * 1024 * 1024  # MB to B
+        dla_dicts['noc_bw'] = self.hw_param_dicts['bw'] * 1024 * 1024  # GB/s to KB/s
         # dla_dicts['offchip_bw'] = self.hw_param_dicts['offchip_bw']
         dla_dicts['dataflow'] = self.dataflow
         return dla_dicts
@@ -114,16 +114,16 @@ class RRAM(object):
 
     def set_rram(self):
         rram_dicts = {}
-        rram_dicts['tile_row'] = self.hw_param_dicts['tile_size']
-        rram_dicts['tile_col'] = self.hw_param_dicts['tile_size']
+        # rram_dicts['tile_row'] = self.hw_param_dicts['tiles']
+        # rram_dicts['tile_col'] = self.hw_param_dicts['tiles']
+        rram_dicts['tiles'] = self.hw_param_dicts['tiles']
         rram_dicts['glb_size'] = self.hw_param_dicts['glb_size']
-        rram_dicts['tile_bw'] = self.hw_param_dicts['bw']
+        rram_dicts['noc_bw'] = self.hw_param_dicts['bw']  # GB/s
         return rram_dicts
 
-    def set_dse_param(self, row, col, tile_bw, indicator):
-        self.rram_dicts['tile_row'] = row
-        self.rram_dicts['tile_col'] = col
-        self.rram_dicts['tile_bw'] = tile_bw
+    def set_dse_param(self, tiles, rram_bw, indicator):
+        self.rram_dicts['tiles'] = tiles
+        self.rram_dicts['noc_bw'] = rram_bw
         self.mem_capacity = self.get_memory_capacity()
         self.DSE_indicator = indicator
 
@@ -131,7 +131,7 @@ class RRAM(object):
         configer = cp.ConfigParser()
         configer.read(self.rram_config_path, encoding='UTF-8')
         xbar_polarity = int(configer.get('Process element level', 'Xbar_Polarity'))
-        return self.rram_dicts['tile_row'] * self.rram_dicts['tile_col'] * 16 * 8 * xbar_polarity * 128**2 * 2  # bits
+        return self.rram_dicts['tiles'] * self.rram_dicts['tiles'] * 16 * 8 * xbar_polarity * 128 * 127 * 2  # bits
 
     def invoke_MNSIM(self, model, dataflow, on_RRAM_layer_index=[]):
         output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/[' + dataflow + ']' + model + '_rram.csv'))
@@ -139,12 +139,12 @@ class RRAM(object):
         #    print("rram outfile conflict.")
         #    raise AttributeError
         print("[MNSIM] invoked", self.rram_dicts)
-        import_module("MNSIM_main").main(model, [self.rram_dicts['tile_row'], self.rram_dicts['tile_col']], self.rram_dicts['tile_bw'], self.DSE_indicator,
-                                         dataflow, on_RRAM_layer_index)
+        import_module("MNSIM_main").main(model, [self.rram_dicts['tiles'], self.rram_dicts['tiles']], self.rram_dicts['noc_bw'], self.DSE_indicator, dataflow,
+                                         on_RRAM_layer_index)
         '''
         command = [
-            "python", "../MNSIM.py", "--model {}".format(model), "--tile_size {} {}".format(self.rram_dicts['tile_row'], self.rram_dicts['tile_col']),
-            "--tile_noc_bw {}".format(self.rram_dicts['tile_bw'])
+            "python", "../MNSIM.py", "--model {}".format(model), "--tiles {} {}".format(self.rram_dicts['tiles'], self.rram_dicts['tiles']),
+            "--noc_bw {}".format(self.rram_dicts['tile_bw'])
         ]
         process = SP.Popen(command, stdout=SP.PIPE, stderr=SP.PIPE)
         stdout, stderr = process.communicate()

@@ -45,7 +45,21 @@ mora_layer_type_dicts = {
 }  # DWCONV is DSCONV for maestro
 ```
 ```
-scenario = {embedded, edge, cloud}
+HW variable params:
+-------------------------------------------------------------------------------------------------------
+Simu     |  latancy      area      power     energy    |
+MNSIM    |  ns           um2       W         nJ        |   ①tile bw = GByte     ②tile size (of a chip)
+maestro  |  cycles/ns    um2       uW        nJ        |   ①noc bw =  KByte     ②pe nums
+mora     |  ns           um2       W         nJ        |   L2 = MB    BW = GB/s
+-------------------------------------------------------------------------------------------------------
+Scenarios:
+-----------------------------------------------------------------------
+Scenario     |  PES       Tile Size      NOCBW/GB/s     L2(GLB)/MB
+embedded     |  1024      16 * 16        16              4
+edge         |  4096      32 * 32        64              8
+cloud        |  16384     64 * 64        256             16
+-----------------------------------------------------------------------
+
 ```
 4. Edit the hw_config.m to init the DSE
 5. Add the workspace folder to PYTHONPATH and run mora
