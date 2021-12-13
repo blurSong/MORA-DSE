@@ -3,6 +3,7 @@ import re
 import sys
 import numpy as np
 import pandas as pd
+from torch._C import CONV_BN_FUSION
 # from mod2map import mod2map
 
 maestro_layer_type_ref_dicts = {
@@ -76,18 +77,76 @@ def area(model, df, homepath, indicator=0):
     return {'dla': dla_area, 'rram': rram_area}
 
 
+def check_mora_csv(homepath, model):
+    model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
+    model_csv_path = os.path.abspath(os.path.join(model_path, model + '_mora.csv'))
+    model_df = pd.read_csv(model_csv_path)
+    # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
+    goodcsv = 1
+    for idx, layer in model_df.iterrows():
+        layertype = MLTD[layer['TYP']]
+        if layertype == 'Linear':
+            if layer['FS'] == 1 and layer['KS'] == 1 and layer['STR'] == 1 and layer['IDX'] < 0 and (layer['APD'] == 1 or layer['APD'] == 0):
+                continue
+        elif layertype == 'CONV':
+            if layer['IDX'] < 0 and layer['APD'] <= 0:
+                continue
+        elif layertype == 'DWCONV':
+            if layer['IC'] == layer['OC'] and layer['IDX'] < 0 and layer['APD'] == 0:
+                continue
+        elif layertype == 'Residual':
+            if layer['OC'] == 1 and layer['KS'] == 1 and layer['STR'] == 1 and layer['IDX'] < 0 and layer['APD'] < 0:
+                continue
+        elif layertype == 'Batchnorm':
+            if layer['KS'] == 1 and layer['STR'] == 1 and layer['IDX'] < 0 and layer['APD'] == 0:
+                continue
+        elif layertype == 'TRCONV' or layertype == 'NGCONV':
+            if layer['APD'] > 0 and layer['IDX'] < 0:
+                continue
+        elif layertype == 'VDP' or layertype == 'VADD' or layertype == 'VMUL':
+            if layer['IC'] == layer['OC'] and layer['FS'] == 1 and layer['KS'] == 1 and layer['STR'] == 1 and layer['IDX'] < 0 and layer['APD'] < 0:
+                continue
+        elif layertype == 'GEMM':
+            if layer['KS'] == 1 and layer['STR'] == 1 and layer['IDX'] < 0 and layer['APD'] < 0:
+                continue
+        else:
+            print("[mora][Check CSV] line {0} layer {1} [TYP] is wrong.".format(idx, layertype))
+            goodcsv = 0
+        print("[mora] Check CSV: line {0} layer {1} params are wrong.".format(idx, layertype))
+        goodcsv = 0
+    assert goodcsv == 1
+    print("[mora][Check CSV] model_mora.csv file is ok.")
+
+
 def remove_csv_bn(homepath, model):
     # remove bn layer and reconstruct csv for 2 simulators
-    # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
     model_csv_path = os.path.abspath(os.path.join(model_path, model + '_mora.csv'))
     model_csv_path_nobn = os.path.abspath(os.path.join(model_path, model + '.csv'))
     model_df = pd.read_csv(model_csv_path)
-    # todo: 1. refill ReLU pooling to previous layer  2. refill index to next layer
-
-    model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
+    # 1. refill ReLU pooling to previous layer  2. refill index to next layer
+    for idx, layer in model_df.iterrows():
+        if MLTD[layer['TYP']] == 'Batchnorm':
+            assert layer['IDX'] == -1, "[mora][Remove CSV BN] Batchnorm idx is not -1."
+            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][Remove CSV BN] ConvBNRelu, conv rp is not 0."
+            model_df.at[idx + layer['IDX'], 'RP'] = layer['RP']
+    for idx, layer in model_df.iterrows():
+        if layer['IDX'] != -1:
+            for tmpidx in range(layer['IDX'], 1, 0):
+                if MLTD[model_df.at[idx + tmpidx, 'TYP']] == 'Batchnorm':
+                    layer['IDX'] += 1
+        if apd_is_index2(MLTD[layer['TYP']], layer['APD']):
+            for tmpidx in range(layer['APD'], 1, 0):
+                if MLTD[model_df.at[idx + tmpidx, 'TYP']] == 'Batchnorm':
+                    layer['APD'] += 1
+    model_df = model_df.drop(model_df[MLTD[model_df['TYP']] == 'Batchnorm'].index)
     model_df.to_csv(model_csv_path_nobn, index=False)
+    print("[mora][Remove CSV BN] csv bn layer removed.")
     return
+
+
+def apd_is_index2(type, apd):
+    return (type == 'CONV' or type == 'Residual' or type == 'VDP' or type == 'VADD' or type == 'VMUL' or type == 'GEMM') and (apd != 0)
 
 
 def gemm(homepath, model, dataflow):
