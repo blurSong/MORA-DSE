@@ -78,11 +78,13 @@ def area(model, df, homepath, indicator=0):
 
 def remove_csv_bn(homepath, model):
     # remove bn layer and reconstruct csv for 2 simulators
+    # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
     model_csv_path = os.path.abspath(os.path.join(model_path, model + '_mora.csv'))
     model_csv_path_nobn = os.path.abspath(os.path.join(model_path, model + '.csv'))
     model_df = pd.read_csv(model_csv_path)
     # todo: 1. refill ReLU pooling to previous layer  2. refill index to next layer
+
     model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
     model_df.to_csv(model_csv_path_nobn, index=False)
     return
