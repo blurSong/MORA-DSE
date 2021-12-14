@@ -38,9 +38,13 @@ def set_path(model, dataflow):
     hw_config_path = os.path.abspath(os.path.join(home_path, "hw_config.m"))
     MNSIM_path = os.path.abspath(os.path.join(home_path, "MNSIM"))
     maestro_path = os.path.abspath(os.path.join(home_path, "maestro"))
+    model_path = os.path.abspath(os.path.join(home_path, 'model/' + model))
     output_path = os.path.join(home_path, 'output/' + model)
     if os.path.exists(output_path):
         SP.run('rm *.csv', cwd=output_path, shell=True)
+    if os.path.exists(model_path):
+        SP.run('rm ' + model + '.csv', cwd=model_path, shell=True)
+        SP.run('rm *.m', cwd=model_path, shell=True)
     sys.path.append(home_path)
     sys.path.append(MNSIM_path)
     sys.path.append(maestro_path)
@@ -69,17 +73,17 @@ def hw_init(hw_config_path):
 def set_hw_range(scenario):
     if scenario == 'embedded':
         mpes = 1024
-        mtiles = 16
+        mtiles = 12
         mglb_size = 6  # MB
         mbw = 16  # GB/s
     elif scenario == 'edge':
         mpes = 4096
-        mtiles = 32
+        mtiles = 24
         mglb_size = 10
         mbw = 64
     elif scenario == 'cloud':
         mpes = 16384
-        mtiles = 64
+        mtiles = 48
         mglb_size = 20
         mbw = 256
     max_hw_param_dicts = {}
@@ -97,6 +101,7 @@ if __name__ == "__main__":
     max_hw_param_dicts = set_hw_range(args.scenario)
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(max_hw_param_dicts, home_path)
+    mora.api.check_mora_csv(home_path, args.model)
     mora.api.remove_csv_bn(home_path, args.model)
     mora.api.gemm(home_path, args.model, args.dataflow)
     # TODO: new workload

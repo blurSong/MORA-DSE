@@ -81,7 +81,6 @@ def check_mora_csv(homepath, model):
     model_path = os.path.abspath(os.path.join(homepath, 'model/' + model))
     model_csv_path = os.path.abspath(os.path.join(model_path, model + '_mora.csv'))
     model_df = pd.read_csv(model_csv_path)
-    # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     goodcsv = 1
     for idx, layer in model_df.iterrows():
         layertype = MLTD[layer['TYP']]
@@ -110,12 +109,13 @@ def check_mora_csv(homepath, model):
             if layer['KS'] == 1 and layer['STR'] == 1 and layer['IDX'] < 0 and layer['APD'] < 0:
                 continue
         else:
-            print("[mora][Check CSV] line {0} layer {1} [TYP] is wrong.".format(idx, layertype))
+            print("[mora][check csv] line {0} layer {1} [TYP] is wrong.".format(idx, layertype))
             goodcsv = 0
-        print("[mora] Check CSV: line {0} layer {1} params are wrong.".format(idx, layertype))
+            continue
+        print("[mora][check csv] line {0} layer {1} params are wrong.".format(idx, layertype))
         goodcsv = 0
     assert goodcsv == 1
-    print("[mora][Check CSV] model_mora.csv file is ok.")
+    print("[mora][check csv] {}_mora.csv file is right.".format(model))
 
 
 def remove_csv_bn(homepath, model):
@@ -127,8 +127,8 @@ def remove_csv_bn(homepath, model):
     # 1. refill ReLU pooling to previous layer  2. refill index to next layer
     for idx, layer in model_df.iterrows():
         if MLTD[layer['TYP']] == 'Batchnorm':
-            assert layer['IDX'] == -1, "[mora][Remove CSV BN] Batchnorm idx is not -1."
-            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][Remove CSV BN] ConvBNRelu, conv rp is not 0."
+            assert layer['IDX'] == -1, "[mora][remove csv BN] Batchnorm idx is not -1."
+            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][remove csv BN] ConvBNRelu, conv rp is not 0."
             model_df.at[idx + layer['IDX'], 'RP'] = layer['RP']
     for idx, layer in model_df.iterrows():
         if layer['IDX'] != -1:
@@ -139,9 +139,9 @@ def remove_csv_bn(homepath, model):
             for tmpidx in range(layer['APD'], 1, 0):
                 if MLTD[model_df.at[idx + tmpidx, 'TYP']] == 'Batchnorm':
                     layer['APD'] += 1
-    model_df = model_df.drop(model_df[MLTD[model_df['TYP']] == 'Batchnorm'].index)
+    model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
     model_df.to_csv(model_csv_path_nobn, index=False)
-    print("[mora][Remove CSV BN] csv bn layer removed.")
+    print("[mora][remove csv BN] csv bn layers removed.")
     return
 
 
@@ -159,11 +159,12 @@ def gemm(homepath, model, dataflow):
     # csv to maestro model
     model_ndarray = pd.read_csv(maestro_model_csv_path).to_numpy()
     model_layer_num = model_ndarray.shape[0]
+    # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     with open(maestro_model_path, 'w') as fo:
         fo.write("Network {} {{\n".format(model))
         for line in range(model_layer_num):
             layer = model_ndarray[line, ...]
-            assert layer[5] != 4  # check bn at gemm
+            assert MLTD[layer[5]] != 'Batchnorm'  # check bn
             KCRSYX = [layer[1], layer[0], layer[3], layer[3], layer[2], layer[2]]
             fo.write("Layer L{} {{\n".format(line))
             fo.write("Type: {} \n".format(MLTRD[MLTD[layer[5]]]))
@@ -171,7 +172,7 @@ def gemm(homepath, model, dataflow):
             fo.write("Dimensions {{ K: {0[0]}, C: {0[1]}, R: {0[2]}, S: {0[3]}, Y: {0[4]}, X: {0[5]} }}\n".format(KCRSYX))
             fo.write("}\n")
         fo.write("}")
-    print("[mora][gemm] done csv to maestro model.")
+    print("[mora][generate maestro model] done csv to maestro model.")
 
     # maestro model to meastro mapping model
     # ykp_os, yxp_os, kcp_ws, xp_ws, rs
@@ -207,7 +208,7 @@ def gemm(homepath, model, dataflow):
                             dsconv = False
                         else:
                             fo.write(line)
-    print("[mora][gemm] done maestro model to mapping.")
+    print("[mora][generate maestro model] done maestro model to mapping.")
     return
 
 
