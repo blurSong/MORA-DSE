@@ -43,10 +43,8 @@ class DLA(object):
         #   raise AttributeError
         if os.path.exists(maestro_result_csv_path):
             os.remove(maestro_result_csv_path)
-        dla_dicts2 = self.dla_dicts
-        dla_dicts2['glb_size'] = self.hw_param_dicts['glb_size']
-        dla_dicts2['noc_bw'] = self.hw_param_dicts['bw']
-        print("[maestro] invoked", dla_dicts2)
+        print("[maestro] Invoked - PEs: {}, NOC: {}, L2 Cache: {}, Dataflow: {}".format(self.dla_dicts['pes'], self.dla_dicts['noc_bw'] / (1024**2),
+                                                                                        self.dla_dicts['glb_size'] / (1024**2), self.dla_dicts['dataflow']))
         params = [self.dla_dicts['pes'], self.dla_dicts['glb_size'], self.dla_dicts['noc_bw'], mapping_path]
         command = "./maestro --num_pes={0[0]} --l2_size_cstr={0[1]} --noc_bw_cstr={0[2]} --Mapping_file='{0[3]}' --print_res=false --print_res_csv_file=true --print_log_file=false".format(
             params)
@@ -81,7 +79,7 @@ class DLA(object):
             power_nd = maestro_result_df[' Power'].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
             l2_size_nd = maestro_result_df["  L2 SRAM Size Req (Bytes)"].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
             if np.median(l2_size_nd) > self.dla_dicts['glb_size']:
-                print('maestro glb size exceed.')
+                print('[maestro] maestro L2 size exceed.')
                 return
             output_csv_dicts['DSE index'] = self.DSE_indicator
             output_csv_dicts['layers'] = len(on_DLA_layer_index)
@@ -101,7 +99,6 @@ class DLA(object):
         print('DLA Latency:', output_csv_dicts['latency'], 'ns')
         print('DLA Area:', output_csv_dicts['area'], 'um2')
         print('DLA Energy:', output_csv_dicts['energy'], 'nJ')
-
         return
 
 
@@ -141,7 +138,7 @@ class RRAM(object):
         # if os.path.exists(output_csv_path):
         #    print("rram outfile conflict.")
         #    raise AttributeError
-        print("[mnsim] invoked", self.rram_dicts)
+        print("[mnsim] Invoked -", self.rram_dicts)
         import_module("MNSIM_main").main(model, [self.rram_dicts['tiles'], self.rram_dicts['tiles']], self.rram_dicts['noc_bw'], self.DSE_indicator, dataflow,
                                          on_RRAM_layer_index)
         '''

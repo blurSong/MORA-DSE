@@ -21,8 +21,8 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
     rounds = (int((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) + 1) * ((
         (max_param_dicts['tiles'] - hw_param_dicts['tiles']) / 2) + 1)**2 * ((
             (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
-    print('[mora] Greedy DSE, Total Rounds:', int(rounds))
-    assert rounds <= 65535, 'too many dse rounds.'
+    print('[mora] Greedy DSE, total rounds:', int(rounds))
+    assert rounds < 11451.4, 'too many dse rounds.'
     DSE_indicator = 1
     for pes in range(hw_param_dicts['pes'], max_param_dicts['pes'] + 4, int(max_param_dicts['pes'] / 128)):
         for tiles in range(hw_param_dicts['tiles'], max_param_dicts['tiles'], 1):

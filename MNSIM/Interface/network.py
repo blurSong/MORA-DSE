@@ -178,51 +178,59 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
     model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../model/' + cate + '/' + cate + '.csv'))
     model_nd = pd.read_csv(model_csv_path).to_numpy()
     model_layer_num = model_nd.shape[0]
-    on_RRAM_layer_index2 = []  # translate on_RRAM_layer_index to MNSIM on_RRAM_layer_index2
-    # O	   I    F	K	S	T	R	A
+    on_RRAM_layer_index2 = []  # translate unsorted on_RRAM_layer_index to sorted MNSIM on_RRAM_layer_index2
+    # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     layer_counter = 0
     for line in range(model_layer_num):
         if line in on_RRAM_layer_index:
             on_RRAM_layer_index2.append(layer_counter)
         layer_counter += 1
         layer = model_nd[line, ...]
-        if layer[5] == 1:  # conv
+        # CONV
+        if layer[5] == 1:
             layer_config_list.append({
                 'type': 'conv',
-                'in_channels': int(layer[1]),
-                'out_channels': int(layer[0]),
+                'in_channels': int(layer[0]),
+                'out_channels': int(layer[1]),
                 'kernel_size': int(layer[3]),
                 'padding': 1,
                 'stride': int(layer[4])
             })
-            if layer[7] != 0:
-                layer_config_list[-1]['input_index'] = [int(layer[7])]
-            if layer[6] == 1:
-                layer_config_list.append({'type': 'relu'})
-            elif layer[6] >= 2:
-                layer_config_list.append({'type': 'relu'})
-                layer_config_list.append({'type': 'pooling', 'mode': 'MAX', 'kernel_size': int(layer[6]), 'stride': int(layer[6])})
-                on_RRAM_layer_index2.append(layer_counter) if line in on_RRAM_layer_index else None
-                layer_counter += 1
-        elif layer[5] == 0:  # linear
-            if layer[7] == 1:  # first fc layer
+            if layer[7] != -1:
+                if layer[8] == 0:
+                    layer_config_list[-1]['input_index'] = [int(layer[7])]
+                else:
+                    layer_config_list[-1]['input_index'] = [int(layer[7]), int(layer[8])]
+        # Linear
+        elif layer[5] == 0:
+            if layer[8] == 1:  # first fc layer
                 layer_config_list.append({'type': 'view'})
-            layer_config_list.append({'type': 'fc', 'in_features': int(layer[1]), 'out_features': int(layer[0])})
-            if layer[6] == 1:
-                layer_config_list.append({'type': 'relu'})
-        elif layer[5] == 2:  # dwconv
+            layer_config_list.append({'type': 'fc', 'in_features': int(layer[0]), 'out_features': int(layer[1])})
+        # DWCONV
+        elif layer[5] == 2:
             raise AssertionError
             # TODO: support in-efficient dwconv in MNSIM
-        elif layer[5] == 3:  # residual
-            layer_config_list.append({'type': 'element_sum', 'input_index': [-1, int(layer[7])]})
-        elif layer[5] == 4:  # TRCONV
+        # Residual
+        elif layer[5] == 3:
+            assert layer[7] == -1
+            layer_config_list.append({'type': 'element_sum', 'input_index': [int(layer[7]), int(layer[8])]})
+        # TRCONV
+        elif layer[5] == 5:
             raise AssertionError
             # TODO: TRCONV
-        elif layer[5] == 5:  # NGCONV
+        # NGCONV
+        elif layer[5] == 6:  # NGCONV
             raise AssertionError
             # TODO: NGCONV
         else:
             raise AttributeError
+        if layer[6] == 1:
+            layer_config_list.append({'type': 'relu'})
+        elif layer[6] >= 2:
+            layer_config_list.append({'type': 'relu'})
+            layer_config_list.append({'type': 'pooling', 'mode': 'MAX', 'kernel_size': int(layer[6]), 'stride': int(layer[6])})
+            on_RRAM_layer_index2.append(layer_counter) if line in on_RRAM_layer_index else None
+            layer_counter += 1
     '''
     # layer by layer
     assert cate in ['lenet', 'vgg16', 'vgg8', 'alexnet', 'resnet18']
@@ -383,20 +391,21 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
     else:
         assert 0, f'not support {cate}'
     '''
+    print(layer_config_list)
     for i in range(len(layer_config_list)):
         quantize_config_list.append({'weight_bit': 9, 'activation_bit': 9, 'point_shift': -3})
         if 'input_index' in layer_config_list[i]:
             input_index_list.append(layer_config_list[i]['input_index'])
         else:
             input_index_list.append([-1])
-    input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, 32, 32)}  # 32 * 7
+    input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, 224, 224)}  # 32 * 7
     # add bn for every conv
     L = len(layer_config_list)
     for i in range(L - 1, -1, -1):
         if layer_config_list[i]['type'] == 'conv':
             # continue
             layer_config_list.insert(i + 1, {'type': 'bn', 'features': layer_config_list[i]['out_channels']})
-            quantize_config_list.insert(i + 1, {'weight_bit': 9, 'activation_bit': 9, 'point_shift': -2})
+            quantize_config_list.insert(i + 1, {'weight_bit': 9, 'activation_bit': 9, 'point_shift': -3})
             input_index_list.insert(i + 1, [-1])
             for j in range(i + 2, len(layer_config_list), 1):
                 for relative_input_index in range(len(input_index_list[j])):

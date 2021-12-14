@@ -77,6 +77,6 @@ Dimensions { K: 4096, C: 4096, R: 1, S: 1, Y: 1, X: 1 }
 Layer L15 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 1000, C: 4096, R: 1, S: 1, Y: 1, X: 1 }
+Dimensions { K: 10, C: 4096, R: 1, S: 1, Y: 1, X: 1 }
 }
 }

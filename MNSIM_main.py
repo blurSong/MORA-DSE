@@ -44,7 +44,7 @@ def Data_clean():
     # print("Removed unnecessary file.")
 
 
-def main(_model='vgg16', _tiles=[16, 16], _noc_bw=64, _DSE_indicator=0, _dataflow='kcp_ws', _on_RRAM_layer_index=[]):
+def main(_model='vgg16', _tiles=[24, 24], _noc_bw=20, _DSE_indicator=0, _dataflow='kcp_ws', _on_RRAM_layer_index=[]):
 
     home_path = os.getcwd()
     SimConfig_path = os.path.join(home_path, "rram_config.ini")
@@ -90,8 +90,8 @@ def main(_model='vgg16', _tiles=[16, 16], _noc_bw=64, _DSE_indicator=0, _dataflo
 
     # mora args
     parser.add_argument("--model", type=str, default='vgg16', help="NN model name, default: vgg16")
-    parser.add_argument("--tiles", nargs='+', type=int, default=[16, 16], help="tiles [row, col] of a chip")
-    parser.add_argument("--noc_bw", type=int, default=16)
+    parser.add_argument("--tiles", nargs='+', type=int, default=[24, 24], help="tiles [row, col] of a chip")
+    parser.add_argument("--noc_bw", type=int, default=20)
     parser.add_argument("--dataflow", type=str, default='kcp_ws')
 
     args = parser.parse_args()
@@ -118,15 +118,16 @@ def main(_model='vgg16', _tiles=[16, 16], _noc_bw=64, _DSE_indicator=0, _dataflo
         args.tiles = _tiles
         args.noc_bw = _noc_bw
         args.dataflow = _dataflow
-        if _on_RRAM_layer_index:
-            on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
-        elif _DSE_indicator == 0:
-            model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'model/' + args.model + '/' + args.model + '.csv'))
-            model_nd = pd.read_csv(model_csv_path).to_numpy()
-            model_layer_num = model_nd.shape[0]
-            on_RRAM_layer_index = range(model_layer_num)
-        else:
-            raise AttributeError
+
+    if _on_RRAM_layer_index:
+        on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
+    elif _DSE_indicator == 0:
+        model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'model/' + args.model + '/' + args.model + '.csv'))
+        model_nd = pd.read_csv(model_csv_path).to_numpy()
+        model_layer_num = model_nd.shape[0]
+        on_RRAM_layer_index = range(model_layer_num)
+    else:
+        raise AttributeError
 
     output_csv_dicts = {}
     output_csv_dicts['DSE index'] = _DSE_indicator
