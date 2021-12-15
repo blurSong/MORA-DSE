@@ -10,7 +10,7 @@ resnet18 = models.resnet18(pretrained=False)
 resnet50 = models.resnet50(pretrained=False)
 resnet152 = models.resnet152(pretrained=False)
 alexnet = models.alexnet(pretrained=False)
-vgg16 = models.vgg16_bn(pretrained=False)
+vgg16 = models.vgg16_bn(pretrained=False, num_classes=10)
 vgg19 = models.vgg19_bn(pretrained=False)
 squeezenet = models.squeezenet1_0(pretrained=False)
 densenet = models.densenet161(pretrained=False)
@@ -29,7 +29,7 @@ if device == 'cuda':
     model = torch.nn.DataParallel(model)
 
 summary(model, (3, 224, 224))
-# print(model)
+print(model)
 '''
 trans = []
 trans.append(transforms.Resize(size=224))

@@ -179,12 +179,12 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
     model_nd = pd.read_csv(model_csv_path).to_numpy()
     model_layer_num = model_nd.shape[0]
     on_RRAM_layer_index2 = []  # translate unsorted on_RRAM_layer_index to sorted MNSIM on_RRAM_layer_index2
-    # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     layer_counter = 0
+    # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     for line in range(model_layer_num):
         if line in on_RRAM_layer_index:
             on_RRAM_layer_index2.append(layer_counter)
-        layer_counter += 1
+        layer_counter = layer_counter + 1
         layer = model_nd[line, ...]
         # CONV
         if layer[5] == 1:
@@ -230,9 +230,10 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
             layer_config_list.append({'type': 'relu'})
             layer_config_list.append({'type': 'pooling', 'mode': 'MAX', 'kernel_size': int(layer[6]), 'stride': int(layer[6])})
             on_RRAM_layer_index2.append(layer_counter) if line in on_RRAM_layer_index else None
-            layer_counter += 1
+            layer_counter = layer_counter + 1
     '''
     # layer by layer
+    on_RRAM_layer_index2 = range(14)
     assert cate in ['lenet', 'vgg16', 'vgg8', 'alexnet', 'resnet18']
     if cate.startswith('lenet'):
         layer_config_list.append({'type': 'conv', 'in_channels': 3, 'out_channels': 6, 'kernel_size': 5})
@@ -391,7 +392,6 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
     else:
         assert 0, f'not support {cate}'
     '''
-    print(layer_config_list)
     for i in range(len(layer_config_list)):
         quantize_config_list.append({'weight_bit': 9, 'activation_bit': 9, 'point_shift': -3})
         if 'input_index' in layer_config_list[i]:
