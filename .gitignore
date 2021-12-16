@@ -10,8 +10,8 @@ MNSIM/Mapping_Model/__pycache__/
 MNSIM/NoC/__pycache__/
 MNSIM/Power_Model/__pycache__/
 mora/__pycache__/
-/.vscode/
-/TestMemcap/torchsummary/__pycache__/
-/maestro/maestro
-/maestro/maestro-top.o
+.vscode/
+TestMemcap/torchsummary/__pycache__/
+maestro/maestro
+maestro/maestro-top.o
 
