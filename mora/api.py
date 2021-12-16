@@ -223,8 +223,8 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     area_dse = area(model, df, homepath, indicator)
     # ii = (edp_dse['dla'] > EDP_cons['dla'] * 0.75) & (edp_dse['rram'] > EDP_cons['rram'] * 0.75)
     # jj = (area_dse['dla'] > area_cons['dla'] * 0.75) & (area_dse['rram'] > area_cons['rram'] * 0.75)
-    ii = (edp_dse['dla'] + edp_dse['rram']) > (EDP_cons['dla'] + EDP_cons['rram']) * 0.75
-    jj = (area_dse['dla'] + area_dse['rram']) > (area_cons['dla'] + area_cons['rram']) * 0.75
+    ii = (edp_dse['dla'] + edp_dse['rram']) > (EDP_cons['dla'] + EDP_cons['rram']) * 0.8
+    jj = (area_dse['dla'] + area_dse['rram']) > (area_cons['dla'] + area_cons['rram']) * 0.8
     if edp_dse['dla'] == 0 or area_dse['dla'] == 0:
         DSE_checkpoint = False
     elif ii | jj:
@@ -233,14 +233,17 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
         DSE_checkpoint = True
     dla_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_dla.csv'))
     rram_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_rram.csv'))
+    mora_output_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/[' + df + ']' + model + '_mora.csv'))
     dla_out_pd = pd.read_csv(dla_output_csv_path)
     rram_out_pd = pd.read_csv(rram_output_csv_path)
     assert dla_out_pd.at[indicator, 'restraint'] == 'unexamined'
     assert rram_out_pd.at[indicator, 'restraint'] == 'unexamined'
+    # todo: add mora result
+    rram_csv_dicts = {}
     if DSE_checkpoint is False:
         dla_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_out_pd.at[indicator, 'restraint'] = 'fail'
-        print('dse checkpoint failed.')
+        print('dse checkpointfailed.')
     else:
         dla_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_out_pd.at[indicator, 'restraint'] = 'pass'

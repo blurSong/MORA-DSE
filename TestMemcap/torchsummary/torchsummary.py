@@ -38,9 +38,9 @@ def summary(model, input_size, batch_size=1, device="cuda"):
                     # if module.groups == 1:
                     xbar_hori_f = module.kernel_size[0] * module.kernel_size[1] * module.in_channels * 1.0 / xbar_size
                     xbar_vert_f = module.out_channels * (16 / 2) / (xbar_size - 1.0)
-                    rram_xbars = math.ceil(xbar_hori_f) * round(xbar_vert_f)
+                    rram_xbars = math.ceil(xbar_hori_f) * math.ceil(xbar_vert_f)
                 elif isinstance(module, nn.Linear):
-                    rram_xbars = math.ceil(module.in_features * 1.0 / xbar_size) * round(module.out_features * (16 / 2) / (xbar_size - 1.0))
+                    rram_xbars = math.ceil(module.in_features * 1.0 / xbar_size) * math.ceil(module.out_features * (16 / 2) / (xbar_size - 1.0))
             if hasattr(module, "bias") and hasattr(module.bias, "size"):
                 params += torch.prod(torch.LongTensor(list(module.bias.size())))
             summary[m_key]["nb_params"] = params
@@ -115,7 +115,7 @@ def summary(model, input_size, batch_size=1, device="cuda"):
     total_size = total_params_size + total_output_size + total_input_size
 
     # mora int16
-    total_memcap = total_xbars * 128**2 * 2.0 / (1024 * 1024 * 8)
+    total_memcap = total_xbars * xbar_size**2 * 2.0 / (1024 * 1024 * 8)
     total_pes = total_xbars / 8.0
     total_tiles = total_pes / 12.0
     total_chips = total_tiles * 1.0 / 168

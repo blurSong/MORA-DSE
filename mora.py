@@ -118,7 +118,8 @@ if __name__ == "__main__":
                                   EDP_cons=edp_cons,
                                   area_cons=area_cons,
                                   hw_param_dicts=hw_param_dicts,
-                                  max_param_dicts=max_hw_param_dicts)
+                                  max_param_dicts=max_hw_param_dicts,
+                                  scenario=args.scenario)
     # TODO: new schedule
 
     mora.schedule.fifo_schedule(DLA=dla,

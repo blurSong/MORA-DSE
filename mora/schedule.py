@@ -5,30 +5,45 @@ import numpy as np
 import pandas as pd
 import subprocess as SP
 import multiprocessing as MP
-from math import ceil
+from math import ceil, floor
 import torch
 import MNSIM
 import mora.HW
 from mora.api import dse_checkpoint
 
 
-def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
+def get_layer_memcap(in_channels, out_channels, kernel_size):
+    xbar_size = 128
+    xbar_hori_f = kernel_size * kernel_size * in_channels * 1.0 / xbar_size
+    xbar_vert_f = out_channels * (16 / 2) / (xbar_size - 1.0)
+    rram_xbars = ceil(xbar_hori_f) * ceil(xbar_vert_f)
+    return rram_xbars * xbar_size**2 * 2.0
+
+
+def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts, scenario):
     assert DLA.home_path == RRAM.home_path
     homepath = RRAM.home_path
+    scenario_step = 1 if scenario == 'embedded' else 0
+    scenario_step = 2 if scenario == 'edge' else 0
+    scenario_step = 4 if scenario == 'cloud' else 0
+    assert scenario_step != 0
     maestro_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '_dla_' + DLA.dataflow + '.csv'))
     model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
     # greedy
-    rounds = (int((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) + 1) * ((
-        (max_param_dicts['tiles'] - hw_param_dicts['tiles']) / 2) + 1)**2 * ((
-            (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
-    print('[mora] Greedy DSE, total rounds:', int(rounds))
+    # rounds = (int((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) + 1) * ((
+    #    (max_param_dicts['tiles'] - hw_param_dicts['tiles']) / 2) + 1)**2 * ((
+    #        (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
+    rounds = (((max_param_dicts['pes'] - hw_param_dicts['pes']) / (scenario_step**2 * 128)) + 1) \
+        * (((max_param_dicts['tiles'] - hw_param_dicts['tiles']) / ceil(scenario_step/2.0)) + 1) \
+        * (((max_param_dicts['bw'] * 0.8 - hw_param_dicts['dla_bw']) / (scenario_step**2)) + 1)
+    print('[mora][DSE] greedy DSE, total rounds:', int(rounds))
     assert rounds < 11451.4, 'too many dse rounds.'
     DSE_indicator = 1
-    for pes in range(hw_param_dicts['pes'], max_param_dicts['pes'] + 4, int(max_param_dicts['pes'] / 128)):
-        for tiles in range(hw_param_dicts['tiles'], max_param_dicts['tiles'], 1):
-            for dbw in range(hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 7 / 8), ceil(max_param_dicts['bw'] / 32)):
+    for pes in range(hw_param_dicts['pes'], max_param_dicts['pes'], scenario_step**2 * 128):
+        for tiles in range(hw_param_dicts['tiles'], max_param_dicts['tiles'], ceil(scenario_step / 2.0)):
+            for dbw in range(hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.8), scenario_step**2):
                 rbw = max_param_dicts['bw'] - dbw
-                print('[mora] Start DSE', DSE_indicator)
+                print('[mora][DSE] start greedy DSE round', DSE_indicator)
                 DLA.set_dse_param(pes, dbw, DSE_indicator)
                 RRAM.set_dse_param(tiles, rbw, DSE_indicator)
                 # run 0: all on dla
@@ -44,9 +59,9 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                     on_RRAM_layer_index = []
                     for _, rows in maestro_result_df.iterrows():
                         layer_index = int(rows[' Layer Number'][1:])
-                        layer_mem_cap = model_csv_nd[layer_index, 0] * model_csv_nd[layer_index, 1] * model_csv_nd[layer_index, 3]**2 * 16 * 2
+                        layer_mem_cap = get_layer_memcap(model_csv_nd[layer_index, 0], model_csv_nd[layer_index, 1], model_csv_nd[layer_index, 3])
                         if (kernel_mem_cap + layer_mem_cap) <= RRAM.mem_capacity:
-                            kernel_mem_cap += layer_mem_cap
+                            kernel_mem_cap = kernel_mem_cap + layer_mem_cap
                             on_RRAM_layer_index.append(layer_index)
                         else:
                             break
@@ -68,7 +83,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                 # set checkpoint
                 dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, DLA.dataflow, homepath)
                 DSE_indicator += 1
-    print("[mora] DSE finish.")
+    print("[mora][DSE] finish.")
     return
 
 
