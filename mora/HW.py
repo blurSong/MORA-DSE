@@ -43,7 +43,7 @@ class DLA(object):
         #   raise AttributeError
         if os.path.exists(maestro_result_csv_path):
             os.remove(maestro_result_csv_path)
-        print("[maestro] Invoked - PEs: {}, NOC: {}, L2 Cache: {}, Dataflow: {}".format(self.dla_dicts['pes'], self.dla_dicts['noc_bw'] / (1024**2),
+        print("[maestro] invoked - PEs: {}, NOC: {}, L2 Cache: {}, Dataflow: {}".format(self.dla_dicts['pes'], self.dla_dicts['noc_bw'] / (1024**2),
                                                                                         self.dla_dicts['glb_size'] / (1024**2), self.dla_dicts['dataflow']))
         params = [self.dla_dicts['pes'], self.dla_dicts['glb_size'], self.dla_dicts['noc_bw'], mapping_path]
         command = "./maestro --num_pes={0[0]} --l2_size_cstr={0[1]} --noc_bw_cstr={0[2]} --Mapping_file='{0[3]}' --print_res=false --print_res_csv_file=true --print_log_file=false".format(
@@ -138,7 +138,7 @@ class RRAM(object):
         # if os.path.exists(output_csv_path):
         #    print("rram outfile conflict.")
         #    raise AttributeError
-        print("[mnsim] Invoked -", self.rram_dicts)
+        print("[mnsim] invoked -", self.rram_dicts)
         import_module("MNSIM_main").main(model, [self.rram_dicts['tiles'], self.rram_dicts['tiles']], self.rram_dicts['noc_bw'], self.DSE_indicator, dataflow,
                                          on_RRAM_layer_index)
         '''

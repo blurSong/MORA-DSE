@@ -12,3 +12,6 @@ MNSIM/Power_Model/__pycache__/
 mora/__pycache__/
 /.vscode/
 /TestMemcap/torchsummary/__pycache__/
+/maestro/maestro
+/maestro/maestro-top.o
+
