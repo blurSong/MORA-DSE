@@ -92,26 +92,28 @@ python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
                    default and usually -1, i.e. the previous layer. the index is **just the layer order in our csv**  
                    for multi-input layers (concat conv, residual, batchnorm, VDP, VADD, GEMM, etc), fill one index in **IDX**, the other in **APD**  
           **[APD]**  
-                  linear： whether it is the first fc layer (yes=1， no=0)   
+                  linear：0: default (not first fc laye), 
+                          1: just the (first fc layer)
+                          2 and above: (first fc layer) pooling kernel size of the pre-appending pooling layer 
                   multi-input layers (concat conv, residual, VDP, VADD, VMUL, GEMM, etc): input index 2  
                   TRCONV: dilation  
                   NGCONV: group number  
                   others: default 0  
 4. All default blank could be： default value or NaN(blank)
 
-| base layer    | IC  | OC  | FS  | KS  | STR | RP  | IDX | APD                                                  | Note               |
-| ------------- | --- | --- | --- | --- | --- | --- | --- | ---------------------------------------------------- | ------------------ |
-| Linear  [0]   | IC  | OC  | 1   | 1   | 1   | RP  | IDX | 1 (is first fc layer) <br> 0 (is not first fc layer) |                    |
-| CONV    [1]   | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0 (default) <br> -x (input index 2 for concat)       |                    |
-| DWCONV [2]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0                                                    | IC = OC            |
-| Residual [3]  | IC  | 1   | FS  | 1   | 1   | RP  | IDX | input index 2                                        | OC = 1 for maestro |
-| Batchnorm [4] | IC  | OC  | FS  | 1   | 1   | RP  | IDX | 0                                                    |                    |
-| TRCONV [5]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | dilation                                             |                    |
-| NGCONV [6]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | group number                                         |                    |
-| VDP [7]       | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                        | IC = OC            |
-| VADD [8]      | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                        | IC = OC            |
-| VMUL [9]      | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                        | IC = OC            |
-| GEMM [10]     | M   | N   | K   | 1   | 1   | RP  | IDX | input index 2                                        | MK * KN            |
+| base layer    | IC  | OC  | FS  | KS  | STR | RP  | IDX | APD                                            | Note               |
+| ------------- | --- | --- | --- | --- | --- | --- | --- | ---------------------------------------------- | ------------------ |
+| Linear  [0]   | IC  | OC  | 1   | 1   | 1   | RP  | IDX | see 3.[APD]                                    |                    |
+| CONV    [1]   | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0 (default) <br> -x (input index 2 for concat) |                    |
+| DWCONV [2]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0                                              | IC = OC            |
+| Residual [3]  | IC  | 1   | FS  | 1   | 1   | RP  | IDX | input index 2                                  | OC = 1 for maestro |
+| Batchnorm [4] | IC  | OC  | FS  | 1   | 1   | RP  | IDX | 0                                              |                    |
+| TRCONV [5]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | dilation                                       |                    |
+| NGCONV [6]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | group number                                   |                    |
+| VDP [7]       | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
+| VADD [8]      | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
+| VMUL [9]      | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
+| GEMM [10]     | M   | N   | K   | 1   | 1   | RP  | IDX | input index 2                                  | MK * KN            |
 
 
 ## LINK
