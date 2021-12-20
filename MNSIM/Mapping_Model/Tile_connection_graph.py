@@ -208,7 +208,7 @@ def generate_zigzag_matrix(row, column):
 
 
 class TCG():
-    def __init__(self, NetStruct, SimConfig_path, disable_pipeline=False, tiles=[16, 16], multiple=None):
+    def __init__(self, NetStruct, SimConfig_path, disable_pipeline=False, tiles=16, multiple=None):
         # NetStruct: layer structure, SimConfig_path: Hardware config path, multiple: allocate more resources for some layers
         TCG_config = cp.ConfigParser()
         TCG_config.read(SimConfig_path, encoding='UTF-8')
@@ -222,10 +222,10 @@ class TCG():
         self.tile_connection = int(TCG_config.get('Architecture level', 'Tile_Connection'))
         # self.tile_num = list(map(int, TCG_config.get('Architecture level', 'Tile_Num').split(',')))
         # mora
-        self.tile_num = tiles
+        self.tile_num = [tiles, tiles]
         if self.tile_num[0] == 0:
-            self.tile_num[0] = 8
-            self.tile_num[1] = 8
+            self.tile_num[0] = 16
+            self.tile_num[1] = 16
         assert self.tile_num[0] > 0, "Tile number < 0"
         assert self.tile_num[1] > 0, "Tile number < 0"
         self.tile_total_num = self.tile_num[0] * self.tile_num[1]

@@ -23,10 +23,14 @@ def get_layer_memcap(in_channels, out_channels, kernel_size):
 def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts, scenario):
     assert DLA.home_path == RRAM.home_path
     homepath = RRAM.home_path
-    scenario_step = 1 if scenario == 'embedded' else 0
-    scenario_step = 2 if scenario == 'edge' else 0
-    scenario_step = 4 if scenario == 'cloud' else 0
-    assert scenario_step != 0
+    if scenario == 'embedded':
+        scenario_step = 1
+    elif scenario == 'edge':
+        scenario_step = 2
+    elif scenario == 'cloud':
+        scenario_step = 4
+    else:
+        raise AssertionError
     maestro_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '_dla_' + DLA.dataflow + '.csv'))
     model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
     # greedy
@@ -43,7 +47,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
         for tiles in range(hw_param_dicts['tiles'], max_param_dicts['tiles'], ceil(scenario_step / 2.0)):
             for dbw in range(hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.8), scenario_step**2):
                 rbw = max_param_dicts['bw'] - dbw
-                print('[mora][DSE] start greedy DSE round', DSE_indicator)
+                print('[mora][DSE] start greedy DSE round', DSE_indicator, '------------------------------------------------------')
                 DLA.set_dse_param(pes, dbw, DSE_indicator)
                 RRAM.set_dse_param(tiles, rbw, DSE_indicator)
                 # run 0: all on dla

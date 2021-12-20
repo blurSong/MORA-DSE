@@ -44,7 +44,7 @@ def Data_clean():
     # print("Removed unnecessary file.")
 
 
-def main(_model='vgg16', _tiles=[24, 24], _noc_bw=20, _DSE_indicator=0, _dataflow='kcp_ws', _on_RRAM_layer_index=[]):
+def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicator=0, _dataflow='kcp_ws', _on_RRAM_layer_index=[]):
 
     home_path = os.getcwd()
     SimConfig_path = os.path.join(home_path, "rram_config.ini")
@@ -90,7 +90,7 @@ def main(_model='vgg16', _tiles=[24, 24], _noc_bw=20, _DSE_indicator=0, _dataflo
 
     # mora args
     parser.add_argument("--model", type=str, default='vgg16', help="NN model name, default: vgg16")
-    parser.add_argument("--tiles", nargs='+', type=int, default=[24, 24], help="tiles [row, col] of a chip")
+    parser.add_argument("--tiles", nargs='+', type=int, default=24, help="tiles [row, col] of a chip")
     parser.add_argument("--noc_bw", type=int, default=20)
     parser.add_argument("--dataflow", type=str, default='kcp_ws')
     parser.add_argument('--scenario', type=str, default='edge', choices=['embedded', 'edge', 'cloud'])
@@ -119,6 +119,7 @@ def main(_model='vgg16', _tiles=[24, 24], _noc_bw=20, _DSE_indicator=0, _dataflo
         args.tiles = _tiles
         args.noc_bw = _noc_bw
         args.dataflow = _dataflow
+        tiles_buildin = _tiles_buildin
 
     if _on_RRAM_layer_index:
         on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
@@ -141,7 +142,8 @@ def main(_model='vgg16', _tiles=[24, 24], _noc_bw=20, _DSE_indicator=0, _dataflo
                                          device=args.device)
     structure_file = __TestInterface.get_structure()
     on_RRAM_layer_index2 = __TestInterface.on_RRAM_layer_index2
-    TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline, args.tiles)
+    # TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline, args.tiles)
+    TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline, tiles_buildin)
 
     if not (args.disable_hardware_modeling):
         __latency = Model_latency(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping, inter_tile_bandwidth=args.noc_bw)
@@ -181,7 +183,7 @@ def main(_model='vgg16', _tiles=[24, 24], _noc_bw=20, _DSE_indicator=0, _dataflo
             print("PIM-based computing accuracy:", __TestInterface.set_net_bits_evaluate(weight_2, adc_action='FIX'))
 
     # write mora csv
-    output_csv_dicts['HW (t_rol,t_col,  tile_bw)'] = '{} {} {}'.format(args.tiles[0], args.tiles[1], args.noc_bw)
+    output_csv_dicts['HW (tiles, bw)'] = '{} {}'.format(args.tiles, args.noc_bw)
     output_csv_dicts['restraint'] = 'unexamined' if _DSE_indicator != 0 else 'pass'
     output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/[' + args.dataflow + ']' + args.model + '_rram.csv'))
     csv = pd.DataFrame(output_csv_dicts, index=[_DSE_indicator])

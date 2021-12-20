@@ -30,6 +30,8 @@ import multiprocessing as MP
 import torch
 import MNSIM
 import mora
+import openpyxl
+import math
 
 
 def set_path(model, dataflow):
@@ -53,7 +55,7 @@ def set_path(model, dataflow):
 def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
     parser.add_argument('--dataflow', type=str, default='kcp_ws', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
-    parser.add_argument('--model', type=str, default='alexnet')
+    parser.add_argument('--model', type=str, default='vgg16')
     parser.add_argument('--scenario', type=str, default='edge', choices=['embedded', 'edge', 'cloud'])
     return parser
 
@@ -67,6 +69,26 @@ def hw_init(hw_config_path):
                 hw_dicts[params.strip()] = int(values.strip())
             except ValueError:
                 print("check your config file.")
+    return hw_dicts
+
+
+def hw_init(model, max_hw_param_dicts):
+    hw_dicts = {}
+    modeldata = openpyxl.load_workbook('model/modelmem.xlsx')
+    sheet1 = modeldata.worksheets[0]
+    for rowidx in range(1, sheet1.max_row):
+        if sheet1.cell(rowidx, 1).value == model:
+            xbarnum = sheet1.cell(rowidx, 5).value
+            break
+    rrampes = math.ceil(xbarnum / 8.0)
+    rramtiles = math.ceil(rrampes / 16.0)
+    hw_dicts['tiles-buildin'] = math.ceil(math.sqrt(rramtiles))
+    assert hw_dicts['tiles-buildin'] <= max_hw_param_dicts['tiles'], "[mora][HW] Scenario too small for rram."
+    hw_dicts['tiles'] = int(max_hw_param_dicts['tiles'] / 4)
+    hw_dicts['pes'] = int(max_hw_param_dicts['pes'] / 4)
+    hw_dicts['glb_size'] = int(max_hw_param_dicts['glb_size'])
+    hw_dicts['dla_bw'] = int(max_hw_param_dicts['bw'] / 4)
+    hw_dicts['rram_bw'] = int(max_hw_param_dicts['bw'] / 4)
     return hw_dicts
 
 
@@ -97,8 +119,9 @@ def set_hw_range(scenario):
 if __name__ == "__main__":
     args = set_parser().parse_args()
     set_path(args.model, args.dataflow)
-    hw_param_dicts = hw_init(hw_config_path)
     max_hw_param_dicts = set_hw_range(args.scenario)
+    hw_param_dicts = hw_init(args.model, max_hw_param_dicts)
+    max_hw_param_dicts['tiles-buildin'] = hw_param_dicts['tiles-buildin'] + 10
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(max_hw_param_dicts, home_path)
     mora.api.check_mora_csv(home_path, args.model)

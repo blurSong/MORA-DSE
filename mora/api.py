@@ -85,7 +85,7 @@ def check_mora_csv(homepath, model):
     for idx, layer in model_df.iterrows():
         layertype = MLTD[layer['TYP']]
         if layertype == 'Linear':
-            if layer['FS'] == 1 and layer['KS'] == 1 and layer['STR'] == 1 and layer['IDX'] < 0 and (layer['APD'] == 1 or layer['APD'] == 0):
+            if layer['FS'] == 1 and layer['KS'] == 1 and layer['STR'] == 1 and layer['IDX'] < 0 and layer['APD'] >= 0:
                 continue
         elif layertype == 'CONV':
             if layer['IDX'] < 0 and layer['APD'] <= 0:
@@ -240,14 +240,32 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     assert rram_out_pd.at[indicator, 'restraint'] == 'unexamined'
     # todo: add mora result
     rram_csv_dicts = {}
+    rram_csv_dicts['DSE index'] = indicator
+    rram_csv_dicts['DLA DSE HW (pes, bw)'] = dla_out_pd.at[indicator, 'HW (pes, bw)']
+    rram_csv_dicts['RRAM DSE HW (tiles, bw)'] = rram_out_pd.at[indicator, 'HW (tiles, bw)']
+    rram_csv_dicts['DLA layernum'] = dla_out_pd.at[indicator, 'layers']
+    rram_csv_dicts['RRAM layernum'] = rram_out_pd.at[indicator, 'layers']
+    rram_csv_dicts['DLA EDP'] = edp_dse['dla']
+    rram_csv_dicts['RRAM EDP'] = edp_dse['rram']
+    rram_csv_dicts['DLA area'] = area_dse['dla']
+    rram_csv_dicts['DLA area'] = area_dse['dla']
+    rram_csv_dicts['restraint'] = 'unexamined'
+
     if DSE_checkpoint is False:
         dla_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_out_pd.at[indicator, 'restraint'] = 'fail'
-        print('dse checkpointfailed.')
+        rram_csv_dicts['restraint'] = 'fail'
+        print('DSE checkpoint failed.')
     else:
         dla_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_out_pd.at[indicator, 'restraint'] = 'pass'
-        print('dse checkpoint passed.')
+        rram_csv_dicts['restraint'] = 'pass'
+        print('DSE checkpoint passed.')
     dla_out_pd.to_csv(dla_output_csv_path, index=False)
     rram_out_pd.to_csv(rram_output_csv_path, index=False)
+    mora_csv = pd.DataFrame(rram_csv_dicts, index=[indicator])
+    if os.path.exists(mora_output_csv_path):
+        mora_csv.to_csv(mora_output_csv_path, mode='a', header=False, index=False)
+    else:
+        mora_csv.to_csv(mora_output_csv_path, index=False)
     return

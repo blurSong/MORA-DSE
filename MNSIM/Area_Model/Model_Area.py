@@ -17,7 +17,7 @@ import math
 
 
 class Model_area():
-    def __init__(self, NetStruct, SimConfig_path, multiple=None, TCG_mapping=None):
+    def __init__(self, NetStruct, SimConfig_path, multiple=None, TCG_mapping=None, tiles=24):
         self.NetStruct = NetStruct
         self.SimConfig_path = SimConfig_path
         # modelL_config = cp.ConfigParser()
@@ -156,6 +156,7 @@ class Model_area():
         for lyr in range(self.total_layer_num):
             if lyr in oRli2:
                 mora_area += self.arch_area[lyr]
+        assert mora_area <= self.arch_total_area
         print("Hardware area:", self.arch_total_area, "um^2")
         if module_information:
             print("		crossbar area:", self.arch_total_xbar_area, "um^2")

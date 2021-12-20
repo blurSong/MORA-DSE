@@ -83,7 +83,7 @@ class DLA(object):
                 return
             output_csv_dicts['DSE index'] = self.DSE_indicator
             output_csv_dicts['layers'] = len(on_DLA_layer_index)
-            output_csv_dicts['latency'] = runtime_nd.sum() * (1000 / 800)
+            output_csv_dicts['latency'] = runtime_nd.sum() * (1500 / 800)
             output_csv_dicts['energy'] = energy_nd.sum()
             output_csv_dicts['area'] = area
             output_csv_dicts['power'] = power_nd.mean()  # wrong
@@ -116,6 +116,7 @@ class RRAM(object):
         rram_dicts = {}
         # rram_dicts['tile_row'] = self.hw_param_dicts['tiles']
         # rram_dicts['tile_col'] = self.hw_param_dicts['tiles']
+        rram_dicts['tiles-buildin'] = self.hw_param_dicts['tiles-buildin']  # add buildin tiles for MNSIM runtime
         rram_dicts['tiles'] = self.hw_param_dicts['tiles']
         rram_dicts['glb_size'] = self.hw_param_dicts['glb_size']
         rram_dicts['noc_bw'] = self.hw_param_dicts['bw']  # GB/s
@@ -139,8 +140,8 @@ class RRAM(object):
         #    print("rram outfile conflict.")
         #    raise AttributeError
         print("[mnsim] invoked -", self.rram_dicts)
-        import_module("MNSIM_main").main(model, [self.rram_dicts['tiles'], self.rram_dicts['tiles']], self.rram_dicts['noc_bw'], self.DSE_indicator, dataflow,
-                                         on_RRAM_layer_index)
+        import_module("MNSIM_main").main(model, self.rram_dicts['tiles'], self.rram_dicts['tiles-buildin'], self.rram_dicts['noc_bw'], self.DSE_indicator,
+                                         dataflow, on_RRAM_layer_index)
         '''
         command = [
             "python", "../MNSIM.py", "--model {}".format(model), "--tiles {} {}".format(self.rram_dicts['tiles'], self.rram_dicts['tiles']),

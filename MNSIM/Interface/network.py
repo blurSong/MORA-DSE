@@ -203,7 +203,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
                     layer_config_list[-1]['input_index'] = [int(layer[7]), int(layer[8])]
         # Linear
         elif layer[5] == 0:
-            if layer[8] == 1:  # first fc layer
+            if layer[8] > 0:  # first fc layer
                 layer_config_list.append({'type': 'view'})
             layer_config_list.append({'type': 'fc', 'in_features': int(layer[0]), 'out_features': int(layer[1])})
         # DWCONV
@@ -398,7 +398,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
             input_index_list.append(layer_config_list[i]['input_index'])
         else:
             input_index_list.append([-1])
-    input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, 224, 224)}  # 32 * 7
+    input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, 32, 32)}  # 32 * 7
     # add bn for every conv
     L = len(layer_config_list)
     for i in range(L - 1, -1, -1):
