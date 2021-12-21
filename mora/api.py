@@ -132,13 +132,17 @@ def remove_csv_bn(homepath, model):
             model_df.at[idx + layer['IDX'], 'RP'] = layer['RP']
     for idx, layer in model_df.iterrows():
         if layer['IDX'] != -1:
-            for tmpidx in range(layer['IDX'], 1, 0):
+            for tmpidx in range(layer['IDX'] + 1, 0, 1):
                 if MLTD[model_df.at[idx + tmpidx, 'TYP']] == 'Batchnorm':
                     layer['IDX'] += 1
+                if model_df.at[idx + tmpidx, 'RP'] > 0:
+                    layer['IDX'] -= 1 if model_df.at[idx + tmpidx, 'RP'] == 1 else 2
         if apd_is_index2(MLTD[layer['TYP']], layer['APD']):
-            for tmpidx in range(layer['APD'], 1, 0):
+            for tmpidx in range(layer['APD'] + 1, 0, 1):
                 if MLTD[model_df.at[idx + tmpidx, 'TYP']] == 'Batchnorm':
                     layer['APD'] += 1
+                if model_df.at[idx + tmpidx, 'RP'] > 0:
+                    layer['APD'] -= 1 if model_df.at[idx + tmpidx, 'RP'] == 1 else 2
     model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
     model_df.to_csv(model_csv_path_nobn, index=False)
     print("[mora][remove csv BN] csv bn layers removed.")
@@ -241,8 +245,8 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     # todo: add mora result
     rram_csv_dicts = {}
     rram_csv_dicts['DSE index'] = indicator
-    rram_csv_dicts['DLA DSE HW (pes, bw)'] = dla_out_pd.at[indicator, 'HW (pes, bw)']
-    rram_csv_dicts['RRAM DSE HW (tiles, bw)'] = rram_out_pd.at[indicator, 'HW (tiles, bw)']
+    rram_csv_dicts['DLA HW (pes, bw)'] = dla_out_pd.at[indicator, 'HW (pes, bw)']
+    rram_csv_dicts['RRAM HW (tiles, bw)'] = rram_out_pd.at[indicator, 'HW (tiles, bw)']
     rram_csv_dicts['DLA layernum'] = dla_out_pd.at[indicator, 'layers']
     rram_csv_dicts['RRAM layernum'] = rram_out_pd.at[indicator, 'layers']
     rram_csv_dicts['DLA EDP'] = edp_dse['dla']

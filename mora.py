@@ -118,7 +118,8 @@ def set_hw_range(scenario):
 
 
 if __name__ == "__main__":
-    args = set_parser().parse_args()
+    parser = set_parser()
+    args = parser.parse_args()
     set_path(args.model, args.dataflow)
     max_hw_param_dicts = set_hw_range(args.scenario)
     hw_param_dicts = hw_init(args.model, max_hw_param_dicts)
