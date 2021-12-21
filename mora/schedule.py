@@ -47,7 +47,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
         for tiles in range(hw_param_dicts['tiles'], max_param_dicts['tiles'], ceil(scenario_step / 2.0)):
             for dbw in range(hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.8), scenario_step**2):
                 rbw = max_param_dicts['bw'] - dbw
-                print('[mora][DSE] start greedy DSE round', DSE_indicator, '------------------------------------------------------')
+                print('[mora][DSE] start greedy DSE round', DSE_indicator, '-----------------------------------------')
                 DLA.set_dse_param(pes, dbw, DSE_indicator)
                 RRAM.set_dse_param(tiles, rbw, DSE_indicator)
                 # run 0: all on dla
