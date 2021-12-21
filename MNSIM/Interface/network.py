@@ -204,7 +204,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
         # Linear
         elif layer[5] == 0:
             if layer[8] > 0:  # first fc layer
-                layer_config_list.append({'type': 'view'})
+                layer_config_list.append({'type': 'view'})  # if APD > 1, an extra pooling layer is no need for MNSIM
             layer_config_list.append({'type': 'fc', 'in_features': int(layer[0]), 'out_features': int(layer[1])})
         # DWCONV
         elif layer[5] == 2:

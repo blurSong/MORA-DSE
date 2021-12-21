@@ -122,7 +122,7 @@ if __name__ == "__main__":
     set_path(args.model, args.dataflow)
     max_hw_param_dicts = set_hw_range(args.scenario)
     hw_param_dicts = hw_init(args.model, max_hw_param_dicts)
-    # max_hw_param_dicts['tiles-buildin'] = hw_param_dicts['tiles-buildin'] + 2
+    max_hw_param_dicts['tiles-buildin'] = hw_param_dicts['tiles-buildin'] + 2
     max_hw_param_dicts['tiles'] = hw_param_dicts['tiles-buildin'] + 2
 
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
