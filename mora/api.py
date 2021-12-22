@@ -115,7 +115,7 @@ def check_mora_csv(homepath, model):
         print("[mora][check csv] line {0} layer {1} params are wrong.".format(idx, layertype))
         goodcsv = 0
     assert goodcsv == 1
-    print("[mora][check csv] {}_mora.csv file is right.".format(model))
+    print("[mora][Check csv] {}_mora.csv file is right.".format(model))
 
 
 def remove_csv_bn(homepath, model):
@@ -127,9 +127,10 @@ def remove_csv_bn(homepath, model):
     # 1. refill ReLU pooling to previous layer  2. refill index to next layer
     for idx, layer in model_df.iterrows():
         if MLTD[layer['TYP']] == 'Batchnorm':
-            assert layer['IDX'] == -1, "[mora][remove csv BN] Batchnorm idx is not -1."
-            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][remove BN] ConvBNRelu, conv rp is not 0."
+            assert layer['IDX'] == -1, "[mora][Remove BN] Batchnorm idx is not -1."
+            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][Remove BN] ConvBNReLU, conv rp is not 0."
             model_df.at[idx + layer['IDX'], 'RP'] = layer['RP']
+            layer['RP'] = 0
     for idx, layer in model_df.iterrows():
         if layer['IDX'] != -1:
             for tmpidx in range(layer['IDX'] + 1, 0, 1):
@@ -145,7 +146,7 @@ def remove_csv_bn(homepath, model):
                     layer['APD'] -= 1 if model_df.at[idx + tmpidx, 'RP'] == 1 else 2
     model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
     model_df.to_csv(model_csv_path_nobn, index=False)
-    print("[mora][remove BN] csv bn layers removed.")
+    print("[mora][Remove BN] csv bn layers removed.")
     return
 
 

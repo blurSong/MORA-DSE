@@ -56,7 +56,7 @@ def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
     parser.add_argument('--dataflow', type=str, default='kcp_ws', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
     parser.add_argument('--model', type=str, default='vgg16')
-    parser.add_argument('--scenario', type=str, default='edge', choices=['embedded', 'edge', 'cloud'])
+    parser.add_argument('--scenario', type=str, default='embedded', choices=['embedded', 'edge', 'cloud'])
     return parser
 
 
