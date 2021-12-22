@@ -7,6 +7,7 @@ from torchsummary import summary
 sys.path.append(os.path.dirname(__file__))
 
 resnet18 = models.resnet18(pretrained=False)
+resnet34 = models.resnet34(pretrained=False)
 resnet50 = models.resnet50(pretrained=False)
 resnet152 = models.resnet152(pretrained=False)
 alexnet = models.alexnet(pretrained=False)
@@ -22,7 +23,7 @@ resnext50_32x4d = models.resnext50_32x4d(pretrained=False)
 wide_resnet50_2 = models.wide_resnet50_2(pretrained=False)
 mnasnet = models.mnasnet1_0(pretrained=False)
 
-model = alexnet
+model = mobilenet_v2
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 if device == 'cuda':
     model = model.to(device)
