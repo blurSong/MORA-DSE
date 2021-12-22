@@ -2,7 +2,7 @@ Network resnet18 {
 Layer L0 {
 Type: CONV 
 Stride { X: 2, Y: 2 }
-Dimensions { K: 64, C: 3, R: 7, S: 7, Y: 224, X: 224 }
+Dimensions { K: 64, C: 3, R: 8, S: 8, Y: 228, X: 228 }
 }
 Layer L1 {
 Type: CONV 

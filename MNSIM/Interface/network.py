@@ -233,7 +233,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
             layer_counter = layer_counter + 1
     '''
     # layer by layer
-    on_RRAM_layer_index2 = range(14)
+    on_RRAM_layer_index2 = range(18)
     assert cate in ['lenet', 'vgg16', 'vgg8', 'alexnet', 'resnet18']
     if cate.startswith('lenet'):
         layer_config_list.append({'type': 'conv', 'in_channels': 3, 'out_channels': 6, 'kernel_size': 5})
@@ -398,7 +398,17 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
             input_index_list.append(layer_config_list[i]['input_index'])
         else:
             input_index_list.append([-1])
-    input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, 32, 32)}  # 32 * 7
+    # input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, 224, 224)}  # 32 * 7
+    # Mora autoadjust input shape
+    if re.search('vgg', cate):
+        shape = 32
+    elif re.search('resnet', cate):
+        shape = 228
+    elif re.search('mobilenet', cate):
+        shape = 224
+    else:
+        shape = 32
+    input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, shape, shape)}  # 32 * 7
     # add bn for every conv
     L = len(layer_config_list)
     for i in range(L - 1, -1, -1):
