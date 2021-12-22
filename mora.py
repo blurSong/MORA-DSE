@@ -133,7 +133,7 @@ if __name__ == "__main__":
     mora.api.gemm(home_path, args.model, args.dataflow)
     # TODO: new workload
 
-    print("[mora] init indicator.")
+    print("[mora] Init indicator.")
     dla.invoke_maestro(args.model)
     dla.export(args.model)
     rram.invoke_MNSIM(args.model, args.dataflow)

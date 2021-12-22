@@ -128,7 +128,7 @@ def remove_csv_bn(homepath, model):
     for idx, layer in model_df.iterrows():
         if MLTD[layer['TYP']] == 'Batchnorm':
             assert layer['IDX'] == -1, "[mora][remove csv BN] Batchnorm idx is not -1."
-            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][remove csv BN] ConvBNRelu, conv rp is not 0."
+            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][remove BN] ConvBNRelu, conv rp is not 0."
             model_df.at[idx + layer['IDX'], 'RP'] = layer['RP']
     for idx, layer in model_df.iterrows():
         if layer['IDX'] != -1:
@@ -145,7 +145,7 @@ def remove_csv_bn(homepath, model):
                     layer['APD'] -= 1 if model_df.at[idx + tmpidx, 'RP'] == 1 else 2
     model_df = model_df.drop(model_df[model_df['TYP'] == 4].index)
     model_df.to_csv(model_csv_path_nobn, index=False)
-    print("[mora][remove csv BN] csv bn layers removed.")
+    print("[mora][remove BN] csv bn layers removed.")
     return
 
 
@@ -176,7 +176,7 @@ def gemm(homepath, model, dataflow):
             fo.write("Dimensions {{ K: {0[0]}, C: {0[1]}, R: {0[2]}, S: {0[3]}, Y: {0[4]}, X: {0[5]} }}\n".format(KCRSYX))
             fo.write("}\n")
         fo.write("}")
-    print("[mora][generate maestro model] done csv to maestro model.")
+    print("[mora][GEMM] Done csv to maestro model.")
 
     # maestro model to meastro mapping model
     # ykp_os, yxp_os, kcp_ws, xp_ws, rs
@@ -212,7 +212,7 @@ def gemm(homepath, model, dataflow):
                             dsconv = False
                         else:
                             fo.write(line)
-    print("[mora][generate maestro model] done maestro model to mapping.")
+    print("[mora][GEMM] Done maestro model to mapping.")
     return
 
 
