@@ -193,9 +193,10 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
                 'in_channels': int(layer[0]),
                 'out_channels': int(layer[1]),
                 'kernel_size': int(layer[3]),
-                'padding': 1,
                 'stride': int(layer[4])
             })
+            if layer[3] != 1:
+                layer_config_list[-1]['padding'] = 1
             if layer[7] != -1:
                 if layer[8] == 0:
                     layer_config_list[-1]['input_index'] = [int(layer[7])]

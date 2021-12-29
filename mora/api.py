@@ -128,7 +128,7 @@ def remove_csv_bn(homepath, model):
     for idx, layer in model_df.iterrows():
         if MLTD[layer['TYP']] == 'Batchnorm':
             assert layer['IDX'] == -1, "[mora][Remove BN] Batchnorm idx is not -1."
-            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][Remove BN] ConvBNReLU, conv rp is not 0."
+            assert model_df.at[idx + layer['IDX'], 'RP'] == 0, "[mora][Remove BN] ConvBNReLU, conv layer {0} RP is not 0.".format(idx + layer['IDX'])
             model_df.at[idx + layer['IDX'], 'RP'] = layer['RP']
             layer['RP'] = 0
     for idx, layer in model_df.iterrows():
