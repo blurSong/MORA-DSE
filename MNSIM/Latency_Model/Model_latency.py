@@ -421,8 +421,8 @@ class Model_latency():
                                                  input_size[1] + min(max(kernelsize-padding,1) + stride * j, input_size[1]) - 1
                             else:
                                 last_layer_pos = i * stride * input_size[1] + j * stride
-                            if last_layer_pos > len(self.finish_time[layer_id - 1]) - 1:
-                                print("pos error", i, j)
+                            # if last_layer_pos > len(self.finish_time[layer_id - 1]) - 1:
+                            #    print("pos error", i, j)
                             if (i == 0) & (j == 0):
                                 # the first output
                                 indata = input_channel_PE * (input_size[1] * max(kernelsize - padding - 1, 0) + max(kernelsize - padding, 0)) * inputbit / 8
@@ -1007,7 +1007,7 @@ class Model_latency():
                                 else:
                                     last_layer_pos = i * stride * input_size[1] + j * stride
                                 # if last_layer_pos > len(self.finish_time[layer_id - 1]) - 1:
-                                #     print("pos error", i, j)
+                                #    print("pos error", i, j)
                                 if (i == 0) & (j == 0):
                                     ''' the first output '''
                                     if mode == 0:
