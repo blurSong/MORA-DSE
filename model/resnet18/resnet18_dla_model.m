@@ -81,8 +81,8 @@ Dimensions { K: 256, C: 256, R: 3, S: 3, Y: 14, X: 14 }
 }
 Layer L16 {
 Type: CONV 
-Stride { X: 3, Y: 3 }
-Dimensions { K: 256, C: 128, R: 1, S: 1, Y: 28, X: 28 }
+Stride { X: 2, Y: 2 }
+Dimensions { K: 256, C: 128, R: 3, S: 3, Y: 28, X: 28 }
 }
 Layer L17 {
 Type: DSCONV 
