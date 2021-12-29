@@ -208,9 +208,18 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
             layer_config_list.append({'type': 'fc', 'in_features': int(layer[0]), 'out_features': int(layer[1])})
         # DWCONV
         elif layer[5] == 2:
-            raise AssertionError
-            # TODO: support in-efficient dwconv in MNSIM
-        # Residual
+            layer_config_list.append({
+                'type': 'conv',
+                'in_channels': int(layer[0]),
+                'out_channels': int(layer[1]),
+                'kernel_size': int(layer[3]),
+                'padding': 1,
+                'stride': int(layer[4])
+            })
+            assert layer[8] == 0 and layer[0] == layer[1]
+            if layer[7] != 0:
+                layer_config_list[-1]['input_index'] = [int(layer[7])]
+            # Residual
         elif layer[5] == 3:
             assert layer[7] == -1
             layer_config_list.append({'type': 'element_sum', 'input_index': [int(layer[7]), int(layer[8])]})
@@ -407,7 +416,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
     elif re.search('mobilenet', cate):
         shape = 224
     else:
-        shape = 32
+        shape = 224
     input_params = {'activation_scale': 1. / 255., 'activation_bit': 9, 'input_shape': (1, 3, shape, shape)}  # 32 * 7
     # add bn for every conv
     L = len(layer_config_list)
