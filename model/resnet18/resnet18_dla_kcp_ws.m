@@ -413,8 +413,8 @@ Dataflow {
 }
 Layer L23 {
 Type: CONV 
-Stride { X: 3, Y: 3 }
-Dimensions { K: 512, C: 256, R: 1, S: 1, Y: 14, X: 14 }
+Stride { X: 2, Y: 2 }
+Dimensions { K: 512, C: 256, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
