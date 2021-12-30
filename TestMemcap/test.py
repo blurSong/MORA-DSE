@@ -18,11 +18,11 @@ inception = models.inception_v3(pretrained=False)
 googlenet = models.googlenet(pretrained=False)
 shufflenet = models.shufflenet_v2_x1_0(pretrained=False)
 mobilenet_v2 = models.mobilenet_v2(pretrained=False)
-resnext50_32x4d = models.resnext50_32x4d(pretrained=False)
+resnext50 = models.resnext50_32x4d(pretrained=False)
 wide_resnet50_2 = models.wide_resnet50_2(pretrained=False)
 mnasnet = models.mnasnet1_0(pretrained=False)
 
-model = mobilenet_v2
+model = resnext50
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 if device == 'cuda':
     model = model.to(device)
