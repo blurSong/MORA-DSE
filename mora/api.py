@@ -174,7 +174,10 @@ def gemm(homepath, model, dataflow):
             fo.write("Layer L{} {{\n".format(line))
             fo.write("Type: {} \n".format(MLTRD[MLTD[layer[5]]]))
             fo.write("Stride {{ X: {}, Y: {} }}\n".format(layer[4], layer[4]))
-            fo.write("Dimensions {{ K: {0[0]}, C: {0[1]}, R: {0[2]}, S: {0[3]}, Y: {0[4]}, X: {0[5]} }}\n".format(KCRSYX))
+            if layer[5] == 6:  # NGCONV
+                fo.write("Dimensions {{ G: {0}, K: {1[0]}, C: {1[1]}, R: {1[2]}, S: {1[3]}, Y: {1[4]}, X: {1[5]} }}\n".format(layer[8], KCRSYX))
+            else:
+                fo.write("Dimensions {{ K: {0[0]}, C: {0[1]}, R: {0[2]}, S: {0[3]}, Y: {0[4]}, X: {0[5]} }}\n".format(KCRSYX))
             fo.write("}\n")
         fo.write("}")
     print("[mora][GEMM] Done csv to maestro model.")

@@ -186,7 +186,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
             on_RRAM_layer_index2.append(layer_counter)
         layer_counter = layer_counter + 1
         layer = model_nd[line, ...]
-        # CONV
+        # 1CONV
         if layer[5] == 1:
             layer_config_list.append({
                 'type': 'conv',
@@ -195,20 +195,22 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
                 'kernel_size': int(layer[3]),
                 'stride': int(layer[4])
             })
-            if layer[3] != 1:
+            if layer[3] != 1:  # for 1x1 conv , padding is 0
                 layer_config_list[-1]['padding'] = 1
             if layer[7] != -1:
                 if layer[8] == 0:
                     layer_config_list[-1]['input_index'] = [int(layer[7])]
                 else:
                     layer_config_list[-1]['input_index'] = [int(layer[7]), int(layer[8])]
-        # Linear
+        # 0Linear
         elif layer[5] == 0:
             if layer[8] > 0:  # first fc layer
                 layer_config_list.append({'type': 'view'})  # if APD > 1, an extra pooling layer is no need for MNSIM
             layer_config_list.append({'type': 'fc', 'in_features': int(layer[0]), 'out_features': int(layer[1])})
-        # DWCONV
-        elif layer[5] == 2:
+        # 2DWCONV
+        # 6NGCONV
+        elif layer[5] == 2 or layer[5] == 6:
+            # group = layer[0] if layer[5] == 2 else layer[8]
             layer_config_list.append({
                 'type': 'conv',
                 'in_channels': int(layer[0]),
@@ -216,24 +218,21 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
                 'kernel_size': int(layer[3]),
                 'padding': 1,
                 'stride': int(layer[4])
+                # 'group': group)
             })
-            assert layer[8] == 0 and layer[0] == layer[1]
-            if layer[7] != 0:
+            if layer[7] != -1:
                 layer_config_list[-1]['input_index'] = [int(layer[7])]
-            # Residual
+        # 3Residual
         elif layer[5] == 3:
             assert layer[7] == -1
             layer_config_list.append({'type': 'element_sum', 'input_index': [int(layer[7]), int(layer[8])]})
-        # TRCONV
+        # 5TRCONV
         elif layer[5] == 5:
             raise AssertionError
             # TODO: TRCONV
-        # NGCONV
-        elif layer[5] == 6:  # NGCONV
-            raise AssertionError
-            # TODO: NGCONV
         else:
             raise AttributeError
+
         if layer[6] == 1:
             layer_config_list.append({'type': 'relu'})
         elif layer[6] >= 2:
