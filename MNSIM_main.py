@@ -129,6 +129,7 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
         model_layer_num = model_nd.shape[0]
         on_RRAM_layer_index = range(model_layer_num)
     else:  # indicates no layers RRAM can excu
+        on_RRAM_layer_index = []
         print('No layers RRAM can excute. Skip')
 
     output_csv_dicts = {}
