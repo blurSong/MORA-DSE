@@ -46,7 +46,7 @@ def set_path(model, dataflow):
         SP.run('rm *.csv', cwd=output_path, shell=True)
     if os.path.exists(model_path):
         SP.run('rm ' + model + '.csv', cwd=model_path, shell=True)
-        SP.run('rm *.m', cwd=model_path, shell=True)
+        SP.run('rm *{}.m'.format(dataflow), cwd=model_path, shell=True)
     sys.path.append(home_path)
     sys.path.append(MNSIM_path)
     sys.path.append(maestro_path)
@@ -55,7 +55,7 @@ def set_path(model, dataflow):
 def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
     parser.add_argument('--dataflow', type=str, default='kcp_ws', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
-    parser.add_argument('--model', type=str, default='resnet50')
+    parser.add_argument('--model', type=str, default='resnet18')
     parser.add_argument('--scenario', type=str, default='edge', choices=['embedded', 'edge', 'cloud'])
     return parser
 
