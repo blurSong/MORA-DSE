@@ -120,6 +120,7 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
         args.noc_bw = _noc_bw
         args.dataflow = _dataflow
         tiles_buildin = _tiles_buildin
+        mora_skip_simu = False
 
     if _on_RRAM_layer_index:
         on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
@@ -130,6 +131,7 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
         on_RRAM_layer_index = range(model_layer_num)
     else:  # indicates no layers RRAM can excu
         on_RRAM_layer_index = []
+        mora_skip_simu = True
         print('No layers RRAM can excute. Skip')
 
     output_csv_dicts = {}
@@ -146,7 +148,7 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
     # TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline, args.tiles)
     TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline, tiles_buildin)
 
-    if not (args.disable_hardware_modeling):
+    if not (args.disable_hardware_modeling) and not (mora_skip_simu):
         __latency = Model_latency(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping, inter_tile_bandwidth=args.noc_bw)
         if not (args.disable_inner_pipeline):
             __latency.calculate_model_latency(mode=1)
@@ -170,6 +172,11 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
                                 model_power=__power)
         # print("========================Energy Results=================================")
         output_csv_dicts['energy'] = __energy.model_energy_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
+    else:
+        output_csv_dicts['latency'] = 0
+        output_csv_dicts['area'] = 0
+        output_csv_dicts['power'] = 0
+        output_csv_dicts['energy'] = 0
 
     if not (args.disable_accuracy_simulation):
         print("======================================")
