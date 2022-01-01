@@ -263,12 +263,12 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
         dla_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_csv_dicts['restraint'] = 'fail'
-        print('DSE checkpoint failed.')
+        print('[mora][DSE] checkpoint failed.')
     else:
         dla_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_csv_dicts['restraint'] = 'pass'
-        print('DSE checkpoint passed.')
+        print('[mora][DSE] checkpoint passed.')
     dla_out_pd.to_csv(dla_output_csv_path, index=False)
     rram_out_pd.to_csv(rram_output_csv_path, index=False)
     mora_csv = pd.DataFrame(rram_csv_dicts, index=[indicator])
