@@ -43,7 +43,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
     rounds = int(rounds)
     print('[mora][DSE] Greedy DSE, total rounds:', rounds)
     print('Starting HW:', hw_param_dicts)
-    print('Ending HW:', max_param_dicts)
+    print('Ending HW:', max_param_dicts, '\n')
     assert rounds < 11451.4, 'too many dse rounds.'
     DSE_indicator = 1
     for pes in range(hw_param_dicts['pes'], max_param_dicts['pes'], scenario_step**2 * 128):
@@ -91,7 +91,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                 dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, DLA.dataflow, homepath)
                 DSE_indicator += 1
                 print('\r')
-    print("[mora][DSE] Finish.")
+    print("[mora][DSE] Finish. Model {}, Dataflow {}".format(model, DLA.dataflow))
     return
 
 
