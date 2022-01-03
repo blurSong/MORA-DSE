@@ -46,7 +46,8 @@ def set_path(model, dataflow):
         SP.run('rm *.csv', cwd=output_path, shell=True)
     if os.path.exists(model_path):
         SP.run('rm ' + model + '.csv', cwd=model_path, shell=True)
-        SP.run('rm *{}.m'.format(dataflow), cwd=model_path, shell=True)
+        SP.run('rm ' + model + '_dla_' + dataflow + '.m', cwd=model_path, shell=True)
+        SP.run('rm ' + model + '_dla_model.m', cwd=model_path, shell=True)
     sys.path.append(home_path)
     sys.path.append(MNSIM_path)
     sys.path.append(maestro_path)

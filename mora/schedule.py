@@ -91,7 +91,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_p
                 dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, DLA.dataflow, homepath)
                 DSE_indicator += 1
                 print('\r')
-    print("[mora][DSE] Finish. Model {}, Dataflow {}".format(model, DLA.dataflow))
+    print('[mora][DSE] Finish.', model, DLA.dataflow)
     return
 
 
