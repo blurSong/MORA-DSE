@@ -186,13 +186,15 @@ def gemm(homepath, model, dataflow):
     # maestro model to meastro mapping model
     # ykp_os, yxp_os, kcp_ws, xp_ws, rs
     dpt_type_dict = {'ykp_os': '3', 'yxp_os': '3', 'kcp_ws': '1', 'xp_ws': '2', 'rs': '1'}
+    df2 = copy.deepcopy(dataflow)
+    df2 += '2'
+    '''
     rs1_type_list = ['resnet', 'resnext', 'unet']
     rs2_type_list = []
-    rs3_type_list = ['vgg']
-    df2 = copy.deepcopy(dataflow)
+    rs3_type_list = ['vgg16', 'vgg19']
     if dataflow == 'rs':
         if model in rs3_type_list:
-            df2 += 3
+            df2 += '3'
         else:
             for mod in rs1_type_list:
                 if re.search(mod, model):
@@ -200,6 +202,7 @@ def gemm(homepath, model, dataflow):
                     break
             if df2 == 'rs':
                 df2 += '2'
+    '''
     dataflow_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/' + df2 + '.m'))
     dpt_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/dpt' + dpt_type_dict[dataflow] + '.m'))
 
