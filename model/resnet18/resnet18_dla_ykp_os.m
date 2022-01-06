@@ -12,8 +12,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L1 {
@@ -29,8 +29,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L2 {
@@ -46,8 +46,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L3 {
@@ -75,8 +75,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L5 {
@@ -92,8 +92,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L6 {
@@ -121,8 +121,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L8 {
@@ -138,8 +138,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L9 {
@@ -155,8 +155,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L10 {
@@ -184,8 +184,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L12 {
@@ -201,8 +201,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L13 {
@@ -230,8 +230,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L15 {
@@ -247,8 +247,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L16 {
@@ -264,8 +264,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L17 {
@@ -293,8 +293,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L19 {
@@ -310,8 +310,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L20 {
@@ -339,8 +339,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L22 {
@@ -356,8 +356,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L23 {
@@ -373,8 +373,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L24 {
@@ -402,8 +402,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L26 {
@@ -419,8 +419,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L27 {
@@ -448,8 +448,8 @@ Dataflow {
     SpatialMap(1,1) K;
     TemporalMap(Sz(R),1) Y;
     TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),7) R;
-    TemporalMap(Sz(S),7) S;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 }

@@ -2,6 +2,7 @@ import os
 import re
 import sys
 import numpy as np
+import copy
 import pandas as pd
 from torch._C import CONV_BN_FUSION
 # from mod2map import mod2map
@@ -185,15 +186,24 @@ def gemm(homepath, model, dataflow):
     # maestro model to meastro mapping model
     # ykp_os, yxp_os, kcp_ws, xp_ws, rs
     dpt_type_dict = {'ykp_os': '3', 'yxp_os': '3', 'kcp_ws': '1', 'xp_ws': '2', 'rs': '1'}
-    rs1_type_list = ['resnet', 'resnext', 'unet', 'vgg']
-    df2 = dataflow
-    if df2 == 'rs':
-        for mod in rs1_type_list:
-            if re.search(mod, model):
-                df2 += '1'
-                break
+    df2 = copy.deepcopy(dataflow)
     if df2 == 'rs':
         df2 += '2'
+    '''
+    rs1_type_list = ['resnet', 'resnext', 'unet']
+    rs2_type_list = []
+    rs3_type_list = ['vgg16', 'vgg19']
+    if dataflow == 'rs':
+        if model in rs3_type_list:
+            df2 += '3'
+        else:
+            for mod in rs1_type_list:
+                if re.search(mod, model):
+                    df2 += '1'
+                    break
+            if df2 == 'rs':
+                df2 += '2'
+    '''
     dataflow_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/' + df2 + '.m'))
     dpt_path = os.path.abspath(os.path.join(homepath, 'maestro/tools/frontend/dataflow/dpt' + dpt_type_dict[dataflow] + '.m'))
 
@@ -263,12 +273,12 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
         dla_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_csv_dicts['restraint'] = 'fail'
-        print('DSE checkpoint failed.')
+        print('[mora][DSE] checkpoint failed.')
     else:
         dla_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_csv_dicts['restraint'] = 'pass'
-        print('DSE checkpoint passed.')
+        print('[mora][DSE] checkpoint passed.')
     dla_out_pd.to_csv(dla_output_csv_path, index=False)
     rram_out_pd.to_csv(rram_output_csv_path, index=False)
     mora_csv = pd.DataFrame(rram_csv_dicts, index=[indicator])
@@ -276,4 +286,10 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
         mora_csv.to_csv(mora_output_csv_path, mode='a', header=False, index=False)
     else:
         mora_csv.to_csv(mora_output_csv_path, index=False)
+    return
+
+
+def summary(homepath, **kwargs):
+    output_path = os.path.abspath(os.path.join(homepath, 'output/' + kwargs['model']))
+    dataflow_list = ['kcp_ws', 'yxp_os', 'xp_ws', 'rs', 'ykp_ws']
     return

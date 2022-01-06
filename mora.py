@@ -46,7 +46,8 @@ def set_path(model, dataflow):
         SP.run('rm *.csv', cwd=output_path, shell=True)
     if os.path.exists(model_path):
         SP.run('rm ' + model + '.csv', cwd=model_path, shell=True)
-        SP.run('rm *{}.m'.format(dataflow), cwd=model_path, shell=True)
+        SP.run('rm ' + model + '_dla_' + dataflow + '.m', cwd=model_path, shell=True)
+        SP.run('rm ' + model + '_dla_model.m', cwd=model_path, shell=True)
     sys.path.append(home_path)
     sys.path.append(MNSIM_path)
     sys.path.append(maestro_path)
@@ -123,7 +124,7 @@ if __name__ == "__main__":
     set_path(args.model, args.dataflow)
     max_hw_param_dicts = set_hw_range(args.scenario)
     hw_param_dicts = hw_init(args.model, max_hw_param_dicts)
-    max_hw_param_dicts['tiles-buildin'] = hw_param_dicts['tiles-buildin'] + 8
+    max_hw_param_dicts['tiles-buildin'] = hw_param_dicts['tiles-buildin'] + 24
     max_hw_param_dicts['tiles'] = max_hw_param_dicts['tiles-buildin']
 
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)

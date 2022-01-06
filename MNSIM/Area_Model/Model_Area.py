@@ -157,7 +157,7 @@ class Model_area():
             if lyr in oRli2:
                 mora_area += self.arch_area[lyr]
         assert mora_area <= self.arch_total_area
-        print("Hardware area:", self.arch_total_area, "um^2")
+        print("RRAM Area:", self.arch_total_area, "um^2")
         if module_information:
             print("		crossbar area:", self.arch_total_xbar_area, "um^2")
             print("		DAC area:", self.arch_total_DAC_area, "um^2")

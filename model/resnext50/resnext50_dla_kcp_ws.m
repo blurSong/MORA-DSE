@@ -2,7 +2,7 @@ Network resnext50 {
 Layer L0 {
 Type: CONV 
 Stride { X: 2, Y: 2 }
-Dimensions { K: 64, C: 3, R: 7, S: 7, Y: 224, X: 224 }
+Dimensions { K: 64, C: 3, R: 8, S: 8, Y: 228, X: 228 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -318,7 +318,7 @@ Dataflow {
 Layer L17 {
 Type: CONV 
 Stride { X: 2, Y: 2 }
-Dimensions { K: 512, C: 256, R: 1, S: 1, Y: 56, X: 56 }
+Dimensions { K: 512, C: 256, R: 3, S: 3, Y: 56, X: 56 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -605,7 +605,7 @@ Dataflow {
 }
 Layer L33 {
 Type: CONV 
-Stride { X: 2, Y: 2 }
+Stride { X: 1, Y: 1 }
 Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 28, X: 28 }
 Dataflow {
         // This is a NVDLA-like dataflow
@@ -624,21 +624,9 @@ Dataflow {
 }
 }
 Layer L34 {
-Type: DSCONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
-Dataflow {
-	SpatialMap(1,1) C;
-	TemporalMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L35 {
 Type: CONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Stride { X: 2, Y: 2 }
+Dimensions { K: 1024, C: 512, R: 3, S: 3, Y: 28, X: 28 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -655,10 +643,22 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L36 {
-Type: NGCONV 
+Layer L35 {
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
+Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dataflow {
+	SpatialMap(1,1) C;
+	TemporalMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L36 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -676,9 +676,9 @@ Dataflow {
 }
 }
 Layer L37 {
-Type: CONV 
+Type: NGCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -696,21 +696,9 @@ Dataflow {
 }
 }
 Layer L38 {
-Type: DSCONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
-Dataflow {
-	SpatialMap(1,1) C;
-	TemporalMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L39 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -727,10 +715,22 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L40 {
-Type: NGCONV 
+Layer L39 {
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
+Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dataflow {
+	SpatialMap(1,1) C;
+	TemporalMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L40 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -748,9 +748,9 @@ Dataflow {
 }
 }
 Layer L41 {
-Type: CONV 
+Type: NGCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -768,21 +768,9 @@ Dataflow {
 }
 }
 Layer L42 {
-Type: DSCONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
-Dataflow {
-	SpatialMap(1,1) C;
-	TemporalMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L43 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -799,10 +787,22 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L44 {
-Type: NGCONV 
+Layer L43 {
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
+Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dataflow {
+	SpatialMap(1,1) C;
+	TemporalMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L44 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -820,9 +820,9 @@ Dataflow {
 }
 }
 Layer L45 {
-Type: CONV 
+Type: NGCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -840,21 +840,9 @@ Dataflow {
 }
 }
 Layer L46 {
-Type: DSCONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
-Dataflow {
-	SpatialMap(1,1) C;
-	TemporalMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L47 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -871,10 +859,22 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L48 {
-Type: NGCONV 
+Layer L47 {
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
+Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dataflow {
+	SpatialMap(1,1) C;
+	TemporalMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L48 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -892,58 +892,6 @@ Dataflow {
 }
 }
 Layer L49 {
-Type: CONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
-Dataflow {
-        // This is a NVDLA-like dataflow
-        SpatialMap(1,1) K;
-        TemporalMap(64,64) C;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        Cluster(64, P);
-        SpatialMap(1,1) C;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L50 {
-Type: DSCONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
-Dataflow {
-	SpatialMap(1,1) C;
-	TemporalMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L51 {
-Type: CONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
-Dataflow {
-        // This is a NVDLA-like dataflow
-        SpatialMap(1,1) K;
-        TemporalMap(64,64) C;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        Cluster(64, P);
-        SpatialMap(1,1) C;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L52 {
 Type: NGCONV 
 Stride { X: 1, Y: 1 }
 Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
@@ -963,7 +911,7 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L53 {
+Layer L50 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
@@ -983,7 +931,7 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L54 {
+Layer L51 {
 Type: DSCONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
@@ -995,7 +943,79 @@ Dataflow {
 	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
+Layer L52 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 512, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dataflow {
+        // This is a NVDLA-like dataflow
+        SpatialMap(1,1) K;
+        TemporalMap(64,64) C;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        Cluster(64, P);
+        SpatialMap(1,1) C;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L53 {
+Type: NGCONV 
+Stride { X: 1, Y: 1 }
+Dimensions { G: 32, K: 512, C: 512, R: 3, S: 3, Y: 14, X: 14 }
+Dataflow {
+        // This is a NVDLA-like dataflow
+        SpatialMap(1,1) K;
+        TemporalMap(64,64) C;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        Cluster(64, P);
+        SpatialMap(1,1) C;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L54 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 1024, C: 512, R: 1, S: 1, Y: 14, X: 14 }
+Dataflow {
+        // This is a NVDLA-like dataflow
+        SpatialMap(1,1) K;
+        TemporalMap(64,64) C;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        Cluster(64, P);
+        SpatialMap(1,1) C;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+}
+}
 Layer L55 {
+Type: DSCONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 1, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
+Dataflow {
+	SpatialMap(1,1) C;
+	TemporalMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L56 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 1024, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
@@ -1015,7 +1035,7 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L56 {
+Layer L57 {
 Type: NGCONV 
 Stride { X: 2, Y: 2 }
 Dimensions { G: 32, K: 1024, C: 1024, R: 3, S: 3, Y: 14, X: 14 }
@@ -1035,30 +1055,10 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L57 {
+Layer L58 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 2048, C: 1024, R: 1, S: 1, Y: 7, X: 7 }
-Dataflow {
-        // This is a NVDLA-like dataflow
-        SpatialMap(1,1) K;
-        TemporalMap(64,64) C;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        Cluster(64, P);
-        SpatialMap(1,1) C;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L58 {
-Type: CONV 
-Stride { X: 2, Y: 2 }
-Dimensions { K: 2048, C: 1024, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -1076,21 +1076,9 @@ Dataflow {
 }
 }
 Layer L59 {
-Type: DSCONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
-Dataflow {
-	SpatialMap(1,1) C;
-	TemporalMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L60 {
 Type: CONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1024, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
+Stride { X: 2, Y: 2 }
+Dimensions { K: 2048, C: 1024, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -1107,10 +1095,22 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L61 {
-Type: NGCONV 
+Layer L60 {
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { G: 32, K: 1024, C: 1024, R: 3, S: 3, Y: 7, X: 7 }
+Dimensions { K: 1, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
+Dataflow {
+	SpatialMap(1,1) C;
+	TemporalMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L61 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 1024, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
 Dataflow {
         // This is a NVDLA-like dataflow
         SpatialMap(1,1) K;
@@ -1128,58 +1128,6 @@ Dataflow {
 }
 }
 Layer L62 {
-Type: CONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 2048, C: 1024, R: 1, S: 1, Y: 7, X: 7 }
-Dataflow {
-        // This is a NVDLA-like dataflow
-        SpatialMap(1,1) K;
-        TemporalMap(64,64) C;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        Cluster(64, P);
-        SpatialMap(1,1) C;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L63 {
-Type: DSCONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
-Dataflow {
-	SpatialMap(1,1) C;
-	TemporalMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L64 {
-Type: CONV 
-Stride { X: 1, Y: 1 }
-Dimensions { K: 1024, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
-Dataflow {
-        // This is a NVDLA-like dataflow
-        SpatialMap(1,1) K;
-        TemporalMap(64,64) C;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        Cluster(64, P);
-        SpatialMap(1,1) C;
-        TemporalMap(Sz(R),1) Y;
-        TemporalMap(Sz(S),1) X;
-        TemporalMap(Sz(R),Sz(R)) R;
-        TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L65 {
 Type: NGCONV 
 Stride { X: 1, Y: 1 }
 Dimensions { G: 32, K: 1024, C: 1024, R: 3, S: 3, Y: 7, X: 7 }
@@ -1199,7 +1147,7 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L66 {
+Layer L63 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 2048, C: 1024, R: 1, S: 1, Y: 7, X: 7 }
@@ -1219,7 +1167,7 @@ Dataflow {
         TemporalMap(Sz(S),Sz(S)) S;
 }
 }
-Layer L67 {
+Layer L64 {
 Type: DSCONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 1, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
@@ -1231,7 +1179,79 @@ Dataflow {
 	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
+Layer L65 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 1024, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
+Dataflow {
+        // This is a NVDLA-like dataflow
+        SpatialMap(1,1) K;
+        TemporalMap(64,64) C;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        Cluster(64, P);
+        SpatialMap(1,1) C;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L66 {
+Type: NGCONV 
+Stride { X: 1, Y: 1 }
+Dimensions { G: 32, K: 1024, C: 1024, R: 3, S: 3, Y: 7, X: 7 }
+Dataflow {
+        // This is a NVDLA-like dataflow
+        SpatialMap(1,1) K;
+        TemporalMap(64,64) C;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        Cluster(64, P);
+        SpatialMap(1,1) C;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L67 {
+Type: CONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 2048, C: 1024, R: 1, S: 1, Y: 7, X: 7 }
+Dataflow {
+        // This is a NVDLA-like dataflow
+        SpatialMap(1,1) K;
+        TemporalMap(64,64) C;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        Cluster(64, P);
+        SpatialMap(1,1) C;
+        TemporalMap(Sz(R),1) Y;
+        TemporalMap(Sz(S),1) X;
+        TemporalMap(Sz(R),Sz(R)) R;
+        TemporalMap(Sz(S),Sz(S)) S;
+}
+}
 Layer L68 {
+Type: DSCONV 
+Stride { X: 1, Y: 1 }
+Dimensions { K: 1, C: 2048, R: 1, S: 1, Y: 7, X: 7 }
+Dataflow {
+	SpatialMap(1,1) C;
+	TemporalMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L69 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 1000, C: 2048, R: 1, S: 1, Y: 1, X: 1 }
