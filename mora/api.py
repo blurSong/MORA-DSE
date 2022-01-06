@@ -187,7 +187,8 @@ def gemm(homepath, model, dataflow):
     # ykp_os, yxp_os, kcp_ws, xp_ws, rs
     dpt_type_dict = {'ykp_os': '3', 'yxp_os': '3', 'kcp_ws': '1', 'xp_ws': '2', 'rs': '1'}
     df2 = copy.deepcopy(dataflow)
-    df2 += '2'
+    if df2 == 'rs':
+        df2 += '2'
     '''
     rs1_type_list = ['resnet', 'resnext', 'unet']
     rs2_type_list = []
@@ -285,4 +286,10 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
         mora_csv.to_csv(mora_output_csv_path, mode='a', header=False, index=False)
     else:
         mora_csv.to_csv(mora_output_csv_path, index=False)
+    return
+
+
+def summary(homepath, **kwargs):
+    output_path = os.path.abspath(os.path.join(homepath, 'output/' + kwargs['model']))
+    dataflow_list = ['kcp_ws', 'yxp_os', 'xp_ws', 'rs', 'ykp_ws']
     return
