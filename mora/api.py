@@ -290,6 +290,9 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
 
 
 def summary(homepath, **kwargs):
-    output_path = os.path.abspath(os.path.join(homepath, 'output/' + kwargs['model']))
+    result_path = os.path.abspath(os.path.join(homepath, 'output/' + kwargs['model'] + '/result'))
     dataflow_list = ['kcp_ws', 'yxp_os', 'xp_ws', 'rs', 'ykp_ws']
+    for df in dataflow_list:
+        result_csv_path = os.path.abspath(os.path.join(result_path, '[' + df + ']' + kwargs['model'] + '_mora.csv'))
+        mora_result = pd.read_csv(result_csv_path)
     return
