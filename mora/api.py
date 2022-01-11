@@ -4,6 +4,7 @@ import sys
 import numpy as np
 import copy
 import pandas as pd
+import matplotlib.pyplot as plt
 from torch._C import CONV_BN_FUSION
 # from mod2map import mod2map
 
@@ -257,31 +258,31 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     assert dla_out_pd.at[indicator, 'restraint'] == 'unexamined'
     assert rram_out_pd.at[indicator, 'restraint'] == 'unexamined'
     # todo: add mora result
-    rram_csv_dicts = {}
-    rram_csv_dicts['DSE index'] = indicator
-    rram_csv_dicts['DLA HW (pes, bw)'] = dla_out_pd.at[indicator, 'HW (pes, bw)']
-    rram_csv_dicts['RRAM HW (tiles, bw)'] = rram_out_pd.at[indicator, 'HW (tiles, bw)']
-    rram_csv_dicts['DLA layernum'] = dla_out_pd.at[indicator, 'layers']
-    rram_csv_dicts['RRAM layernum'] = rram_out_pd.at[indicator, 'layers']
-    rram_csv_dicts['DLA EDP'] = edp_dse['dla']
-    rram_csv_dicts['RRAM EDP'] = edp_dse['rram']
-    rram_csv_dicts['DLA area'] = area_dse['dla']
-    rram_csv_dicts['DLA area'] = area_dse['dla']
-    rram_csv_dicts['restraint'] = 'unexamined'
+    mora_csv_dicts = {}
+    mora_csv_dicts['DSE index'] = indicator
+    mora_csv_dicts['DLA HW (pes, bw)'] = dla_out_pd.at[indicator, 'HW (pes, bw)']
+    mora_csv_dicts['RRAM HW (tiles, bw)'] = rram_out_pd.at[indicator, 'HW (tiles, bw)']
+    mora_csv_dicts['DLA layernum'] = dla_out_pd.at[indicator, 'layers']
+    mora_csv_dicts['RRAM layernum'] = rram_out_pd.at[indicator, 'layers']
+    mora_csv_dicts['DLA EDP'] = edp_dse['dla']
+    mora_csv_dicts['RRAM EDP'] = edp_dse['rram']
+    mora_csv_dicts['DLA area'] = area_dse['dla']
+    mora_csv_dicts['RRAM area'] = area_dse['rram']
+    mora_csv_dicts['restraint'] = 'unexamined'
 
     if DSE_checkpoint is False:
         dla_out_pd.at[indicator, 'restraint'] = 'fail'
         rram_out_pd.at[indicator, 'restraint'] = 'fail'
-        rram_csv_dicts['restraint'] = 'fail'
+        mora_csv_dicts['restraint'] = 'fail'
         print('[mora][DSE] checkpoint failed.')
     else:
         dla_out_pd.at[indicator, 'restraint'] = 'pass'
         rram_out_pd.at[indicator, 'restraint'] = 'pass'
-        rram_csv_dicts['restraint'] = 'pass'
+        mora_csv_dicts['restraint'] = 'pass'
         print('[mora][DSE] checkpoint passed.')
     dla_out_pd.to_csv(dla_output_csv_path, index=False)
     rram_out_pd.to_csv(rram_output_csv_path, index=False)
-    mora_csv = pd.DataFrame(rram_csv_dicts, index=[indicator])
+    mora_csv = pd.DataFrame(mora_csv_dicts, index=[indicator])
     if os.path.exists(mora_output_csv_path):
         mora_csv.to_csv(mora_output_csv_path, mode='a', header=False, index=False)
     else:
@@ -292,7 +293,63 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
 def summary(homepath, **kwargs):
     result_path = os.path.abspath(os.path.join(homepath, 'output/' + kwargs['model'] + '/result'))
     dataflow_list = ['kcp_ws', 'yxp_os', 'xp_ws', 'rs', 'ykp_ws']
+    DSE_top_latancy = pd.DataFrame()
+    DSE_top_energy = pd.DataFrame()
+    # axis: energy latency
     for df in dataflow_list:
-        result_csv_path = os.path.abspath(os.path.join(result_path, '[' + df + ']' + kwargs['model'] + '_mora.csv'))
-        mora_result = pd.read_csv(result_csv_path)
+        try:
+            rram_result_csv_path = os.path.abspath(os.path.join(result_path, '[' + df + ']' + kwargs['model'] + '_rram.csv'))
+            dla_result_csv_path = os.path.abspath(os.path.join(result_path, '[' + df + ']' + kwargs['model'] + '_dla.csv'))
+            rram_result = pd.read_csv(rram_result_csv_path)
+            dla_result = pd.read_csv(dla_result_csv_path)
+            [rram_energy_0, rram_latency_0,
+             rram_area_0] = [float(rram_result.at[0, 'energy']),
+                             float(rram_result.at[0, 'latency']),
+                             float(rram_result.at[0, 'area'])]
+            [dla_energy_0, dla_latency_0, dla_area_0] = [float(dla_result.at[0, 'energy']), float(dla_result.at[0, 'latency']), float(dla_result.at[0, 'area'])]
+            top_latancy_dict = {}
+            top_energy_dict = {}
+            norm_latancy = {'rram': 1.0, 'dla': 1.0}
+            norm_energy = {'rram': 1.0, 'dla': 1.0}
+            DSE_iters = rram_result.shape[0]
+            assert DSE_iters == dla_result.shape[0]
+            for idx in range(1, DSE_iters + 1):
+                rram_row = rram_result.iloc([idx])
+                dla_row = dla_result.iloc([idx])
+                # check status
+                if rram_row['area'] > rram_area_0 * 0.79:
+                    continue
+                if dla_row['area'] > dla_area_0 * 0.79:
+                    continue
+                if dla_row['latency'] == 0 or dla_row['energy'] == 0:
+                    continue
+                # try latency
+                tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
+                if tmp_norm_latancy[0] >= 1.0 or tmp_norm_latancy[1] >= 1.0:
+                    continue
+                if tmp_norm_latancy[0] + tmp_norm_latancy[1] < norm_latancy['rram'] + norm_latancy['dla']:
+                    top_latancy_dict = update_top(rram_row, dla_row)
+                # try energy
+
+            rram_result = rram_result.drop(rram_result[rram_result['TYP'] == 4].index)
+            dla_result = dla_result.drop(dla_result[dla_result['TYP'] == 4].index)
+        except:
+            return
     return
+
+
+def update_top(rram_row, dla_row):
+    dict = {}
+    assert rram_row['DSE index'] == dla_row['DSE index']
+    dict['DSE index'] = rram_row['DSE index']
+    dict['DLA HW (pes, bw)'] = dla_row['HW (pes, bw)']
+    dict['RRAM HW (tiles, bw)'] = rram_row['HW (tiles, bw)']
+    dict['DLA layernum'] = dla_row['layers']
+    dict['RRAM layernum'] = rram_row['layers']
+    dict['DLA latency'] = dla_row['latency']
+    dict['RRAM latency'] = rram_row['latency']
+    dict['DLA energy'] = dla_row['energy']
+    dict['RRAM energy'] = rram_row['energy']
+    dict['DLA area'] = dla_row['area']
+    dict['RRAM area'] = rram_row['area']
+    return dict
