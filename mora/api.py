@@ -372,10 +372,10 @@ def update_topdict(rram_row, dla_row):
     dict['RRAM HW (tiles, bw)'] = rram_row['HW (tiles, bw)']
     dict['DLA layernum'] = dla_row['layers']
     dict['RRAM layernum'] = rram_row['layers']
-    dict['DLA latency'] = dla_row['latency']
-    dict['RRAM latency'] = rram_row['latency']
-    dict['DLA energy'] = dla_row['energy']
-    dict['RRAM energy'] = rram_row['energy']
-    dict['DLA area'] = dla_row['area']
-    dict['RRAM area'] = rram_row['area']
+    dict['DLA latency'] = np.int64(dla_row['latency'])
+    dict['RRAM latency'] = np.int64(rram_row['latency'])
+    dict['DLA energy'] = np.int64(dla_row['energy'])
+    dict['RRAM energy'] = np.int64(rram_row['energy'])
+    dict['DLA area'] = np.int64(dla_row['area'])
+    dict['RRAM area'] = np.int64(rram_row['area'])
     return dict
