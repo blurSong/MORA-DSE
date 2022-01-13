@@ -5,6 +5,7 @@ import numpy as np
 import copy
 import pandas as pd
 import matplotlib.pyplot as plt
+import subprocess as SP
 from torch._C import CONV_BN_FUSION
 # from mod2map import mod2map
 
@@ -242,8 +243,8 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     area_dse = area(model, df, homepath, indicator)
     # ii = (edp_dse['dla'] > EDP_cons['dla'] * 0.75) & (edp_dse['rram'] > EDP_cons['rram'] * 0.75)
     # jj = (area_dse['dla'] > area_cons['dla'] * 0.75) & (area_dse['rram'] > area_cons['rram'] * 0.75)
-    ii = (edp_dse['dla'] + edp_dse['rram']) > (EDP_cons['dla'] + EDP_cons['rram']) * 0.8
-    jj = (area_dse['dla'] + area_dse['rram']) > (area_cons['dla'] + area_cons['rram']) * 0.8
+    ii = (edp_dse['dla'] + edp_dse['rram']) > (EDP_cons['dla'] + EDP_cons['rram']) * 0.63
+    jj = (area_dse['dla'] + area_dse['rram']) > (area_cons['dla'] + area_cons['rram']) * 0.63
     if edp_dse['dla'] == 0 or area_dse['dla'] == 0:
         DSE_checkpoint = False
     elif ii | jj:
@@ -290,55 +291,80 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     return
 
 
-def summary(homepath, **kwargs):
-    result_path = os.path.abspath(os.path.join(homepath, 'output/' + kwargs['model'] + '/result'))
-    dataflow_list = ['kcp_ws', 'yxp_os', 'xp_ws', 'rs', 'ykp_ws']
-    DSE_top_latancy = pd.DataFrame()
-    DSE_top_energy = pd.DataFrame()
+def summary(homepath, model):
+    model_path = os.path.abspath(os.path.join(homepath, 'output/' + model))
+    result_path = os.path.abspath(os.path.join(model_path, 'result'))
+    dataflow_list = ['kcp_ws', 'yxp_os', 'xp_ws', 'rs', 'ykp_os']
+    DSE_top_latancy = pd.DataFrame(columns=[
+        'DSE index', 'DLA HW (pes, bw)', 'RRAM HW (tiles, bw)', 'DLA layernum', 'RRAM layernum', 'DLA latency', 'RRAM latency', 'DLA energy', 'RRAM energy',
+        'DLA area', 'RRAM area'
+    ])
+    DSE_top_energy = pd.DataFrame(columns=[
+        'DSE index', 'DLA HW (pes, bw)', 'RRAM HW (tiles, bw)', 'DLA layernum', 'RRAM layernum', 'DLA latency', 'RRAM latency', 'DLA energy', 'RRAM energy',
+        'DLA area', 'RRAM area'
+    ])
     # axis: energy latency
     for df in dataflow_list:
         try:
-            rram_result_csv_path = os.path.abspath(os.path.join(result_path, '[' + df + ']' + kwargs['model'] + '_rram.csv'))
-            dla_result_csv_path = os.path.abspath(os.path.join(result_path, '[' + df + ']' + kwargs['model'] + '_dla.csv'))
+            rram_result_csv_path = os.path.abspath(os.path.join(result_path, '[' + df + ']' + model + '_rram.csv'))
+            dla_result_csv_path = os.path.abspath(os.path.join(result_path, '[' + df + ']' + model + '_dla.csv'))
             rram_result = pd.read_csv(rram_result_csv_path)
             dla_result = pd.read_csv(dla_result_csv_path)
             [rram_energy_0, rram_latency_0,
-             rram_area_0] = [float(rram_result.at[0, 'energy']),
-                             float(rram_result.at[0, 'latency']),
-                             float(rram_result.at[0, 'area'])]
-            [dla_energy_0, dla_latency_0, dla_area_0] = [float(dla_result.at[0, 'energy']), float(dla_result.at[0, 'latency']), float(dla_result.at[0, 'area'])]
-            top_latancy_dict = {}
-            top_energy_dict = {}
-            norm_latancy = {'rram': 1.0, 'dla': 1.0}
-            norm_energy = {'rram': 1.0, 'dla': 1.0}
+             rram_area_0] = [np.float64(rram_result.at[0, 'energy']),
+                             np.float64(rram_result.at[0, 'latency']),
+                             np.float64(rram_result.at[0, 'area'])]
+            [dla_energy_0, dla_latency_0,
+             dla_area_0] = [np.float64(dla_result.at[0, 'energy']),
+                            np.float64(dla_result.at[0, 'latency']),
+                            np.float64(dla_result.at[0, 'area'])]
+            top_latancy = {'rram': rram_latency_0, 'dla': dla_latency_0, 'idx': 0}
+            top_energy = {'rram': rram_energy_0, 'dla': dla_energy_0, 'idx': 0}
             DSE_iters = rram_result.shape[0]
             assert DSE_iters == dla_result.shape[0]
-            for idx in range(1, DSE_iters + 1):
-                rram_row = rram_result.iloc([idx])
-                dla_row = dla_result.iloc([idx])
+            for idx in range(1, DSE_iters):
+                rram_row = rram_result.iloc[idx]
+                dla_row = dla_result.iloc[idx]
                 # check status
-                if rram_row['area'] > rram_area_0 * 0.79:
+                if rram_row['area'] > rram_area_0 * 0.47:
                     continue
                 if dla_row['area'] > dla_area_0 * 0.79:
                     continue
-                if dla_row['latency'] == 0 or dla_row['energy'] == 0:
+                if dla_row['latency'] < 0.1 or dla_row['energy'] < 0.1:
                     continue
-                # try latency
-                tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
-                if tmp_norm_latancy[0] >= 1.0 or tmp_norm_latancy[1] >= 1.0:
+                # keypint观点：RRAM作为协处理器，只需要验证在RRAM存在的情况下，通过DSE寻找到的最小处理速度
+                # tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
+                if rram_row['latency'] >= rram_latency_0 or dla_row['latency'] >= dla_latency_0:
                     continue
-                if tmp_norm_latancy[0] + tmp_norm_latancy[1] < norm_latancy['rram'] + norm_latancy['dla']:
-                    top_latancy_dict = update_top(rram_row, dla_row)
-                # try energy
-
-            rram_result = rram_result.drop(rram_result[rram_result['TYP'] == 4].index)
-            dla_result = dla_result.drop(dla_result[dla_result['TYP'] == 4].index)
-        except:
+                if rram_row['energy'] >= rram_energy_0 or dla_row['energy'] >= dla_energy_0:
+                    continue
+                if dla_row['latency'] < top_latancy['dla']:
+                    top_latancy['dla'] = dla_row['latency']
+                    top_latancy['rram'] = rram_row['latency']
+                    top_latancy['idx'] = idx
+                    # top_latancy_dict = copy.deepcopy(update_topdict(rram_row, dla_row))
+                if dla_row['energy'] < top_energy['dla']:
+                    top_energy['dla'] = dla_row['energy']
+                    top_energy['rram'] = rram_row['energy']
+                    top_energy['idx'] = idx
+            top_latancy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_latancy['idx']], dla_result.iloc[top_latancy['idx']]))
+            top_energy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_energy['idx']], dla_result.iloc[top_energy['idx']]))
+            top_latancy_df = pd.DataFrame(top_latancy_dict, index=[df])
+            top_energy_df = pd.DataFrame(top_energy_dict, index=[df])
+            DSE_top_latancy = DSE_top_latancy.append(top_latancy_df)
+            DSE_top_energy = DSE_top_energy.append(top_energy_df)
+        except FileNotFoundError:
             return
+        mora_latency_summary_csv_path = os.path.abspath(os.path.join(model_path, 'mora_latency_summary.csv'))
+        mora_energy_summary_csv_path = os.path.abspath(os.path.join(model_path, 'mora_energy_summary.csv'))
+        if os.path.exists(mora_latency_summary_csv_path):
+            SP.run('rm *_summary.csv', cwd=model_path, shell=True)
+        DSE_top_latancy.to_csv(mora_latency_summary_csv_path, index=True)
+        DSE_top_latancy.to_csv(mora_energy_summary_csv_path, index=True)
     return
 
 
-def update_top(rram_row, dla_row):
+def update_topdict(rram_row, dla_row):
     dict = {}
     assert rram_row['DSE index'] == dla_row['DSE index']
     dict['DSE index'] = rram_row['DSE index']
