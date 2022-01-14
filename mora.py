@@ -12,9 +12,9 @@ mora     |  ns           um2       W         nJ        |     Top BW = GB/s      
 Scenarios:(modified)
 -------------------------------------------------------------------------
 Scenario     |  PEs       Tiles                  BW/GB/s       L2(GLB)/MB
-edge         |  1024      24 * 24 - 4  chip      16            6
-desktop      |  4096      48 * 48 - 16 chip      64            10
-cloud        |  16384     96 * 96 - 64 chip      256           20
+edge         |  1024      24 * 24 - 4  chip      20            6
+desktop      |  4096      48 * 48 - 16 chip      80            10
+cloud        |  16384     96 * 96 - 64 chip      300           20
 -------------------------------------------------------------------------
 
 '''
@@ -109,17 +109,17 @@ def set_hw_range(scenario):
         mpes = 1024
         mtiles = 24
         mglb_size = 6  # MB
-        mbw = 16  # GB/s
+        mbw = 20  # GB/s
     elif scenario == 'desktop':
         mpes = 4096
         mtiles = 48
         mglb_size = 10
-        mbw = 64
+        mbw = 80
     elif scenario == 'cloud':
         mpes = 16384
         mtiles = 96
         mglb_size = 20
-        mbw = 256
+        mbw = 283
     max_hw_param_dicts = {}
     max_hw_param_dicts['pes'] = mpes
     max_hw_param_dicts['tiles'] = mtiles
