@@ -37,9 +37,9 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
     # rounds = (int((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) + 1) * ((
     #    (max_param_dicts['tiles'] - hw_param_dicts['tiles']) / 2) + 1)**2 * ((
     #        (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
-    rounds = ((max_param_dicts['pes'] - ini_hw_param_dicts['pes']) / (scenario_step**2 * 128)) \
-        * (((max_param_dicts['tiles'] - ini_hw_param_dicts['tiles']) / ceil(scenario_step/2.0)) + 1) \
-        * (((max_param_dicts['bw'] * 0.8 - ini_hw_param_dicts['dla_bw']) / (scenario_step**2)) + 1)
+    rounds = int((max_param_dicts['pes'] - ini_hw_param_dicts['pes']) / (scenario_step**2 * 128)) \
+        * int(((max_param_dicts['tiles'] - ini_hw_param_dicts['tiles']) / ceil(scenario_step/2.0)) + 1) \
+        * int(((max_param_dicts['bw'] * 0.8 - ini_hw_param_dicts['dla_bw']) / (scenario_step**2 * 4)) + 1)
     rounds = int(rounds)
     print('[mora][DSE] Greedy DSE, total rounds:', rounds)
     print('Starting HW:', ini_hw_param_dicts)
@@ -48,7 +48,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
     DSE_indicator = 1
     for pes in range(ini_hw_param_dicts['pes'], max_param_dicts['pes'], scenario_step**2 * 128):
         for tiles in range(ini_hw_param_dicts['tiles'], max_param_dicts['tiles'] + 1, ceil(scenario_step / 2.0)):
-            for dbw in range(ini_hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.8), scenario_step**2):
+            for dbw in range(ini_hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.8), scenario_step**2 * 4):
                 rbw = max_param_dicts['bw'] - dbw
                 print('[mora][DSE] Start greedy DSE round {0} / {1}'.format(DSE_indicator, rounds))
                 DLA.set_dse_param(pes, dbw, DSE_indicator)
