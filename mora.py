@@ -60,7 +60,7 @@ def set_parser():
     parser.add_argument('--model',
                         type=str,
                         default='vgg16',
-                        choice=['alexnet', 'vgg16', 'vgg19', 'resnet18', 'resnet34', 'resnet50', 'resnext50', 'mobilenet_v2', 'shufflenet_v2', 'unet'])
+                        choices=['alexnet', 'vgg16', 'vgg19', 'resnet18', 'resnet34', 'resnet50', 'resnext50', 'mobilenet_v2', 'shufflenet_v2', 'unet'])
     parser.add_argument('--scenario', type=str, default='edge', choices=['edge', 'desktop', 'cloud'])
     return parser
 
@@ -100,12 +100,12 @@ def hw_init(model, max_hw_param_dicts):
 
 
 def set_hw_range(scenario):
-    if scenario == 'embedded':
+    if scenario == 'edge':
         mpes = 1024
         mtiles = 24
         mglb_size = 6  # MB
         mbw = 16  # GB/s
-    elif scenario == 'edge':
+    elif scenario == 'desktop':
         mpes = 4096
         mtiles = 48
         mglb_size = 10
