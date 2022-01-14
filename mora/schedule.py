@@ -37,7 +37,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
     # rounds = (int((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) + 1) * ((
     #    (max_param_dicts['tiles'] - hw_param_dicts['tiles']) / 2) + 1)**2 * ((
     #        (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
-    rounds = int((max_param_dicts['pes'] - ini_hw_param_dicts['pes']) / (scenario_step**2 * 128)) \
+    rounds = int((max_param_dicts['pes'] - ini_hw_param_dicts['pes']) / (scenario_step**2 * 128) + 1) \
         * int(((max_param_dicts['tiles'] - ini_hw_param_dicts['tiles']) / ceil(scenario_step/2.0)) + 1) \
         * int(((max_param_dicts['bw'] * 0.8 - ini_hw_param_dicts['dla_bw']) / (scenario_step**2 * 4)) + 1)
     rounds = int(rounds)
@@ -46,7 +46,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
     print('Ending HW:', max_param_dicts, '\n')
     assert rounds < 11451.4, 'too many dse rounds.'
     DSE_indicator = 1
-    for pes in range(ini_hw_param_dicts['pes'], max_param_dicts['pes'], scenario_step**2 * 128):
+    for pes in range(ini_hw_param_dicts['pes'], max_param_dicts['pes'] + 64, scenario_step**2 * 128):
         for tiles in range(ini_hw_param_dicts['tiles'], max_param_dicts['tiles'] + 1, ceil(scenario_step / 2.0)):
             for dbw in range(ini_hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.8), scenario_step**2 * 4):
                 rbw = max_param_dicts['bw'] - dbw

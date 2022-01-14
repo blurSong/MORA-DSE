@@ -97,7 +97,7 @@ def hw_init(model, max_hw_param_dicts):
         hw_dicts['tiles'] = int(max_hw_param_dicts['tiles'] / 4)
     else:
         hw_dicts['tiles'] = int(hw_dicts['tiles-buildin'] / 4)
-    hw_dicts['pes'] = int(max_hw_param_dicts['pes'] / 4) - int(max_hw_param_dicts['pes'] / 16)
+    hw_dicts['pes'] = int(max_hw_param_dicts['pes'] / 4)
     hw_dicts['glb_size'] = int(max_hw_param_dicts['glb_size'])
     hw_dicts['dla_bw'] = int(max_hw_param_dicts['bw'] / 4)
     hw_dicts['rram_bw'] = int(max_hw_param_dicts['bw'] / 4)
