@@ -12,13 +12,17 @@ UN="unet"
 
 DATAFLOW="kcp_ws"
 
-echo "start dse cloudy"
+echo "Start dse cloudy" & echo $DATAFLOW
+echo $VG16
 python mora.py --scenario edge --dataflow $DATAFLOW --model $VG16
 wait
+echo $VG19
 python mora.py --scenario edge --dataflow $DATAFLOW --model $VG19
 wait
+echo $RN50
 python mora.py --scenario edge --dataflow $DATAFLOW --model $RN50
 wait
+echo $RXN50
 python mora.py --scenario edge --dataflow $DATAFLOW --model $RXN50
 wait
 

@@ -12,15 +12,20 @@ UN="unet"
 
 DATAFLOW="kcp_ws"
 
-echo "start dse locally"
+echo "Start dse locally" & echo $DATAFLOW
+echo $AN
 python mora.py --scenario edge --dataflow $DATAFLOW --model $AN
 wait
+echo $RN18
 python mora.py --scenario edge --dataflow $DATAFLOW --model $RN18
 wait
+echo $RN34
 python mora.py --scenario edge --dataflow $DATAFLOW --model $RN34
 wait
+echo $MN
 python mora.py --scenario edge --dataflow $DATAFLOW --model $MN
 wait
+echo $SN
 python mora.py --scenario edge --dataflow $DATAFLOW --model $SN
 wait
 
