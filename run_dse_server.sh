@@ -10,15 +10,15 @@ MN="mobilenet_v2"
 SN="shufflenet_v2"
 UN="unet"
 
+DATAFLOW="kcp_ws"
+
 echo "start dse cloudy"
-python mora.py --scenario edge --dataflow kcp_ws --model $VG16
+python mora.py --scenario edge --dataflow $DATAFLOW --model $VG16
 wait
-python mora.py --scenario edge --dataflow kcp_ws --model $VG19
+python mora.py --scenario edge --dataflow $DATAFLOW --model $VG19
 wait
-python mora.py --scenario edge --dataflow kcp_ws --model $RN50
+python mora.py --scenario edge --dataflow $DATAFLOW --model $RN50
 wait
-python mora.py --scenario edge --dataflow kcp_ws --model $RXN50
-wait
-python mora.py --scenario edge --dataflow kcp_ws --model $MN
+python mora.py --scenario edge --dataflow $DATAFLOW --model $RXN50
 wait
 

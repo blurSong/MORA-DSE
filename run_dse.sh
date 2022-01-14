@@ -10,16 +10,18 @@ MN="mobilenet_v2"
 SN="shufflenet_v2"
 UN="unet"
 
+DATAFLOW="kcp_ws"
+
 echo "start dse locally"
-python mora.py --scenario edge --dataflow kcp_ws --model $AN
+python mora.py --scenario edge --dataflow $DATAFLOW --model $AN
 wait
-python mora.py --scenario edge --dataflow kcp_ws --model $RN18
+python mora.py --scenario edge --dataflow $DATAFLOW --model $RN18
 wait
-python mora.py --scenario edge --dataflow kcp_ws --model $RN34
+python mora.py --scenario edge --dataflow $DATAFLOW --model $RN34
 wait
-python mora.py --scenario edge --dataflow kcp_ws --model $AN
+python mora.py --scenario edge --dataflow $DATAFLOW --model $MN
 wait
-python mora.py --scenario edge --dataflow kcp_ws --model $SN
+python mora.py --scenario edge --dataflow $DATAFLOW --model $SN
 wait
 
 
