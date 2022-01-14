@@ -24,6 +24,7 @@ from random import choice
 import sys
 import argparse
 from typing import Container
+import re
 import numpy as np
 import pandas as pd
 import subprocess as SP
@@ -90,7 +91,7 @@ def hw_init(model, max_hw_param_dicts):
     hw_dicts['tiles-buildin'] = math.ceil(math.sqrt(rramtiles))
     assert hw_dicts['tiles-buildin'] <= max_hw_param_dicts['tiles'], "[mora][HW] scenario too small for RRAM."
     # change buildin strategy
-    hw_dicts['tiles-buildin'] = hw_dicts['tiles-buildin'] + 1
+    hw_dicts['tiles-buildin'] = hw_dicts['tiles-buildin'] + (5 if re.search('resnet', model) else 2)
     hw_dicts['tiles'] = int(hw_dicts['tiles-buildin'] / 4)
     hw_dicts['pes'] = int(max_hw_param_dicts['pes'] / 4) - int(max_hw_param_dicts['pes'] / 16)
     hw_dicts['glb_size'] = int(max_hw_param_dicts['glb_size'])
