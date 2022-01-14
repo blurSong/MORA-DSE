@@ -265,8 +265,8 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     mora_csv_dicts['RRAM HW (tiles, bw)'] = rram_out_pd.at[indicator, 'HW (tiles, bw)']
     mora_csv_dicts['DLA layernum'] = dla_out_pd.at[indicator, 'layers']
     mora_csv_dicts['RRAM layernum'] = rram_out_pd.at[indicator, 'layers']
-    mora_csv_dicts['DLA EDP'] = np.int64(edp_dse['dla'])
-    mora_csv_dicts['RRAM EDP'] = np.int64(edp_dse['rram'])
+    mora_csv_dicts['DLA EDP'] = np.float64(edp_dse['dla'])
+    mora_csv_dicts['RRAM EDP'] = np.float64(edp_dse['rram'])
     mora_csv_dicts['DLA latency'] = np.int64(dla_out_pd.at[indicator, 'latency'])
     mora_csv_dicts['RRAM latency'] = np.int64(rram_out_pd.at[indicator, 'latency'])
     mora_csv_dicts['DLA energy'] = np.int64(dla_out_pd.at[indicator, 'energy'])

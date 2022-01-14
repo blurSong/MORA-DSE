@@ -23,9 +23,9 @@ def get_layer_memcap(in_channels, out_channels, kernel_size):
 def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, max_param_dicts, scenario):
     assert DLA.home_path == RRAM.home_path
     homepath = RRAM.home_path
-    if scenario == 'embedded':
+    if scenario == 'edge':
         scenario_step = 1
-    elif scenario == 'edge':
+    elif scenario == 'desktop':
         scenario_step = 2
     elif scenario == 'cloud':
         scenario_step = 4
