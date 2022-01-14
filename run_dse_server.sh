@@ -10,7 +10,7 @@ MN="mobilenet_v2"
 SN="shufflenet_v2"
 UN="unet"
 
-echo "start dse locally"
+echo "start dse cloudy"
 python mora.py --scenario edge --dataflow kcp_ws --model $VG16
 wait
 python mora.py --scenario edge --dataflow kcp_ws --model $VG19
