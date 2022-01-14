@@ -95,13 +95,13 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
     return
 
 
-def fifo_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
+def fifo_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, max_param_dicts):
     return
 
 
-def heuristic_based_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
+def heuristic_based_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, max_param_dicts):
     return
 
 
-def mora_schedule(DLA, RRAM, model, EDP_cons, area_cons, hw_param_dicts, max_param_dicts):
+def mora_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, max_param_dicts):
     return
