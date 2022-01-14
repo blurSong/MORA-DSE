@@ -93,7 +93,10 @@ def hw_init(model, max_hw_param_dicts):
     assert hw_dicts['tiles-buildin'] <= max_hw_param_dicts['tiles'], "[mora][HW] scenario too small for RRAM."
     # change buildin strategy
     hw_dicts['tiles-buildin'] = hw_dicts['tiles-buildin'] + addtiles
-    hw_dicts['tiles'] = int(hw_dicts['tiles-buildin'] / 4)
+    if hw_dicts['tiles-buildin'] > max_hw_param_dicts['tiles']:
+        hw_dicts['tiles'] = int(max_hw_param_dicts['tiles'] / 4)
+    else:
+        hw_dicts['tiles'] = int(hw_dicts['tiles-buildin'] / 4)
     hw_dicts['pes'] = int(max_hw_param_dicts['pes'] / 4) - int(max_hw_param_dicts['pes'] / 16)
     hw_dicts['glb_size'] = int(max_hw_param_dicts['glb_size'])
     hw_dicts['dla_bw'] = int(max_hw_param_dicts['bw'] / 4)
@@ -133,7 +136,8 @@ if __name__ == "__main__":
     max_hw_param_dicts = set_hw_range(args.scenario)
     ini_hw_param_dicts = hw_init(args.model, max_hw_param_dicts)
     max_hw_param_dicts['tiles-buildin'] = ini_hw_param_dicts['tiles-buildin']
-    max_hw_param_dicts['tiles'] = ini_hw_param_dicts['tiles-buildin']
+    if max_hw_param_dicts['tiles-buildin'] < max_hw_param_dicts['tiles']:
+        max_hw_param_dicts['tiles'] = max_hw_param_dicts['tiles-buildin']
 
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(max_hw_param_dicts, home_path)
