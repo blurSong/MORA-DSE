@@ -243,8 +243,8 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     area_dse = area(model, df, homepath, indicator)
     # ii = (edp_dse['dla'] > EDP_cons['dla'] * 0.75) & (edp_dse['rram'] > EDP_cons['rram'] * 0.75)
     # jj = (area_dse['dla'] > area_cons['dla'] * 0.75) & (area_dse['rram'] > area_cons['rram'] * 0.75)
-    ii = (edp_dse['dla'] + edp_dse['rram']) > (EDP_cons['dla'] + EDP_cons['rram']) * 0.63
-    jj = (area_dse['dla'] + area_dse['rram']) > (area_cons['dla'] + area_cons['rram']) * 0.63
+    ii = (edp_dse['dla'] + edp_dse['rram']) > (EDP_cons['dla'] + EDP_cons['rram']) * 0.765
+    jj = (area_dse['dla'] + area_dse['rram']) > (area_cons['dla'] + area_cons['rram']) * 0.765
     if edp_dse['dla'] == 0 or area_dse['dla'] == 0:
         DSE_checkpoint = False
     elif ii | jj:
@@ -265,10 +265,14 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     mora_csv_dicts['RRAM HW (tiles, bw)'] = rram_out_pd.at[indicator, 'HW (tiles, bw)']
     mora_csv_dicts['DLA layernum'] = dla_out_pd.at[indicator, 'layers']
     mora_csv_dicts['RRAM layernum'] = rram_out_pd.at[indicator, 'layers']
-    mora_csv_dicts['DLA EDP'] = edp_dse['dla']
-    mora_csv_dicts['RRAM EDP'] = edp_dse['rram']
-    mora_csv_dicts['DLA area'] = area_dse['dla']
-    mora_csv_dicts['RRAM area'] = area_dse['rram']
+    mora_csv_dicts['DLA EDP'] = np.int64(edp_dse['dla'])
+    mora_csv_dicts['RRAM EDP'] = np.int64(edp_dse['rram'])
+    mora_csv_dicts['DLA latency'] = np.int64(dla_out_pd.at[indicator, 'latency'])
+    mora_csv_dicts['RRAM latency'] = np.int64(rram_out_pd.at[indicator, 'latency'])
+    mora_csv_dicts['DLA energy'] = np.int64(dla_out_pd.at[indicator, 'energy'])
+    mora_csv_dicts['RRAM energy'] = np.int64(rram_out_pd.at[indicator, 'energy'])
+    mora_csv_dicts['DLA area'] = np.int64(area_dse['dla'])
+    mora_csv_dicts['RRAM area'] = np.int64(area_dse['rram'])
     mora_csv_dicts['restraint'] = 'unexamined'
 
     if DSE_checkpoint is False:
