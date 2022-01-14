@@ -327,16 +327,15 @@ def summary(homepath, model, rule='dlaperf'):
                 rram_row = rram_result.iloc[idx]
                 dla_row = dla_result.iloc[idx]
                 # check status
-                if rram_row['area'] > rram_area_0 * 0.765:
+                if rram_row['area'] > rram_area_0 * 0.876 or rram_row['area'] < rram_area_0 * 0.283:
                     continue
-                if dla_row['area'] > dla_area_0 * 0.765:
+                if dla_row['area'] < dla_area_0 * 0.346:
                     continue
                 if dla_row['latency'] < 1.0 or dla_row['energy'] < 1.0:
                     continue
-                # tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
-                if dla_row['energy'] >= dla_energy_0 or dla_row['latency'] >= dla_latency_0:
+                if dla_row['energy'] > dla_energy_0 * 0.876 or dla_row['latency'] > dla_latency_0 * 0.876:
                     continue
-                if rram_row['energy'] >= rram_energy_0 * 0.765 or rram_row['latency'] >= rram_latency_0 * 0.765:
+                if rram_row['energy'] > rram_energy_0 * 0.765 or rram_row['latency'] > rram_latency_0 * 0.765:
                     continue
                 # rule 1
                 # RRAM作为协处理器，只需要验证在RRAM存在的情况下，通过DSE寻找到的最小处理速度
@@ -362,6 +361,7 @@ def summary(homepath, model, rule='dlaperf'):
                         top_energy['idx'] = idx
                 elif rule == 'normperf':
                     # todo
+                    # tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
                     return
             top_latancy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_latancy['idx']], dla_result.iloc[top_latancy['idx']]))
             top_energy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_energy['idx']], dla_result.iloc[top_energy['idx']]))

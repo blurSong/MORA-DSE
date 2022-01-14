@@ -9,17 +9,18 @@ MNSIM    |  ns           um2       W         nJ        |   ①Tile BW = GB/s    
 maestro  |  cycles/ns    um2       uW        nJ        |   ①NoC BW  = KB/s      ②PE nums                     L2 = Byte
 mora     |  ns           um2       W         nJ        |    Top BW = GB/s                                     L2 = MB
 ------------------------------------------------------------------------------------------------------------------------
-Scenarios:
+Scenarios:(modified)
 -------------------------------------------------------------------------
-Scenario     |  PEs       Tiles                 BW/GB/s       L2(GLB)/MB
-embedded     |  1024      12 * 12  1  chip      16            4
-edge         |  4096      24 * 24  4  chip      64            8
-cloud        |  16384     48 * 48  16 chip      256           16
+Scenario     |  PEs       Tiles                  BW/GB/s       L2(GLB)/MB
+edge         |  1024      24 * 24 - 4  chip      16            6
+desktop      |  4096      48 * 48 - 16 chip      64            10
+cloud        |  16384     96 * 96 - 64 chip      256           20
 -------------------------------------------------------------------------
 
 '''
 import copy
 import os
+from random import choice
 import sys
 import argparse
 from typing import Container
@@ -56,12 +57,15 @@ def set_path(model, dataflow):
 def set_parser():
     parser = argparse.ArgumentParser(description='mora dse parser')
     parser.add_argument('--dataflow', type=str, default='kcp_ws', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
-    parser.add_argument('--model', type=str, default='resnet18')
-    parser.add_argument('--scenario', type=str, default='edge', choices=['embedded', 'edge', 'cloud'])
+    parser.add_argument('--model',
+                        type=str,
+                        default='vgg16',
+                        choice=['alexnet', 'vgg16', 'vgg19', 'resnet18', 'resnet34', 'resnet50', 'resnext50', 'mobilenet_v2', 'shufflenet_v2', 'unet'])
+    parser.add_argument('--scenario', type=str, default='edge', choices=['edge', 'desktop', 'cloud'])
     return parser
 
 
-def hw_init(hw_config_path):
+def hw_init_depr(hw_config_path):
     hw_dicts = {}
     with open(hw_config_path, 'r') as fs:
         for lines in fs:
@@ -85,29 +89,30 @@ def hw_init(model, max_hw_param_dicts):
     rramtiles = math.ceil(rrampes / 16.0)
     hw_dicts['tiles-buildin'] = math.ceil(math.sqrt(rramtiles))
     assert hw_dicts['tiles-buildin'] <= max_hw_param_dicts['tiles'], "[mora][HW] scenario too small for RRAM."
-    hw_dicts['tiles'] = int(hw_dicts['tiles-buildin'] / 4)
-    # hw_dicts['tiles'] = int(max_hw_param_dicts['tiles'] / 4)
+    # change buildin strategy
+    hw_dicts['tiles'] = int(max_hw_param_dicts['tiles'] / 4)
     hw_dicts['pes'] = int(max_hw_param_dicts['pes'] / 4)
     hw_dicts['glb_size'] = int(max_hw_param_dicts['glb_size'])
     hw_dicts['dla_bw'] = int(max_hw_param_dicts['bw'] / 4)
     hw_dicts['rram_bw'] = int(max_hw_param_dicts['bw'] / 4)
+    hw_dicts['tiles-buildin'] = hw_dicts['tiles-buildin'] + 2
     return hw_dicts
 
 
 def set_hw_range(scenario):
     if scenario == 'embedded':
         mpes = 1024
-        mtiles = 12
+        mtiles = 24
         mglb_size = 6  # MB
         mbw = 16  # GB/s
     elif scenario == 'edge':
         mpes = 4096
-        mtiles = 24
+        mtiles = 48
         mglb_size = 10
         mbw = 64
     elif scenario == 'cloud':
         mpes = 16384
-        mtiles = 48
+        mtiles = 96
         mglb_size = 20
         mbw = 256
     max_hw_param_dicts = {}
@@ -115,6 +120,7 @@ def set_hw_range(scenario):
     max_hw_param_dicts['tiles'] = mtiles
     max_hw_param_dicts['glb_size'] = mglb_size
     max_hw_param_dicts['bw'] = mbw
+    max_hw_param_dicts['tiles-buildin'] = mtiles
     return max_hw_param_dicts
 
 
@@ -123,9 +129,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     set_path(args.model, args.dataflow)
     max_hw_param_dicts = set_hw_range(args.scenario)
-    hw_param_dicts = hw_init(args.model, max_hw_param_dicts)
-    max_hw_param_dicts['tiles-buildin'] = hw_param_dicts['tiles-buildin'] + 24
-    max_hw_param_dicts['tiles'] = max_hw_param_dicts['tiles-buildin']
+    ini_hw_param_dicts = hw_init(args.model, max_hw_param_dicts)
+    max_hw_param_dicts['tiles-buildin'] = ini_hw_param_dicts['tiles-buildin']
 
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(max_hw_param_dicts, home_path)
@@ -145,7 +150,7 @@ if __name__ == "__main__":
                                   model=args.model,
                                   EDP_cons=edp_cons,
                                   area_cons=area_cons,
-                                  hw_param_dicts=hw_param_dicts,
+                                  ini_hw_param_dicts=ini_hw_param_dicts,
                                   max_param_dicts=max_hw_param_dicts,
                                   scenario=args.scenario)
     # TODO: new schedule
@@ -155,5 +160,5 @@ if __name__ == "__main__":
                                 model=args.model,
                                 EDP_cons=edp_cons,
                                 area_cons=area_cons,
-                                hw_param_dicts=hw_param_dicts,
+                                ini_hw_param_dicts=ini_hw_param_dicts,
                                 max_param_dicts=max_hw_param_dicts)
