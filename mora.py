@@ -4,10 +4,10 @@ A greedy and singel model version
 
 HW variable params:
 ------------------------------------------------------------------------------------------------------------------------
-HW       |  latancy      area      power     energy    |
+HW       |  latancy      area      power     energy    |   
 MNSIM    |  ns           um2       W         nJ        |   ①Tile BW = GB/s      ②Tile nums(1d, of a chip)
-maestro  |  cycles/ns    um2       uW        nJ        |   ①NoC BW  = KB/s      ②PE nums                     L2 = Byte
-mora     |  ns           um2       W         nJ        |    Top BW = GB/s                                     L2 = MB
+maestro  |  cycles/ns    um2       uW        nJ        |   ①NoC BW  = kB/s      ②PE nums                     L2 = Byte
+mora     |  ns           um2       W         nJ        |     Top BW = GB/s                                     L2 = MB
 ------------------------------------------------------------------------------------------------------------------------
 Scenarios:(modified)
 -------------------------------------------------------------------------
@@ -90,12 +90,12 @@ def hw_init(model, max_hw_param_dicts):
     hw_dicts['tiles-buildin'] = math.ceil(math.sqrt(rramtiles))
     assert hw_dicts['tiles-buildin'] <= max_hw_param_dicts['tiles'], "[mora][HW] scenario too small for RRAM."
     # change buildin strategy
-    hw_dicts['tiles'] = int(max_hw_param_dicts['tiles'] / 4)
-    hw_dicts['pes'] = int(max_hw_param_dicts['pes'] / 4)
+    hw_dicts['tiles-buildin'] = hw_dicts['tiles-buildin'] + 1
+    hw_dicts['tiles'] = int(hw_dicts['tiles-buildin'] / 4)
+    hw_dicts['pes'] = int(max_hw_param_dicts['pes'] / 4) - int(max_hw_param_dicts['pes'] / 16)
     hw_dicts['glb_size'] = int(max_hw_param_dicts['glb_size'])
     hw_dicts['dla_bw'] = int(max_hw_param_dicts['bw'] / 4)
     hw_dicts['rram_bw'] = int(max_hw_param_dicts['bw'] / 4)
-    hw_dicts['tiles-buildin'] = hw_dicts['tiles-buildin'] + 2
     return hw_dicts
 
 
@@ -131,6 +131,7 @@ if __name__ == "__main__":
     max_hw_param_dicts = set_hw_range(args.scenario)
     ini_hw_param_dicts = hw_init(args.model, max_hw_param_dicts)
     max_hw_param_dicts['tiles-buildin'] = ini_hw_param_dicts['tiles-buildin']
+    max_hw_param_dicts['tiles'] = ini_hw_param_dicts['tiles-buildin']
 
     dla = mora.HW.DLA(max_hw_param_dicts, args.dataflow, home_path)
     rram = mora.HW.RRAM(max_hw_param_dicts, home_path)
