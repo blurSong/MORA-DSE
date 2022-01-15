@@ -10,23 +10,23 @@ MN="mobilenet_v2"
 SN="shufflenet_v2"
 UN="unet"
 
-DATAFLOW="xp_ws"
+DATAFLOW1="xp_ws"
 
-echo "Start dse locally" & echo $DATAFLOW
+echo "Start dse locally" & echo $DATAFLOW1
 echo $AN
-python mora.py --scenario edge --dataflow $DATAFLOW --model $AN
+python mora.py --scenario edge --dataflow $DATAFLOW1 --model $AN
 wait
 echo $RN18
-python mora.py --scenario edge --dataflow $DATAFLOW --model $RN18
+python mora.py --scenario edge --dataflow $DATAFLOW1 --model $RN18
 wait
 echo $RN34
-python mora.py --scenario edge --dataflow $DATAFLOW --model $RN34
+python mora.py --scenario edge --dataflow $DATAFLOW1 --model $RN34
 wait
 echo $MN
-python mora.py --scenario edge --dataflow $DATAFLOW --model $MN
+python mora.py --scenario edge --dataflow $DATAFLOW1 --model $MN
 wait
 echo $SN
-python mora.py --scenario edge --dataflow $DATAFLOW --model $SN
+python mora.py --scenario edge --dataflow $DATAFLOW1 --model $SN
 wait
 
 
@@ -49,3 +49,21 @@ echo $SN
 python mora.py --scenario edge --dataflow $DATAFLOW2 --model $SN
 wait
 
+DATAFLOW3="yxp_os"
+
+echo "Start dse locally" & echo $DATAFLOW3
+echo $AN
+python mora.py --scenario edge --dataflow $DATAFLOW3 --model $AN
+wait
+echo $RN18
+python mora.py --scenario edge --dataflow $DATAFLOW3 --model $RN18
+wait
+echo $RN34
+python mora.py --scenario edge --dataflow $DATAFLOW3 --model $RN34
+wait
+echo $MN
+python mora.py --scenario edge --dataflow $DATAFLOW3 --model $MN
+wait
+echo $SN
+python mora.py --scenario edge --dataflow $DATAFLOW3 --model $SN
+wait
