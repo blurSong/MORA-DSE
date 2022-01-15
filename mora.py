@@ -4,10 +4,10 @@ A greedy and singel model version
 
 HW variable params:
 ------------------------------------------------------------------------------------------------------------------------
-HW       |  latancy      area      power     energy    |   
-MNSIM    |  ns           um2       W         nJ        |   ①Tile BW = GB/s      ②Tile nums(1d, of a chip)
-maestro  |  cycles/ns    um2       uW        nJ        |   ①NoC BW  = kB/s      ②PE nums                     L2 = Byte
-mora     |  ns           um2       W         nJ        |     Top BW = GB/s                                     L2 = MB
+HW       |  latancy      area      power     energy    |  
+MNSIM    |  ns           um2       W         nJ        |   Tile BW = GB/s      Tile nums(1d, of a chip)
+maestro  |  cycles/ns    um2       uW        nJ        |   NoC BW  = kB/s      PE nums                     L2 = Byte
+mora     |  ns           um2       W         nJ        |   Top BW  = GB/s                                  L2 = MB
 ------------------------------------------------------------------------------------------------------------------------
 Scenarios:(modified)
 -------------------------------------------------------------------------
