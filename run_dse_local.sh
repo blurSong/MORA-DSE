@@ -10,7 +10,7 @@ MN="mobilenet_v2"
 SN="shufflenet_v2"
 UN="unet"
 
-DATAFLOW="kcp_ws"
+DATAFLOW="xp_ws"
 
 echo "Start dse locally" & echo $DATAFLOW
 echo $AN
