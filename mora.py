@@ -45,7 +45,8 @@ def set_path(model, dataflow):
     model_path = os.path.abspath(os.path.join(home_path, 'model/' + model))
     output_path = os.path.join(home_path, 'output/' + model)
     if os.path.exists(output_path):
-        SP.run('rm *.csv', cwd=output_path, shell=True)
+        SP.run('rm [{}]*.csv'.format(dataflow), cwd=output_path, shell=True)
+        SP.run('rm *_{}.csv'.format(dataflow), cwd=output_path, shell=True)
     if os.path.exists(model_path):
         SP.run('rm ' + model + '.csv', cwd=model_path, shell=True)
         SP.run('rm ' + model + '_dla_' + dataflow + '.m', cwd=model_path, shell=True)

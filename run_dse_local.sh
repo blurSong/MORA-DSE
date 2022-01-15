@@ -30,4 +30,22 @@ python mora.py --scenario edge --dataflow $DATAFLOW --model $SN
 wait
 
 
+DATAFLOW2="rs"
+
+echo "Start dse locally" & echo $DATAFLOW2
+echo $AN
+python mora.py --scenario edge --dataflow $DATAFLOW2 --model $AN
+wait
+echo $RN18
+python mora.py --scenario edge --dataflow $DATAFLOW2 --model $RN18
+wait
+echo $RN34
+python mora.py --scenario edge --dataflow $DATAFLOW2 --model $RN34
+wait
+echo $MN
+python mora.py --scenario edge --dataflow $DATAFLOW2 --model $MN
+wait
+echo $SN
+python mora.py --scenario edge --dataflow $DATAFLOW2 --model $SN
+wait
 
