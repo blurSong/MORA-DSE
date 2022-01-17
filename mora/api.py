@@ -295,10 +295,10 @@ def dse_checkpoint(indicator, EDP_cons, area_cons, model, df, homepath):
     return
 
 
-def summary(homepath, model, rule='dlaperf'):
+def summary(homepath, model, scenario='edge', rule='dlaperf'):
     assert rule in ['dlaperf', 'normperf', 'totalperf']
     model_path = os.path.abspath(os.path.join(homepath, 'output/' + model))
-    result_path = os.path.abspath(os.path.join(model_path, 'result'))
+    result_path = os.path.abspath(os.path.join(model_path, scenario + ' result'))
     dataflow_list = ['kcp_ws', 'yxp_os', 'xp_ws', 'rs', 'ykp_os']
     DSE_top_latancy = pd.DataFrame(columns=[
         'DSE index', 'DLA HW (pes, bw)', 'RRAM HW (tiles, bw)', 'DLA layernum', 'RRAM layernum', 'DLA latency', 'RRAM latency', 'DLA energy', 'RRAM energy',
