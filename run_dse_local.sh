@@ -67,3 +67,22 @@ wait
 echo $SN
 python mora.py --scenario edge --dataflow $DATAFLOW3 --model $SN
 wait
+
+DATAFLOW4="ykp_os"
+
+echo "Start dse locally" & echo $DATAFLOW4
+echo $AN
+python mora.py --scenario edge --dataflow $DATAFLOW4 --model $AN
+wait
+echo $RN18
+python mora.py --scenario edge --dataflow $DATAFLOW4 --model $RN18
+wait
+echo $RN34
+python mora.py --scenario edge --dataflow $DATAFLOW4 --model $RN34
+wait
+echo $MN
+python mora.py --scenario edge --dataflow $DATAFLOW4 --model $MN
+wait
+echo $SN
+python mora.py --scenario edge --dataflow $DATAFLOW4 --model $SN
+wait
