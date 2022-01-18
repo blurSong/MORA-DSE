@@ -1,5 +1,5 @@
 pes: 256
 tiles: 12
-glb_size: 4
-dla_bw: 4
-rram_bw: 4
+glb_size: 6
+dla_bw: 16
+rram_bw: 16

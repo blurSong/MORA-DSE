@@ -123,7 +123,7 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
         mora_skip_simu = False
 
     if _on_RRAM_layer_index:
-        on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)
+        on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)  # on_RRAM_layer_index is out of order
     elif _DSE_indicator == 0:
         model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'model/' + args.model + '/' + args.model + '.csv'))
         model_nd = pd.read_csv(model_csv_path).to_numpy()

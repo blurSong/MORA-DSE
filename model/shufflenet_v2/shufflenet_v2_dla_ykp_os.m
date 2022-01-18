@@ -17,15 +17,20 @@ Dataflow {
 }
 }
 Layer L1 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 2, Y: 2 }
 Dimensions { K: 24, C: 24, R: 3, S: 3, Y: 56, X: 56 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L2 {
@@ -63,15 +68,20 @@ Dataflow {
 }
 }
 Layer L4 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 2, Y: 2 }
 Dimensions { K: 58, C: 58, R: 3, S: 3, Y: 56, X: 56 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L5 {
@@ -92,20 +102,15 @@ Dataflow {
 }
 }
 Layer L6 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 116, C: 58, R: 1, S: 1, Y: 28, X: 28 }
+Dimensions { K: 1, C: 58, R: 1, S: 1, Y: 28, X: 28 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L7 {
@@ -126,15 +131,20 @@ Dataflow {
 }
 }
 Layer L8 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 58, C: 58, R: 3, S: 3, Y: 28, X: 28 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L9 {
@@ -155,20 +165,15 @@ Dataflow {
 }
 }
 Layer L10 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 116, C: 58, R: 1, S: 1, Y: 28, X: 28 }
+Dimensions { K: 1, C: 58, R: 1, S: 1, Y: 28, X: 28 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L11 {
@@ -189,15 +194,20 @@ Dataflow {
 }
 }
 Layer L12 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 58, C: 58, R: 3, S: 3, Y: 28, X: 28 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L13 {
@@ -218,20 +228,15 @@ Dataflow {
 }
 }
 Layer L14 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 116, C: 58, R: 1, S: 1, Y: 28, X: 28 }
+Dimensions { K: 1, C: 58, R: 1, S: 1, Y: 28, X: 28 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L15 {
@@ -252,15 +257,20 @@ Dataflow {
 }
 }
 Layer L16 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 58, C: 58, R: 3, S: 3, Y: 28, X: 28 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L17 {
@@ -281,9 +291,21 @@ Dataflow {
 }
 }
 Layer L18 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 116, C: 58, R: 1, S: 1, Y: 28, X: 28 }
+Dimensions { K: 1, C: 58, R: 1, S: 1, Y: 28, X: 28 }
+Dataflow {
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L19 {
+Type: CONV 
+Stride { X: 2, Y: 2 }
+Dimensions { K: 116, C: 58, R: 3, S: 3, Y: 28, X: 28 }
 Dataflow {
     TemporalMap(16,16) K;
     SpatialMap(Sz(R),1) Y;
@@ -295,18 +317,6 @@ Dataflow {
     TemporalMap(Sz(S),1) X;
     TemporalMap(Sz(R),Sz(R)) R;
     TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L19 {
-Type: DSCONV 
-Stride { X: 2, Y: 2 }
-Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 28, X: 28 }
-Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L20 {
@@ -329,7 +339,7 @@ Dataflow {
 Layer L21 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 116, C: 116, R: 1, S: 1, Y: 28, X: 28 }
+Dimensions { K: 116, C: 58, R: 1, S: 1, Y: 28, X: 28 }
 Dataflow {
     TemporalMap(16,16) K;
     SpatialMap(Sz(R),1) Y;
@@ -344,15 +354,20 @@ Dataflow {
 }
 }
 Layer L22 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 2, Y: 2 }
 Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 28, X: 28 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L23 {
@@ -373,20 +388,15 @@ Dataflow {
 }
 }
 Layer L24 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1, C: 116, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L25 {
@@ -407,15 +417,20 @@ Dataflow {
 }
 }
 Layer L26 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L27 {
@@ -436,20 +451,15 @@ Dataflow {
 }
 }
 Layer L28 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1, C: 116, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L29 {
@@ -470,15 +480,20 @@ Dataflow {
 }
 }
 Layer L30 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L31 {
@@ -499,20 +514,15 @@ Dataflow {
 }
 }
 Layer L32 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1, C: 116, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L33 {
@@ -533,15 +543,20 @@ Dataflow {
 }
 }
 Layer L34 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L35 {
@@ -562,20 +577,15 @@ Dataflow {
 }
 }
 Layer L36 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1, C: 116, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L37 {
@@ -596,15 +606,20 @@ Dataflow {
 }
 }
 Layer L38 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L39 {
@@ -625,20 +640,15 @@ Dataflow {
 }
 }
 Layer L40 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1, C: 116, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L41 {
@@ -659,15 +669,20 @@ Dataflow {
 }
 }
 Layer L42 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L43 {
@@ -688,20 +703,15 @@ Dataflow {
 }
 }
 Layer L44 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1, C: 116, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L45 {
@@ -722,15 +732,20 @@ Dataflow {
 }
 }
 Layer L46 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L47 {
@@ -751,20 +766,15 @@ Dataflow {
 }
 }
 Layer L48 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1, C: 116, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L49 {
@@ -785,15 +795,20 @@ Dataflow {
 }
 }
 Layer L50 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 1, Y: 1 }
 Dimensions { K: 116, C: 116, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L51 {
@@ -814,9 +829,21 @@ Dataflow {
 }
 }
 Layer L52 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 1, C: 116, R: 1, S: 1, Y: 14, X: 14 }
+Dataflow {
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
+}
+}
+Layer L53 {
+Type: CONV 
+Stride { X: 2, Y: 2 }
+Dimensions { K: 232, C: 116, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
     TemporalMap(16,16) K;
     SpatialMap(Sz(R),1) Y;
@@ -828,18 +855,6 @@ Dataflow {
     TemporalMap(Sz(S),1) X;
     TemporalMap(Sz(R),Sz(R)) R;
     TemporalMap(Sz(S),Sz(S)) S;
-}
-}
-Layer L53 {
-Type: DSCONV 
-Stride { X: 2, Y: 2 }
-Dimensions { K: 232, C: 232, R: 3, S: 3, Y: 14, X: 14 }
-Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L54 {
@@ -862,7 +877,7 @@ Dataflow {
 Layer L55 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 232, C: 232, R: 1, S: 1, Y: 14, X: 14 }
+Dimensions { K: 232, C: 116, R: 1, S: 1, Y: 14, X: 14 }
 Dataflow {
     TemporalMap(16,16) K;
     SpatialMap(Sz(R),1) Y;
@@ -877,15 +892,20 @@ Dataflow {
 }
 }
 Layer L56 {
-Type: DSCONV 
+Type: CONV 
 Stride { X: 2, Y: 2 }
-Dimensions { K: 232, C: 232, R: 3, S: 3, Y: 7, X: 7 }
+Dimensions { K: 232, C: 232, R: 3, S: 3, Y: 14, X: 14 }
 Dataflow {
-	TemporalMap(1,1) C;
-	SpatialMap(Sz(R),1) Y;
-	TemporalMap(Sz(S),1) X;
-	TemporalMap(Sz(R),Sz(R)) R;
-	TemporalMap(Sz(S),Sz(S)) S;
+    TemporalMap(16,16) K;
+    SpatialMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(1,1) C;
+    Cluster(16, P);
+    SpatialMap(1,1) K;
+    TemporalMap(Sz(R),1) Y;
+    TemporalMap(Sz(S),1) X;
+    TemporalMap(Sz(R),Sz(R)) R;
+    TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L57 {
@@ -906,20 +926,15 @@ Dataflow {
 }
 }
 Layer L58 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 464, C: 232, R: 1, S: 1, Y: 7, X: 7 }
+Dimensions { K: 1, C: 232, R: 1, S: 1, Y: 7, X: 7 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L59 {
@@ -974,20 +989,15 @@ Dataflow {
 }
 }
 Layer L62 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 464, C: 232, R: 1, S: 1, Y: 7, X: 7 }
+Dimensions { K: 1, C: 232, R: 1, S: 1, Y: 7, X: 7 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L63 {
@@ -1042,20 +1052,15 @@ Dataflow {
 }
 }
 Layer L66 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 464, C: 232, R: 1, S: 1, Y: 7, X: 7 }
+Dimensions { K: 1, C: 232, R: 1, S: 1, Y: 7, X: 7 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L67 {
@@ -1110,26 +1115,21 @@ Dataflow {
 }
 }
 Layer L70 {
-Type: CONV 
+Type: DSCONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 464, C: 232, R: 1, S: 1, Y: 7, X: 7 }
+Dimensions { K: 1, C: 232, R: 1, S: 1, Y: 7, X: 7 }
 Dataflow {
-    TemporalMap(16,16) K;
-    SpatialMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(1,1) C;
-    Cluster(16, P);
-    SpatialMap(1,1) K;
-    TemporalMap(Sz(R),1) Y;
-    TemporalMap(Sz(S),1) X;
-    TemporalMap(Sz(R),Sz(R)) R;
-    TemporalMap(Sz(S),Sz(S)) S;
+	TemporalMap(1,1) C;
+	SpatialMap(Sz(R),1) Y;
+	TemporalMap(Sz(S),1) X;
+	TemporalMap(Sz(R),Sz(R)) R;
+	TemporalMap(Sz(S),Sz(S)) S;
 }
 }
 Layer L71 {
 Type: CONV 
 Stride { X: 1, Y: 1 }
-Dimensions { K: 1024, C: 464, R: 1, S: 1, Y: 7, X: 7 }
+Dimensions { K: 1024, C: 232, R: 1, S: 1, Y: 7, X: 7 }
 Dataflow {
     TemporalMap(16,16) K;
     SpatialMap(Sz(R),1) Y;

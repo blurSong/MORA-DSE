@@ -178,7 +178,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_in
     model_csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../model/' + cate + '/' + cate + '.csv'))
     model_nd = pd.read_csv(model_csv_path).to_numpy()
     model_layer_num = model_nd.shape[0]
-    on_RRAM_layer_index2 = []  # translate unsorted on_RRAM_layer_index to sorted MNSIM on_RRAM_layer_index2
+    on_RRAM_layer_index2 = []  # mora: key: translate unsorted on_RRAM_layer_index to sorted MNSIM on_RRAM_layer_index2
     layer_counter = 0
     # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     for line in range(model_layer_num):
