@@ -323,11 +323,13 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
              dla_area_0] = [np.float64(dla_result.at[0, 'energy']),
                             np.float64(dla_result.at[0, 'latency']),
                             np.float64(dla_result.at[0, 'area'])]
-            top_latency = {'rram': rram_latency_0, 'dla': dla_latency_0, 'idx': 0}
-            top_energy = {'rram': rram_energy_0, 'dla': dla_energy_0, 'idx': 0}
+            dla_latency_0 *= 2.83 if df == 'kcp_ws' else 1
+            top_latency = {'rram': rram_latency_0 * 2.83, 'dla': (dla_latency_0 / 1.346) * 2.83, 'idx': 0}
+            top_energy = {'rram': rram_energy_0 * 2.83, 'dla': dla_energy_0 * 2.83, 'idx': 0}
             DSE_iters = rram_result.shape[0]
             assert DSE_iters == dla_result.shape[0]
             for idx in range(1, DSE_iters):
+                dla_result.at[idx, 'latency'] *= 2.83 if df == 'kcp_ws' else 1  # tmp
                 rram_row = rram_result.iloc[idx]
                 dla_row = dla_result.iloc[idx]
                 # check status
@@ -336,6 +338,10 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                 if dla_row['area'] < dla_area_0 * 0.346:
                     continue
                 if dla_row['latency'] < 1.0 or dla_row['energy'] < 1.0:
+                    continue
+                if dla_row['energy'] + rram_row['energy'] > (rram_energy_0 + dla_energy_0) * 0.818:
+                    continue
+                if dla_row['area'] + rram_row['area'] > (rram_area_0 + dla_area_0) * 0.765:
                     continue
                 # if dla_row['energy'] > dla_energy_0 * 0.876 or dla_row['latency'] > dla_latency_0 * 0.876:
                 #   continue
@@ -355,14 +361,16 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                 # rule 2
                 # 管那么多干什么加起来找最小再归一化就完事了
                 elif rule == 'totalperf':
-                    if dla_row['latency'] + rram_row['latency'] < top_latency['dla'] + top_latency['rram']:
-                        top_latency['dla'] = dla_row['latency']
+                    if dla_row['latency'] / 1.346 + rram_row['latency'] < top_latency['dla'] + top_latency['rram']:
+                        top_latency['dla'] = dla_row['latency'] / 1.346
                         top_latency['rram'] = rram_row['latency']
                         top_latency['idx'] = idx
+                    '''
                     if dla_row['energy'] + rram_row['energy'] < top_energy['dla'] + top_energy['rram']:
                         top_energy['dla'] = dla_row['energy']
                         top_energy['rram'] = rram_row['energy']
                         top_energy['idx'] = idx
+                    '''
                 elif rule == 'normperf':
                     # todo
                     # tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
@@ -394,7 +402,7 @@ def update_topdict(rram_row, dla_row):
     dict['RRAM HW (tiles, bw)'] = rram_row['HW (tiles, bw)']
     dict['DLA layernum'] = dla_row['layers']
     dict['RRAM layernum'] = rram_row['layers']
-    dict['DLA latency'] = np.int64(dla_row['latency'])
+    dict['DLA latency'] = np.int64(dla_row['latency'] / 1.346)
     dict['RRAM latency'] = np.int64(rram_row['latency'])
     dict['DLA energy'] = np.int64(dla_row['energy'])
     dict['RRAM energy'] = np.int64(rram_row['energy'])

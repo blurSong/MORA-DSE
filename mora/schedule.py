@@ -76,17 +76,18 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 except FileNotFoundError:
                     print("read maestro result fatal.")
                 # run 0: get on-dla result
-                # print(on_RRAM_layer_index)
                 on_DLA_layer_index = []
                 assert layers != 0
                 for lyr in range(layers):
                     on_DLA_layer_index.append(lyr) if lyr not in on_RRAM_layer_index else None
-                # print(on_DLA_layer_index)
+                # print(on_RRAM_layer_index, on_DLA_layer_index)
                 DLA.export(model, on_DLA_layer_index)
                 # run 1: run and get on-rram result
                 # rram_model_df = model_csv_df.iloc[on_RRAM_layer_index].copy()
                 # rram_model_df.to_csv(rram_model_csv_path, index=False)  # replace old csv with new scheduled csv
                 RRAM.invoke_MNSIM(model, DLA.dataflow, on_RRAM_layer_index)
+
+                # 01.18 add: adjust rram and dla result
 
                 # set checkpoint
                 dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, DLA.dataflow, homepath)
