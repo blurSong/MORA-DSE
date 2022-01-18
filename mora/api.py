@@ -323,7 +323,7 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
              dla_area_0] = [np.float64(dla_result.at[0, 'energy']),
                             np.float64(dla_result.at[0, 'latency']),
                             np.float64(dla_result.at[0, 'area'])]
-            top_latancy = {'rram': rram_latency_0, 'dla': dla_latency_0, 'idx': 0}
+            top_latency = {'rram': rram_latency_0, 'dla': dla_latency_0, 'idx': 0}
             top_energy = {'rram': rram_energy_0, 'dla': dla_energy_0, 'idx': 0}
             DSE_iters = rram_result.shape[0]
             assert DSE_iters == dla_result.shape[0]
@@ -337,17 +337,17 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                     continue
                 if dla_row['latency'] < 1.0 or dla_row['energy'] < 1.0:
                     continue
-                if dla_row['energy'] > dla_energy_0 * 0.876 or dla_row['latency'] > dla_latency_0 * 0.876:
-                    continue
-                if rram_row['energy'] > rram_energy_0 * 0.765 or rram_row['latency'] > rram_latency_0 * 0.765:
-                    continue
+                # if dla_row['energy'] > dla_energy_0 * 0.876 or dla_row['latency'] > dla_latency_0 * 0.876:
+                #   continue
+                # if rram_row['energy'] > rram_energy_0 * 0.765 or rram_row['latency'] > rram_latency_0 * 0.765:
+                #    continue
                 # rule 1
                 # RRAM作为协处理器，只需要验证在RRAM存在的情况下，通过DSE寻找到的最小处理速度
                 if rule == 'dlaperf':
-                    if dla_row['latency'] < top_latancy['dla']:
-                        top_latancy['dla'] = dla_row['latency']
-                        top_latancy['rram'] = rram_row['latency']
-                        top_latancy['idx'] = idx
+                    if dla_row['latency'] < top_latency['dla']:
+                        top_latency['dla'] = dla_row['latency']
+                        top_latency['rram'] = rram_row['latency']
+                        top_latency['idx'] = idx
                     if dla_row['energy'] < top_energy['dla']:
                         top_energy['dla'] = dla_row['energy']
                         top_energy['rram'] = rram_row['energy']
@@ -355,10 +355,10 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                 # rule 2
                 # 管那么多干什么加起来找最小再归一化就完事了
                 elif rule == 'totalperf':
-                    if dla_row['latency'] + rram_row['latency'] < top_latancy['dla'] + top_latancy['rram']:
-                        top_latancy['dla'] = dla_row['latency']
-                        top_latancy['rram'] = rram_row['latency']
-                        top_latancy['idx'] = idx
+                    if dla_row['latency'] + rram_row['latency'] < top_latency['dla'] + top_latency['rram']:
+                        top_latency['dla'] = dla_row['latency']
+                        top_latency['rram'] = rram_row['latency']
+                        top_latency['idx'] = idx
                     if dla_row['energy'] + rram_row['energy'] < top_energy['dla'] + top_energy['rram']:
                         top_energy['dla'] = dla_row['energy']
                         top_energy['rram'] = rram_row['energy']
@@ -367,7 +367,7 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                     # todo
                     # tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
                     return
-            top_latancy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_latancy['idx']], dla_result.iloc[top_latancy['idx']]))
+            top_latancy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_latency['idx']], dla_result.iloc[top_latency['idx']]))
             top_energy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_energy['idx']], dla_result.iloc[top_energy['idx']]))
             top_latancy_df = pd.DataFrame(top_latancy_dict, index=[df])
             top_energy_df = pd.DataFrame(top_energy_dict, index=[df])
