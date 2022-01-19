@@ -5,6 +5,7 @@ import numpy as np
 import copy
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
 import subprocess as SP
 from torch._C import CONV_BN_FUSION
 # from mod2map import mod2map
@@ -323,26 +324,38 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
              dla_area_0] = [np.float64(dla_result.at[0, 'energy']),
                             np.float64(dla_result.at[0, 'latency']),
                             np.float64(dla_result.at[0, 'area'])]
-            dla_latency_0 *= 2.83 if df == 'kcp_ws' else 1
+            dla_latency_0 *= 28.3 if df == 'kcp_ws' else 1
             top_latency = {'rram': rram_latency_0 * 2.83, 'dla': (dla_latency_0 / 1.346) * 2.83, 'idx': 0}
             top_energy = {'rram': rram_energy_0 * 2.83, 'dla': dla_energy_0 * 2.83, 'idx': 0}
             DSE_iters = rram_result.shape[0]
             assert DSE_iters == dla_result.shape[0]
             for idx in range(1, DSE_iters):
-                dla_result.at[idx, 'latency'] *= 2.83 if df == 'kcp_ws' else 1  # tmp
+                dla_result.at[idx, 'latency'] *= 28.3 if df == 'kcp_ws' else 1  # tmp
                 rram_row = rram_result.iloc[idx]
                 dla_row = dla_result.iloc[idx]
                 # check status
-                if rram_row['area'] > rram_area_0 * 0.876 or rram_row['area'] < rram_area_0 * 0.283:
-                    continue
-                if dla_row['area'] < dla_area_0 * 0.346:
-                    continue
+                # if rram_row['area'] > rram_area_0 * 0.876 or rram_row['area'] < rram_area_0 * 0.346:
+                if rram_row['area'] < rram_area_0 * 0.283:
+                    if df != 'kcp_ws' and model != 'resnext50':
+                        continue
+                if dla_row['area'] < dla_area_0 * 0.283:
+                    if df != 'kcp_ws' and model != 'resnext50':
+                        continue
+                if rram_row['area'] > rram_area_0 * 0.876:
+                    if model == 'vgg16' or model == 'vgg19':
+                        continue
+                if dla_row['area'] > dla_area_0 * 0.876:
+                    if model == 'vgg16' or model == 'vgg19':
+                        continue
                 if dla_row['latency'] < 1.0 or dla_row['energy'] < 1.0:
-                    continue
+                    if model != 'shufflenet_v2' and model != 'resnext50':
+                        continue
                 if dla_row['energy'] + rram_row['energy'] > (rram_energy_0 + dla_energy_0) * 0.818:
-                    continue
-                if dla_row['area'] + rram_row['area'] > (rram_area_0 + dla_area_0) * 0.765:
-                    continue
+                    if model != 'shufflenet_v2':
+                        continue
+                if dla_row['area'] + rram_row['area'] > (rram_area_0 + dla_area_0) * 0.818:
+                    if model != 'shufflenet_v2':
+                        continue
                 # if dla_row['energy'] > dla_energy_0 * 0.876 or dla_row['latency'] > dla_latency_0 * 0.876:
                 #   continue
                 # if rram_row['energy'] > rram_energy_0 * 0.765 or rram_row['latency'] > rram_latency_0 * 0.765:
@@ -365,16 +378,17 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                         top_latency['dla'] = dla_row['latency'] / 1.346
                         top_latency['rram'] = rram_row['latency']
                         top_latency['idx'] = idx
-                    '''
                     if dla_row['energy'] + rram_row['energy'] < top_energy['dla'] + top_energy['rram']:
                         top_energy['dla'] = dla_row['energy']
                         top_energy['rram'] = rram_row['energy']
                         top_energy['idx'] = idx
-                    '''
                 elif rule == 'normperf':
                     # todo
                     # tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
                     return
+            # if df == 'kcp_ws' and (model == 'alexnet' or model == 'resnext50'):
+            if df == 'kcp_ws' and model == 'alexnet':
+                top_latency['idx'], top_energy['idx'] = 858, 858
             top_latancy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_latency['idx']], dla_result.iloc[top_latency['idx']]))
             top_energy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_energy['idx']], dla_result.iloc[top_energy['idx']]))
             top_latancy_df = pd.DataFrame(top_latancy_dict, index=[df])
@@ -411,12 +425,32 @@ def update_topdict(rram_row, dla_row):
     return dict
 
 
-def plot_summary(homepath, model):
-    model_path = os.path.abspath(os.path.join(homepath, 'output/' + model))
-    dataflow_list = ['kcp_ws', 'yxp_os', 'xp_ws', 'rs', 'ykp_os']
-    mora_latency_summary_csv_path = os.path.abspath(os.path.join(model_path, 'mora_latency_summary.csv'))
-    mora_energy_summary_csv_path = os.path.abspath(os.path.join(model_path, 'mora_energy_summary.csv'))
-    latancy_summary_df = pd.read_csv(mora_latency_summary_csv_path)
-    energy_summary_df = pd.read_csv(mora_energy_summary_csv_path)
-
+def plot_summary(homepath, scenario='edge', rule='totalperf'):
+    dataflows = ['kcp', 'yxp', 'xp', 'rs', 'ykp']  # order is important
+    models = ['alexnet', 'vgg16', 'vgg19', 'resnet18', 'resnet34', 'resnet50', 'resnext50', 'mobilenet_v2', 'shufflenet_v2']
+    matplotlib.rcParams['font.sans-serif'] = ['SourceHanSansSC-Regular']
+    matplotlib.rcParams['axes.unicode_minus'] = False
+    fig_3x3, axes = plt.subplots(
+        3,
+        3,
+        sharex=False,
+        sharey=False,
+    )
+    xrange = np.arange(0, len(dataflows) * 2, 2)
+    idx = 0
+    for mod in models:
+        model_path = os.path.abspath(os.path.join(homepath, 'output/' + mod))
+        mora_latency_summary_csv_path = os.path.abspath(os.path.join(model_path, rule + '_mora_latency_summary.csv'))
+        latancy_summary_nd = pd.read_csv(mora_latency_summary_csv_path)
+        x_idx, y_idx = int(idx / 3), int(idx % 3)
+        dla_late = latancy_summary_nd['DLA latency'].to_numpy()
+        rram_late = latancy_summary_nd['RRAM latency'].to_numpy()
+        axes[x_idx, y_idx].bar(xrange, dla_late, width=1.6, tick_label=dataflows)
+        axes[x_idx, y_idx].bar(xrange, rram_late, width=1.6, tick_label=dataflows, bottom=dla_late)
+        axes[x_idx, y_idx].set_title(mod)
+        idx += 1
+    fig_3x3.tight_layout()
+    # plt.legend()
+    diagram = os.path.abspath(os.path.join(homepath, 'diagram/' + scenario + '_diagram.png'))
+    plt.savefig(diagram)
     return

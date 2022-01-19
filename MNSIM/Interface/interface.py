@@ -22,7 +22,7 @@ class TrainTestInterface(object):
         self.weights_file = weights_file
         self.test_loader = None
         # load simconfig
-        ## xbar_size, input_bit, weight_bit, quantize_bit
+        # xbar_size, input_bit, weight_bit, quantize_bit
         xbar_config = configparser.ConfigParser()
         xbar_config.read(SimConfig_path, encoding='UTF-8')
         self.hardware_config = collections.OrderedDict()
@@ -85,10 +85,10 @@ class TrainTestInterface(object):
             self.hardware_config['input_bit'] = extra_define['dac_res']
             self.hardware_config['quantize_bit'] = extra_define['adc_res']
             self.hardware_config['xbar_size'] = extra_define['xbar_size']
-        self.net, self.on_RRAM_layer_index2 = import_module('MNSIM.Interface.network').get_net(self.hardware_config,
-                                                                                               cate=self.network_module,
-                                                                                               num_classes=num_classes,
-                                                                                               on_RRAM_layer_index=on_RRAM_layer_index)
+        self.net, self.MNSIM_layer_index_list = import_module('MNSIM.Interface.network').get_net(self.hardware_config,
+                                                                                                 cate=self.network_module,
+                                                                                                 num_classes=num_classes,
+                                                                                                 on_RRAM_layer_index=on_RRAM_layer_index)
         '''
         if weights_file is not None:
             print(f'load weights from {weights_file}')
