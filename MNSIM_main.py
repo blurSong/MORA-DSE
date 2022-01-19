@@ -173,6 +173,8 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
                                 model_power=__power)
 
         # print("======================== Results  =================================")
+        # todo: post dse process
+        MNSIM_latency_list = []
         output_csv_dicts['latency'] = __latency.model_latency_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
         output_csv_dicts['area'] = __area.model_area_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
         output_csv_dicts['power'] = __power.model_power_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
@@ -184,7 +186,6 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
         output_csv_dicts['energy'] = 0
 
     if not (args.disable_accuracy_simulation):
-        print("======================================")
         print("Accuracy simulation will take a few minutes on GPU")
         weight = __TestInterface.get_net_bits()
         weight_2 = weight_update(args.hardware_description, weight, is_Variation=args.enable_variation, is_SAF=args.enable_SAF, is_Rratio=args.enable_R_ratio)

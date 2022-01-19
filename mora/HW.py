@@ -85,7 +85,7 @@ class DLA(object):
             output_csv_dicts['layers'] = len(on_DLA_layer_index)
             output_csv_dicts['latency'] = runtime_nd.sum() * 1.5 * 1.7
             output_csv_dicts['energy'] = energy_nd.sum()
-            output_csv_dicts['area'] = area
+            output_csv_dicts['area'] = area  # wrong
             output_csv_dicts['power'] = power_nd.mean()  # wrong
             output_csv_dicts['HW (pes, bw)'] = '{} {}'.format(self.dla_dicts['pes'], int(self.dla_dicts['noc_bw'] / 1024**2))
             output_csv_dicts['restraint'] = 'unexamined' if self.DSE_indicator != 0 else 'pass'
