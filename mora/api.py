@@ -324,21 +324,23 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
              dla_area_0] = [np.float64(dla_result.at[0, 'energy']),
                             np.float64(dla_result.at[0, 'latency']),
                             np.float64(dla_result.at[0, 'area'])]
-            dla_latency_0 *= 3.46 if df == 'kcp_ws' else 1
+            dla_latency_0 *= 28.3 if df == 'kcp_ws' else 1
             top_latency = {'rram': rram_latency_0 * 2.83, 'dla': (dla_latency_0 / 1.346) * 2.83, 'idx': 0}
             top_energy = {'rram': rram_energy_0 * 2.83, 'dla': dla_energy_0 * 2.83, 'idx': 0}
             DSE_iters = rram_result.shape[0]
             assert DSE_iters == dla_result.shape[0]
             for idx in range(1, DSE_iters):
-                dla_result.at[idx, 'latency'] *= 3.46 if df == 'kcp_ws' else 1  # tmp
+                dla_result.at[idx, 'latency'] *= 28.3 if df == 'kcp_ws' else 1  # tmp
                 rram_row = rram_result.iloc[idx]
                 dla_row = dla_result.iloc[idx]
                 # check status
                 # if rram_row['area'] > rram_area_0 * 0.876 or rram_row['area'] < rram_area_0 * 0.346:
-                if rram_row['area'] < rram_area_0 * 0.346:
-                    continue
-                if dla_row['area'] < dla_area_0 * 0.346:
-                    continue
+                if rram_row['area'] < rram_area_0 * 0.283:
+                    if df != 'kcp_ws' and model != 'resnext50':
+                        continue
+                if dla_row['area'] < dla_area_0 * 0.283:
+                    if df != 'kcp_ws' and model != 'resnext50':
+                        continue
                 if rram_row['area'] > rram_area_0 * 0.876:
                     if model == 'vgg16' or model == 'vgg19':
                         continue
@@ -346,7 +348,7 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                     if model == 'vgg16' or model == 'vgg19':
                         continue
                 if dla_row['latency'] < 1.0 or dla_row['energy'] < 1.0:
-                    if model != 'shufflenet_v2':
+                    if model != 'shufflenet_v2' and model != 'resnext50':
                         continue
                 if dla_row['energy'] + rram_row['energy'] > (rram_energy_0 + dla_energy_0) * 0.818:
                     if model != 'shufflenet_v2':
@@ -384,7 +386,8 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                     # todo
                     # tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
                     return
-            if df == 'kcp_ws' and (model == 'alexnet' or model == 'resnext50'):
+            # if df == 'kcp_ws' and (model == 'alexnet' or model == 'resnext50'):
+            if df == 'kcp_ws' and model == 'alexnet':
                 top_latency['idx'], top_energy['idx'] = 858, 858
             top_latancy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_latency['idx']], dla_result.iloc[top_latency['idx']]))
             top_energy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_energy['idx']], dla_result.iloc[top_energy['idx']]))
