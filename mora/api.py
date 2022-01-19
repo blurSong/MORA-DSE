@@ -428,7 +428,7 @@ def update_topdict(rram_row, dla_row):
 def plot_summary(homepath, scenario='edge', rule='totalperf'):
     dataflows = ['kcp', 'yxp', 'xp', 'rs', 'ykp']  # order is important
     models = ['alexnet', 'vgg16', 'vgg19', 'resnet18', 'resnet34', 'resnet50', 'resnext50', 'mobilenet_v2', 'shufflenet_v2']
-    matplotlib.rcParams['font.sans-serif'] = ['SourceHanSansSC-Regular']
+    matplotlib.rcParams['font.serif'] = ['Fira Code Regular']
     matplotlib.rcParams['axes.unicode_minus'] = False
     fig_3x3, axes = plt.subplots(
         3,
@@ -452,5 +452,5 @@ def plot_summary(homepath, scenario='edge', rule='totalperf'):
     fig_3x3.tight_layout()
     # plt.legend()
     diagram = os.path.abspath(os.path.join(homepath, 'diagram/' + scenario + '_diagram.png'))
-    plt.savefig(diagram)
+    plt.savefig(diagram, dpi=300)
     return
