@@ -87,8 +87,7 @@ class TrainTestInterface(object):
             self.hardware_config['xbar_size'] = extra_define['xbar_size']
         self.net, self.MNSIM_layer_index_list = import_module('MNSIM.Interface.network').get_net(self.hardware_config,
                                                                                                  cate=self.network_module,
-                                                                                                 num_classes=num_classes,
-                                                                                                 on_RRAM_layer_index=on_RRAM_layer_index)
+                                                                                                 num_classes=num_classes)
         '''
         if weights_file is not None:
             print(f'load weights from {weights_file}')

@@ -126,12 +126,8 @@ class Model_energy():
         self.arch_total_buf_w_energy = sum(self.arch_buf_w_energy) + self.global_buf.buf_wpower * 1e-3 * self.global_buf.buf_wlatency
         self.arch_total_pooling_energy = sum(self.arch_pooling_energy)
 
-    def model_energy_output(self, module_information=1, layer_information=1, oRli2=[]):
-        mora_energy = self.arch_Noc_energy
-        for lyr in range(self.total_layer_num):
-            if lyr in oRli2:
-                mora_energy += self.arch_energy[lyr]
-        print("RRAM Energy:", mora_energy, '(', self.arch_total_energy, ") nJ")
+    def model_energy_output(self, module_information=1, layer_information=1):
+        print("Hardware energy:", self.arch_total_energy, "nJ")
         if module_information:
             print("		crossbar energy:", self.arch_total_xbar_energy, "nJ")
             print("		DAC energy:", self.arch_total_DAC_energy, "nJ")
@@ -152,8 +148,12 @@ class Model_energy():
             for i in range(self.total_layer_num):
                 print("Layer", i, ":")
                 print("     Hardware energy:", self.arch_energy[i], "nJ")
-        # return self.arch_total_energy
-        return mora_energy
+        energy_list = []
+        for lyr in range(self.total_layer_num):
+            energy_list.append(self.arch_energy[lyr])
+        MNSIM_noc_energy = self.arch_Noc_energy
+        MNSIMenergy = self.arch_total_energy
+        return energy_list, MNSIMenergy, MNSIM_noc_energy
 
 
 if __name__ == '__main__':

@@ -41,18 +41,18 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
     #        (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
     rounds = int((max_param_dicts['pes'] - ini_hw_param_dicts['pes']) / (scenario_step**2 * 128) + 1) \
         * int(((max_param_dicts['tiles'] - ini_hw_param_dicts['tiles']) / ceil(scenario_step/2.0)) + 1) \
-        * int(((max_param_dicts['bw'] * 0.8 - ini_hw_param_dicts['dla_bw']) / (scenario_step**2 * 4)) + 1)
+        * int(((max_param_dicts['bw'] * 0.9 - ini_hw_param_dicts['dla_bw']) / (scenario_step**2 * 4)) + 1)
     rounds = int(rounds)
     print('[mora][DSE] Greedy DSE, total rounds:', rounds)
     print('Starting HW:', ini_hw_param_dicts)
     print('Ending HW:', max_param_dicts, '\n')
-    assert rounds < 11451.4, 'too many dse rounds.'
+    assert rounds < 2830, 'too many dse rounds.'
     DSE_indicator = 1
     for pes in range(ini_hw_param_dicts['pes'], max_param_dicts['pes'] + 64, scenario_step**2 * 128):
         for tiles in range(ini_hw_param_dicts['tiles'], max_param_dicts['tiles'] + 1, ceil(scenario_step / 2.0)):
-            for dbw in range(ini_hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.8), scenario_step**2 * 4):
+            for dbw in range(ini_hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.9), scenario_step**2 * 4):
                 rbw = max_param_dicts['bw'] - dbw
-                print('[mora][DSE] Start greedy DSE round {0} / {1}'.format(DSE_indicator, rounds))
+                print('[mora][DSE] Start greedy DSE round {0} / {1} - {2}'.format(DSE_indicator, rounds, DLA.dataflow))
                 DLA.set_dse_param(pes, dbw, DSE_indicator)
                 RRAM.set_dse_param(tiles, rbw, DSE_indicator)
                 # run 0: all on dla
@@ -81,12 +81,13 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 assert layers != 0
                 for lyr in range(layers):
                     on_DLA_layer_index.append(lyr) if lyr not in on_RRAM_layer_index else None
-                # print(on_RRAM_layer_index, on_DLA_layer_index)
+                print(on_RRAM_layer_index, on_DLA_layer_index)
                 # run 1: run and get on-rram result
                 # rram_model_df = model_csv_df.iloc[on_RRAM_layer_index].copy()
                 # rram_model_df.to_csv(rram_model_csv_path, index=False)  # replace old csv with new scheduled csv
                 DLA.export(model, on_DLA_layer_index)
-                RRAM.invoke_MNSIM(model, DLA.dataflow, on_RRAM_layer_index)
+                skip_simu = False  # todo
+                RRAM.invoke_MNSIM(model, DLA.dataflow, skip_simu)
                 # todo: add adjust rram and dla result
 
                 # set checkpoint

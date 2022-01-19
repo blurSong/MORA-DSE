@@ -165,7 +165,7 @@ class NetworkGraph(nn.Module):
         self.load_state_dict(tmp_state_dict)
 
 
-def get_net(hardware_config=None, cate='vgg16', num_classes=10, on_RRAM_layer_index=[]):
+def get_net(hardware_config=None, cate='vgg16', num_classes=10):
     # initial config
     if hardware_config is None:
         hardware_config = {'xbar_size': 128, 'input_bit': 2, 'weight_bit': 1, 'quantize_bit': 10}

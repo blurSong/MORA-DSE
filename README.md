@@ -117,3 +117,6 @@ python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
 
 
 ## LINK
+
+## result
+1. RRAM对带宽的需求远大于DLA(RRAM变，DLA不变)

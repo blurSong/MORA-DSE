@@ -134,14 +134,21 @@ class RRAM(object):
         xbar_polarity = int(configer.get('Process element level', 'Xbar_Polarity'))
         return self.rram_dicts['tiles'] * self.rram_dicts['tiles'] * 16 * 8 * xbar_polarity * 128 * 127 * 2  # bits
 
-    def invoke_MNSIM(self, model, dataflow, on_RRAM_layer_index=[]):
-        output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/[' + dataflow + ']' + model + '_rram.csv'))
+    def invoke_MNSIM(self, model, dataflow, skip_simu=False):
+        MNSIM_result_csv = model + '_rram_noc' + str(self.rram_dicts['noc_bw']) + '.csv'
+        MNSIM_result_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + MNSIM_result_csv))
         # if os.path.exists(output_csv_path):
         #    print("rram outfile conflict.")
         #    raise AttributeError
-        print("[mnsim] invoked -", self.rram_dicts)
-        import_module("MNSIM_main").main(model, self.rram_dicts['tiles'], self.rram_dicts['tiles-buildin'], self.rram_dicts['noc_bw'], self.DSE_indicator,
-                                         dataflow, on_RRAM_layer_index)
+        if not skip_simu:
+            print("[mnsim] invoked -", self.rram_dicts)
+            import_module("MNSIM_main").main(model, self.rram_dicts['tiles'], self.rram_dicts['tiles-buildin'], self.rram_dicts['noc_bw'], self.DSE_indicator,
+                                             dataflow)
+            if os.path.exists(MNSIM_result_csv_path) is False:
+                print('MNSIM invoke fatal.')
+                raise FileNotFoundError
+        else:
+            print("[mnsim] bypassed -", self.rram_dicts)
         '''
         command = [
             "python", "../MNSIM.py", "--model {}".format(model), "--tiles {} {}".format(self.rram_dicts['tiles'], self.rram_dicts['tiles']),
@@ -149,11 +156,13 @@ class RRAM(object):
         ]
         process = SP.Popen(command, stdout=SP.PIPE, stderr=SP.PIPE)
         stdout, stderr = process.communicate()
-        process.wait()
-        '''
-        if os.path.exists(output_csv_path) is False:
-            print('MNSIM invoke fatal.')
-            raise FileNotFoundError
+        process.wait() '''
+        return
+
+    def export(self, model, dataflow):
+        output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/[' + dataflow + ']' + model + '_rram.csv'))
+        MNSIM_result_csv = model + '_rram_noc' + str(self.rram_dicts['noc_bw']) + '.csv'
+        MNSIM_result_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + MNSIM_result_csv))
         return
 
 

@@ -112,11 +112,7 @@ class Model_inference_power():
         self.arch_total_buf_w_power = sum(self.arch_buf_w_power) + self.global_buf.buf_wpower * 1e-3
         self.arch_total_pooling_power = sum(self.arch_pooling_power)
 
-    def model_power_output(self, module_information=1, layer_information=1, oRli2=[]):
-        mora_power = 0
-        for lyr in range(self.total_layer_num):
-            if lyr in oRli2:
-                mora_power += self.arch_power[lyr]
+    def model_power_output(self, module_information=1, layer_information=1):
         # print("RRAM Power:", mora_power, '(', self.arch_total_power, ") W")
         if module_information:
             print("		crossbar power:", self.arch_total_xbar_power, "W")
@@ -144,8 +140,17 @@ class Model_inference_power():
                           "W")
                 else:
                     print("Hardware power:", self.arch_power[i], "W")
-        # return self.arch_total_power
-        return mora_power
+        # mora
+        power_list = []
+        for lyr in range(self.total_layer_num):
+            layer_dict = self.NetStruct[i][0][0]
+            if layer_dict['type'] == 'element_sum':
+                power_list.append(0)
+            else:
+                power_list.append(self.arch_power[lyr])
+        MNSIMpower = self.arch_total_power
+        MNSIM_acc_power = self.global_add.adder_power * self.graph.global_adder_num + self.global_buf.buf_wpower * 1e-3 + self.global_buf.buf_rpower * 1e-3
+        return power_list, MNSIMpower, MNSIM_acc_power
 
 
 if __name__ == '__main__':
