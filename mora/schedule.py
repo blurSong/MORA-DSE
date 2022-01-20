@@ -103,7 +103,7 @@ def post_process(oDli, oRli, Mlil, memcapR, maestro_result_csv_path, MNSIM_resul
                 continue
     oRli.sort()
     oDli.sort()
-    return oDli, oRli
+    return oDli, oRli, memcapRact
 
 
 def take_second(elem):
@@ -141,7 +141,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
         for tiles in range(ini_hw_param_dicts['tiles'], max_param_dicts['tiles'] + 1, ceil(scenario_step / 2.0)):
             for dbw in range(ini_hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.9), scenario_step**2 * 4):
                 rbw = max_param_dicts['bw'] - dbw
-                print('[mora][DSE] Start greedy DSE round {0} / {1}.    [{2}]'.format(DSE_indicator, rounds, model))
+                print('[mora][DSE] Start greedy DSE round {0} / {1}    {2}'.format(DSE_indicator, rounds, model))
                 DLA.set_dse_param(pes, dbw, DSE_indicator)
                 RRAM.set_dse_param(tiles, rbw, DSE_indicator)
                 # run 0: dla get full on-dla result
@@ -172,7 +172,8 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 for lyr in range(model_layers):
                     on_DLA_layer_index.append(lyr) if lyr not in on_RRAM_layer_index else None
                 assert len(MNSIM_layer_index_list) == len(on_RRAM_layer_index) + len(on_DLA_layer_index)
-                print('[mora][DSE][Preproc] layers on DLA: {}, RRAM: {}.'.format(len(on_DLA_layer_index), len(on_RRAM_layer_index)))
+                print('[mora][DSE][Preproc] layers on DLA: {}, RRAM: {} . MemOcc： {:.3f}'.format(len(on_DLA_layer_index), len(on_RRAM_layer_index),
+                                                                                                 kernel_memcap / RRAM.mem_capacity))
                 # run 1: run and get full on-rram result
                 MNSIM_result_csv = model + '_rram_noc' + str(RRAM.rram_dicts['noc_bw']) + '.csv'
                 MNSIM_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + MNSIM_result_csv))
@@ -180,10 +181,12 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 RRAM.invoke_MNSIM(model, skip_simu)
 
                 # post-process: add adjust rram and dla result
-                on_DLA_layer_index, on_RRAM_layer_index = post_process(on_DLA_layer_index, on_RRAM_layer_index, MNSIM_layer_index_list, RRAM.mem_capacity,
-                                                                       maestro_result_csv_path, MNSIM_result_csv_path, model_csv_path)
+                on_DLA_layer_index, on_RRAM_layer_index, kernel_memcap = post_process(on_DLA_layer_index, on_RRAM_layer_index, MNSIM_layer_index_list,
+                                                                                      RRAM.mem_capacity, maestro_result_csv_path, MNSIM_result_csv_path,
+                                                                                      model_csv_path)
                 on_RRAM_layer_index2 = get_oRli2(on_RRAM_layer_index, MNSIM_layer_index_list)
-                print('[mora][DSE][Postproc] layers on DLA: {}, RRAM: {}.'.format(len(on_DLA_layer_index), len(on_RRAM_layer_index)))
+                print('[mora][DSE][Postproc] layers on DLA: {}, RRAM: {} . MemOcc： {:.3f}'.format(len(on_DLA_layer_index), len(on_RRAM_layer_index),
+                                                                                                  kernel_memcap / RRAM.mem_capacity))
                 DLA.export(model, on_DLA_layer_index)
                 RRAM.export(model, DLA.dataflow, len(on_RRAM_layer_index), on_RRAM_layer_index2)
 

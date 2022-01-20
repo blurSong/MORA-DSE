@@ -102,9 +102,9 @@ class DLA(object):
                 csv.to_csv(output_csv_path, index=False)
         except FileNotFoundError:
             print('maestro export fatal.')
-        print('DLA Latency:', output_csv_dicts['latency'], 'ns')
-        print('DLA Area:', output_csv_dicts['area'], 'um2')
-        print('DLA Energy:', output_csv_dicts['energy'], 'nJ')
+        print('DLA Latency: {:.2f} ns'.format(output_csv_dicts['latency']))
+        print('DLA Area: {:.2f} um2'.format(output_csv_dicts['area']))
+        print('DLA Energy: {:.2f} nJ'.format(output_csv_dicts['energy']))
         return
 
 
@@ -204,11 +204,11 @@ class RRAM(object):
             csv.to_csv(output_csv_path, mode='a', header=False, index=False)
         else:
             csv.to_csv(output_csv_path, index=False)
-        print('MNSIM Total: {} ns, {} um2, {} nJ.'.format(MNSIM_result_df.at[MNSIMlayers, 'latency'], MNSIM_result_df.at[MNSIMlayers, 'area'],
-                                                          MNSIM_result_df.at[MNSIMlayers, 'energy']))
-        print('RRAM Latency:', output_csv_dicts['latency'], 'ns.')
-        print('RRAM Area:', output_csv_dicts['area'], 'um2.')
-        print('RRAM Energy:', output_csv_dicts['energy'], 'nJ.')
+        print('MNSIM Total: {:.2f} ns, {:.2f} um2, {:.2f} nJ.'.format(MNSIM_result_df.at[MNSIMlayers, 'latency'], MNSIM_result_df.at[MNSIMlayers, 'area'],
+                                                                      MNSIM_result_df.at[MNSIMlayers, 'energy']))
+        print('RRAM Latency: {:.2f} ns'.format(output_csv_dicts['latency']))
+        print('RRAM Area: {:.2f} um2'.format(output_csv_dicts['area']))
+        print('RRAM Energy: {:.2f} nJ'.format(output_csv_dicts['energy']))
         return
 
 
