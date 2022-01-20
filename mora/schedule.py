@@ -20,6 +20,29 @@ def get_layer_memcap(in_channels, out_channels, kernel_size):
     return rram_xbars * xbar_size**2 * 2.0
 
 
+def gen_Mlil(model_csv_path):
+    model_nd = pd.read_csv(model_csv_path).to_numpy()
+    model_layer_num = model_nd.shape[0]
+    Mlil = []  # 0118 add Mlil to map model layers to MNSIM layer_list
+    layer_counter = 0
+    for line in range(model_layer_num):
+        Mlil.append([layer_counter])
+        layer_counter = layer_counter + 1
+        if model_nd[line, 6] >= 2:
+            Mlil[line].append(layer_counter)
+            layer_counter = layer_counter + 1
+    return Mlil
+
+
+def get_oRli2(oRli, Mlil):
+    oRli2 = []
+    for line in range(len(Mlil)):
+        if line in oRli:
+            for idx in Mlil[line]:
+                oRli2.append(idx)
+    return oRli2
+
+
 def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, max_param_dicts, scenario):
     assert DLA.home_path == RRAM.home_path
     homepath = RRAM.home_path
@@ -35,10 +58,9 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
     model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
     model_csv_df = pd.read_csv(model_csv_path)
     model_csv_nd = model_csv_df.to_numpy(dtype=int)
-    # greedy
-    # rounds = (int((max_param_dicts['pes'] - hw_param_dicts['pes']) / int(max_param_dicts['pes'] / 128)) + 1) * ((
-    #    (max_param_dicts['tiles'] - hw_param_dicts['tiles']) / 2) + 1)**2 * ((
-    #        (max_param_dicts['bw'] * 7 / 8) - hw_param_dicts['dla_bw']) / ceil(max_param_dicts['bw'] / 32))
+    MNSIM_layer_index_list = gen_Mlil(model_csv_path)
+
+    # greedy w/ post process
     rounds = int((max_param_dicts['pes'] - ini_hw_param_dicts['pes']) / (scenario_step**2 * 128) + 1) \
         * int(((max_param_dicts['tiles'] - ini_hw_param_dicts['tiles']) / ceil(scenario_step/2.0)) + 1) \
         * int(((max_param_dicts['bw'] * 0.9 - ini_hw_param_dicts['dla_bw']) / (scenario_step**2 * 4)) + 1)
@@ -55,13 +77,13 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 print('[mora][DSE] Start greedy DSE round {0} / {1} - {2}'.format(DSE_indicator, rounds, DLA.dataflow))
                 DLA.set_dse_param(pes, dbw, DSE_indicator)
                 RRAM.set_dse_param(tiles, rbw, DSE_indicator)
-                # run 0: all on dla
+                # run 0: dla get full on-dla result
                 DLA.invoke_maestro(model)
-                layers = 0
+                model_layers = 0
                 try:
                     maestro_result_df = pd.read_csv(maestro_result_csv_path)
                     assert maestro_result_df.shape[0] == model_csv_df.shape[0]
-                    layers = maestro_result_df.shape[0]
+                    model_layers = maestro_result_df.shape[0]
                     maestro_result_df.sort_values(by=' Runtime (Cycles)', ascending=False, inplace=True, kind='mergesort')  # use merge sort to stay stable
                     kernel_mem_cap = 0
                     on_RRAM_layer_index = []
@@ -78,17 +100,20 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 # run 0: get on-dla result
                 on_RRAM_layer_index.sort(reverse=False)
                 on_DLA_layer_index = []
-                assert layers != 0
-                for lyr in range(layers):
+                assert model_layers != 0
+                for lyr in range(model_layers):
                     on_DLA_layer_index.append(lyr) if lyr not in on_RRAM_layer_index else None
+                assert len(MNSIM_layer_index_list) == len(on_RRAM_layer_index) + len(on_DLA_layer_index)
                 print(on_RRAM_layer_index, on_DLA_layer_index)
-                # run 1: run and get on-rram result
-                # rram_model_df = model_csv_df.iloc[on_RRAM_layer_index].copy()
-                # rram_model_df.to_csv(rram_model_csv_path, index=False)  # replace old csv with new scheduled csv
-                DLA.export(model, on_DLA_layer_index)
-                skip_simu = False  # todo
+                # run 1: run and get full on-rram result
+                MNSIM_result_csv = model + '_rram_noc' + str(RRAM.rram_dicts['noc_bw']) + '.csv'
+                MNSIM_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + MNSIM_result_csv))
+                skip_simu = True if os.path.exists(MNSIM_result_csv_path) else False
                 RRAM.invoke_MNSIM(model, DLA.dataflow, skip_simu)
-                # todo: add adjust rram and dla result
+                # post-process: add adjust rram and dla result
+                on_RRAM_layer_index2 = get_oRli2(on_RRAM_layer_index, MNSIM_layer_index_list)
+                DLA.export(model, on_DLA_layer_index)
+                RRAM.export(model, DLA.dataflow, len(on_RRAM_layer_index), on_RRAM_layer_index2)
 
                 # set checkpoint
                 dse_checkpoint(DSE_indicator, EDP_cons, area_cons, model, DLA.dataflow, homepath)

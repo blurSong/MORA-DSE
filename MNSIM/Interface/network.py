@@ -180,14 +180,14 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10):
     model_nd = pd.read_csv(model_csv_path).to_numpy()
     model_layer_num = model_nd.shape[0]
     # on_RRAM_layer_index2 = []
-    MNSIM_layer_index_list = []  # 0118 add Mlil to map model layers to MNSIM layer_list
-    layer_counter = 0
+    # MNSIM_layer_index_list = []  # 0118 add Mlil to map model layers to MNSIM layer_list
+    # layer_counter = 0
     # 0IC 1OC 2FS 3KS 4STR 5TYP 6RP 7IDX 8APD
     for line in range(model_layer_num):
-        MNSIM_layer_index_list.append([layer_counter])
+        # MNSIM_layer_index_list.append([layer_counter])
         # if line in on_RRAM_layer_index:
         #    on_RRAM_layer_index2.append(layer_counter)
-        layer_counter = layer_counter + 1
+        # layer_counter = layer_counter + 1
         layer = model_nd[line, ...]
         # 1CONV
         if layer[5] == 1:
@@ -242,8 +242,8 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10):
             layer_config_list.append({'type': 'relu'})
             layer_config_list.append({'type': 'pooling', 'mode': 'MAX', 'kernel_size': int(layer[6]), 'stride': int(layer[6])})
             # on_RRAM_layer_index2.append(layer_counter) if line in on_RRAM_layer_index else None
-            MNSIM_layer_index_list[line].append(layer_counter)
-            layer_counter = layer_counter + 1
+            # MNSIM_layer_index_list[line].append(layer_counter)
+            # layer_counter = layer_counter + 1
     '''
     # layer by layer
     on_RRAM_layer_index2 = range(18)
@@ -439,7 +439,7 @@ def get_net(hardware_config=None, cate='vgg16', num_classes=10):
     # print(input_index_list)
     # generate net
     net = NetworkGraph(hardware_config, layer_config_list, quantize_config_list, input_index_list, input_params)
-    return net, MNSIM_layer_index_list
+    return net
 
 
 if __name__ == '__main__':

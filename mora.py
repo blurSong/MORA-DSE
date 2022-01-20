@@ -150,7 +150,8 @@ if __name__ == "__main__":
     print("[mora] Init indicator.")
     dla.invoke_maestro(args.model)
     dla.export(args.model)
-    rram.invoke_MNSIM(args.model, args.dataflow)
+    rram.invoke_MNSIM(args.model)
+    rram.export(args.model, args.dataflow)
     edp_cons = mora.api.EDP(args.model, args.dataflow, home_path)
     area_cons = mora.api.area(args.model, args.dataflow, home_path)
     mora.schedule.greedy_schedule(DLA=dla,
