@@ -94,6 +94,7 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=32):
     parser.add_argument("--tiles", nargs='+', type=int, default=24, help="tiles [row, col] of a chip")
     parser.add_argument("--noc_bw", type=int, default=20)
     parser.add_argument('--scenario', type=str, default='edge', choices=['embedded', 'edge', 'cloud'])
+    parser.add_argument('--dataflow', type=str, default='yxp_os', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
 
     args = parser.parse_args()
     if args.file_auto_delete:
