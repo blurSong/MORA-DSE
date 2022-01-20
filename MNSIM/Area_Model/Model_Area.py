@@ -187,7 +187,7 @@ class Model_area():
         # mora
         area_list = []
         for lyr in range(self.total_layer_num):
-            layer_dict = self.NetStruct[i][0][0]
+            layer_dict = self.NetStruct[lyr][0][0]
             if layer_dict['type'] == 'element_sum':
                 area_list.append(0)
             else:

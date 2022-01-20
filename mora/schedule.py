@@ -56,12 +56,13 @@ def post_process(oDli, oRli, Mlil, memcapR, maestro_result_csv_path, MNSIM_resul
     _memcap = []
     memcapRact = copy.deepcopy(memcapR)
     for lyr in range(layerM):
-        _latencyD[lyr] = maestro_result_df.at[lyr, ' Runtime (Cycles)'] * 1.283 * 1.765
-        _latencyR[lyr] = MNSIM_result_df['latency'].to_numpy().reshape(-1, 1)[Mlil[lyr]].sum()
-        _memcap[lyr] = get_layer_memcap(model_nd[lyr, 0], model_nd[lyr, 1], model_nd[lyr, 3])
+        _latencyD.append(maestro_result_df.at[lyr, ' Runtime (Cycles)'] * 1.283 * 1.765)
+        _latencyR.append(MNSIM_result_df['latency'].to_numpy().reshape(-1, 1)[Mlil[lyr]].sum())
+        _memcap.append(get_layer_memcap(model_nd[lyr, 0], model_nd[lyr, 1], model_nd[lyr, 3]))
     latencyD = np.asarray(_latencyD)
     latencyR = np.asarray(_latencyR)
     memcap = np.asarray(_memcap)
+
     for lyr in range(layerM):
         if lyr in oRli:
             if latencyD[lyr] > latencyR[lyr]:
@@ -86,6 +87,7 @@ def post_process(oDli, oRli, Mlil, memcapR, maestro_result_csv_path, MNSIM_resul
                 oDli.sort()
         else:
             continue
+
     if memcapRact < memcapR:
         oDli_t = copy.deepcopy(oDli)
         latencyD_TL = list(zip(oDli_t, latencyD[oDli].tolist()))
@@ -101,7 +103,6 @@ def post_process(oDli, oRli, Mlil, memcapR, maestro_result_csv_path, MNSIM_resul
                 continue
     oRli.sort()
     oDli.sort()
-
     return oDli, oRli
 
 
@@ -140,7 +141,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
         for tiles in range(ini_hw_param_dicts['tiles'], max_param_dicts['tiles'] + 1, ceil(scenario_step / 2.0)):
             for dbw in range(ini_hw_param_dicts['dla_bw'], int(max_param_dicts['bw'] * 0.9), scenario_step**2 * 4):
                 rbw = max_param_dicts['bw'] - dbw
-                print('[mora][DSE] Start greedy DSE round {0} / {1} - {2}'.format(DSE_indicator, rounds, DLA.dataflow))
+                print('[mora][DSE] Start greedy DSE round {0} / {1}.    [{2}]'.format(DSE_indicator, rounds, model))
                 DLA.set_dse_param(pes, dbw, DSE_indicator)
                 RRAM.set_dse_param(tiles, rbw, DSE_indicator)
                 # run 0: dla get full on-dla result
@@ -163,6 +164,7 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                             continue
                 except FileNotFoundError:
                     print("read maestro result fatal.")
+
                 # run 0: get on-dla result
                 on_RRAM_layer_index.sort(reverse=False)
                 on_DLA_layer_index = []
@@ -175,7 +177,8 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 MNSIM_result_csv = model + '_rram_noc' + str(RRAM.rram_dicts['noc_bw']) + '.csv'
                 MNSIM_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + MNSIM_result_csv))
                 skip_simu = True if os.path.exists(MNSIM_result_csv_path) else False
-                RRAM.invoke_MNSIM(model, DLA.dataflow, skip_simu)
+                RRAM.invoke_MNSIM(model, skip_simu)
+
                 # post-process: add adjust rram and dla result
                 on_DLA_layer_index, on_RRAM_layer_index = post_process(on_DLA_layer_index, on_RRAM_layer_index, MNSIM_layer_index_list, RRAM.mem_capacity,
                                                                        maestro_result_csv_path, MNSIM_result_csv_path, model_csv_path)

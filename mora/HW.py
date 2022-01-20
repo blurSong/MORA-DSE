@@ -148,7 +148,7 @@ class RRAM(object):
         #    raise AttributeError
         if not skip_simu:
             print("[mnsim] invoked -", self.rram_dicts)
-            import_module("MNSIM_main").main(model, self.rram_dicts['tiles'], self.rram_dicts['tiles-buildin'], self.rram_dicts['noc_bw'], self.DSE_indicator)
+            import_module("MNSIM_main").main(model, self.rram_dicts['tiles'], self.rram_dicts['tiles-buildin'], self.rram_dicts['noc_bw'])
             if os.path.exists(MNSIM_result_csv_path) is False:
                 print('MNSIM invoke fatal.')
                 raise FileNotFoundError
@@ -164,7 +164,7 @@ class RRAM(object):
         process.wait() '''
         return
 
-    def export(self, model, dataflow, oRlayernum, on_RRAM_layer_index2=[]):
+    def export(self, model, dataflow, oRlayernum=-1, on_RRAM_layer_index2=[]):
         output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/[' + dataflow + ']' + model + '_rram.csv'))
         MNSIM_result_csv = model + '_rram_noc' + str(self.rram_dicts['noc_bw']) + '.csv'
         MNSIM_result_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + MNSIM_result_csv))
@@ -186,16 +186,17 @@ class RRAM(object):
                 energy_nd = MNSIM_result_df['energy'].to_numpy().reshape(-1, 1)[on_RRAM_layer_index2]
                 area_nd = MNSIM_result_df['area'].to_numpy().reshape(-1, 1)[on_RRAM_layer_index2]
                 power_nd = MNSIM_result_df['power'].to_numpy().reshape(-1, 1)[on_RRAM_layer_index2]
-                output_csv_dicts['latency'] = runtime_nd.sum() + MNSIM_result_df.at['addtional', 'latency']
-                output_csv_dicts['area'] = area_nd.sum() + MNSIM_result_df.at['addtional', 'area']
-                output_csv_dicts['power'] = power_nd.sum() + MNSIM_result_df.at['addtional', 'power']
-                output_csv_dicts['energy'] = energy_nd.sum() + MNSIM_result_df.at['addtional', 'energy']
+                output_csv_dicts['latency'] = runtime_nd.sum() + MNSIM_result_df.at[MNSIMlayers + 1, 'latency']
+                output_csv_dicts['area'] = area_nd.sum() + MNSIM_result_df.at[MNSIMlayers + 1, 'area']
+                output_csv_dicts['power'] = power_nd.sum() + MNSIM_result_df.at[MNSIMlayers + 1, 'power']
+                output_csv_dicts['energy'] = energy_nd.sum() + MNSIM_result_df.at[MNSIMlayers + 1, 'energy']
         except FileNotFoundError:
             print('MNSIM export fatal.')
 
         # write mora csv ------------------------------------------------->
         output_csv_dicts['DSE index'] = self.DSE_indicator
-        output_csv_dicts['layers'] = oRlayernum if self.DSE_indicator != 0 else MNSIMlayers
+        oRlayernum = copy.deepcopy(MNSIMlayers) if (oRlayernum == -1 and self.DSE_indicator == 0) else oRlayernum
+        output_csv_dicts['layers'] = oRlayernum
         output_csv_dicts['HW (tiles, bw)'] = '{} {}'.format(self.rram_dicts['tiles'], self.rram_dicts['noc_bw'])
         output_csv_dicts['restraint'] = 'unexamined' if self.DSE_indicator != 0 else 'pass'
         csv = pd.DataFrame(output_csv_dicts, index=[self.DSE_indicator])
@@ -203,8 +204,8 @@ class RRAM(object):
             csv.to_csv(output_csv_path, mode='a', header=False, index=False)
         else:
             csv.to_csv(output_csv_path, index=False)
-        print('MNSIM Total: {} ns, {} um2, {} nJ.'.format(MNSIM_result_df.at['total', 'latency'], MNSIM_result_df.at['total', 'area'],
-                                                          MNSIM_result_df.at['total', 'energy']))
+        print('MNSIM Total: {} ns, {} um2, {} nJ.'.format(MNSIM_result_df.at[MNSIMlayers, 'latency'], MNSIM_result_df.at[MNSIMlayers, 'area'],
+                                                          MNSIM_result_df.at[MNSIMlayers, 'energy']))
         print('RRAM Latency:', output_csv_dicts['latency'], 'ns.')
         print('RRAM Area:', output_csv_dicts['area'], 'um2.')
         print('RRAM Energy:', output_csv_dicts['energy'], 'nJ.')

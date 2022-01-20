@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*-coding:utf-8-*-
+from pickle import FALSE
 import torch
 import sys
 import os
@@ -44,7 +45,7 @@ def Data_clean():
     # print("Removed unnecessary file.")
 
 
-def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicator=0):
+def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=32):
 
     home_path = os.getcwd()
     SimConfig_path = os.path.join(home_path, "rram_config.ini")
@@ -172,55 +173,27 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
 
     # MNSIM export outputs ------------------------------------------------->
     latency_list, MNSIMlatency = __latency.model_latency_output(not (args.disable_module_output), not (args.disable_layer_output))
-    area_list, MNSIMarea, MNSIM_acc_area = __area.model_area_output(not (args.disable_module_output), not (args.disable_layer_output))
-    power_list, MNSIMpower, MNSIM_acc_power = __power.model_power_output(not (args.disable_module_output), not (args.disable_layer_output))
-    energy_list, MNSIMenergy, MNSIM_noc_energy = __energy.model_energy_output(not (args.disable_module_output), not (args.disable_layer_output))
+    area_list, MNSIMarea, MNSIMacc_area = __area.model_area_output(not (args.disable_module_output), not (args.disable_layer_output))
+    power_list, MNSIMpower, MNSIMacc_power = __power.model_power_output(not (args.disable_module_output), not (args.disable_layer_output))
+    energy_list, MNSIMenergy, MNSIMnoc_energy = __energy.model_energy_output(not (args.disable_module_output), not (args.disable_layer_output))
 
     # mora post-process ------------------------------------------------->
     assert len(latency_list) == len(area_list) == len(power_list) == len(energy_list)
     MNSIM_layer_resultlist_dict = {'latency': latency_list, 'area': area_list, 'power': power_list, 'energy': energy_list}
     MNSIM_total_result_dict = {'latency': MNSIMlatency, 'area': MNSIMarea, 'power': MNSIMpower, 'energy': MNSIMenergy}
-    MNSIM_addtional_result_dict = {'latency': 0, 'area': MNSIM_acc_area, 'power': MNSIM_acc_power, 'energy': MNSIM_noc_energy}
+    MNSIM_additional_result_dict = {'latency': 0, 'area': MNSIMacc_area, 'power': MNSIMacc_power, 'energy': MNSIMnoc_energy}
     # save: model + nocbw
     MNSIM_result_csv = args.model + '_rram_noc' + str(args.noc_bw) + '.csv'
     MNSIM_result_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/' + MNSIM_result_csv))
     Mdf = pd.DataFrame(MNSIM_layer_resultlist_dict, index=range(len(latency_list)))
-    Mdft = pd.DataFrame(MNSIM_total_result_dict, index=['total'])
-    Mdfa = pd.DataFrame(MNSIM_addtional_result_dict, index=['addtional'])
+    Mdft = pd.DataFrame(MNSIM_total_result_dict, index=['tol'])
+    Mdfa = pd.DataFrame(MNSIM_additional_result_dict, index=['add'])
     Mdf = Mdf.append(Mdft)
     Mdf = Mdf.append(Mdfa)
-    Mdf.to_csv(MNSIM_result_csv_path, index=True)
+    Mdf.to_csv(MNSIM_result_csv_path, index=False)
 
     return
 
-
-'''
-    # MORA gather oRli2 ------------------------------------------------->
-    on_RRAM_layer_index2 = []
-    for line in range(len(MNSIM_layer_index_list)):
-    if line in on_RRAM_layer_index:
-        for idx in MNSIM_layer_index_list[line]:
-            on_RRAM_layer_index2.append(idx)
-        output_csv_dicts = {}
-        output_csv_dicts['DSE index'] = _DSE_indicator
-        output_csv_dicts['layers'] = len(on_RRAM_layer_index)
-
-    else:
-        output_csv_dicts['latency'] = 0
-        output_csv_dicts['area'] = 0
-        output_csv_dicts['power'] = 0
-        output_csv_dicts['energy'] = 0
-
-    # write mora csv ------------------------------------------------->
-    output_csv_dicts['HW (tiles, bw)'] = '{} {}'.format(args.tiles, args.noc_bw)
-    output_csv_dicts['restraint'] = 'unexamined' if _DSE_indicator != 0 else 'pass'
-    output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/[' + args.dataflow + ']' + args.model + '_rram.csv'))
-    csv = pd.DataFrame(output_csv_dicts, index=[_DSE_indicator])
-    if os.path.exists(output_csv_path):
-        csv.to_csv(output_csv_path, mode='a', header=False, index=False)
-    else:
-        csv.to_csv(output_csv_path, index=False)
-'''
 
 if __name__ == '__main__':
     main()
