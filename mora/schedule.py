@@ -43,6 +43,72 @@ def get_oRli2(oRli, Mlil):
     return oRli2
 
 
+def post_process(oDli, oRli, Mlil, memcapR, maestro_result_csv_path, MNSIM_result_csv_path, model_csv_path):
+    maestro_result_df = pd.read_csv(maestro_result_csv_path)
+    MNSIM_result_df = pd.read_csv(MNSIM_result_csv_path)
+    model_nd = pd.read_csv(model_csv_path).to_numpy(dtype=int)
+    layerM = model_nd.shape[0]
+    layerD = maestro_result_df.shape[0]
+    layerR = MNSIM_result_df.shape[0]
+    assert layerM == layerD
+    _latencyD = []
+    _latencyR = []
+    _memcap = []
+    memcapRact = copy.deepcopy(memcapR)
+    for lyr in range(layerM):
+        _latencyD[lyr] = maestro_result_df.at[lyr, ' Runtime (Cycles)'] * 1.283 * 1.765
+        _latencyR[lyr] = MNSIM_result_df['latency'].to_numpy().reshape(-1, 1)[Mlil[lyr]].sum()
+        _memcap[lyr] = get_layer_memcap(model_nd[lyr, 0], model_nd[lyr, 1], model_nd[lyr, 3])
+    latencyD = np.asarray(_latencyD)
+    latencyR = np.asarray(_latencyR)
+    memcap = np.asarray(_memcap)
+    for lyr in range(layerM):
+        if lyr in oRli:
+            if latencyD[lyr] > latencyR[lyr]:
+                continue
+            else:
+                layer_memcap = memcap[lyr]
+                memcapRact = memcapRact - layer_memcap
+                for tmplyr in oDli:
+                    if latencyD[tmplyr] < latencyR[tmplyr]:
+                        continue
+                    else:
+                        layer_memcap = memcap[tmplyr]
+                        if memcapRact + layer_memcap < memcapR:
+                            memcapRact += layer_memcap
+                            oRli.append(tmplyr)
+                            oDli.remove(tmplyr)
+                        else:
+                            continue
+                oRli.remove(lyr)
+                oDli.append(lyr)
+                oRli.sort()
+                oDli.sort()
+        else:
+            continue
+    if memcapRact < memcapR:
+        oDli_t = copy.deepcopy(oDli)
+        latencyD_TL = list(zip(oDli_t, latencyD[oDli].tolist()))
+        latencyD_TL.sort(key=take_second, reverse=True)
+        for ltl in latencyD_TL:
+            lyr = ltl[0]
+            layer_memcap = memcap[lyr]
+            if memcapRact + layer_memcap < memcapR:
+                memcapRact += layer_memcap
+                oRli.append(lyr)
+                oDli.remove(lyr)
+            else:
+                continue
+    oRli.sort()
+    oDli.sort()
+
+    return oDli, oRli
+
+
+def take_second(elem):
+    return elem[1]
+
+
 def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, max_param_dicts, scenario):
     assert DLA.home_path == RRAM.home_path
     homepath = RRAM.home_path
@@ -56,8 +122,8 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
         raise AssertionError
     maestro_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + model + '_dla_' + DLA.dataflow + '.csv'))
     model_csv_path = os.path.abspath(os.path.join(homepath, 'model/' + model + '/' + model + '.csv'))
-    model_csv_df = pd.read_csv(model_csv_path)
-    model_csv_nd = model_csv_df.to_numpy(dtype=int)
+    model_df = pd.read_csv(model_csv_path)
+    model_nd = model_df.to_numpy(dtype=int)
     MNSIM_layer_index_list = gen_Mlil(model_csv_path)
 
     # greedy w/ post process
@@ -82,16 +148,16 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 model_layers = 0
                 try:
                     maestro_result_df = pd.read_csv(maestro_result_csv_path)
-                    assert maestro_result_df.shape[0] == model_csv_df.shape[0]
-                    model_layers = maestro_result_df.shape[0]
+                    assert maestro_result_df.shape[0] == model_nd.shape[0]
+                    model_layers = model_nd.shape[0]
                     maestro_result_df.sort_values(by=' Runtime (Cycles)', ascending=False, inplace=True, kind='mergesort')  # use merge sort to stay stable
-                    kernel_mem_cap = 0
+                    kernel_memcap = 0
                     on_RRAM_layer_index = []
                     for _, rows in maestro_result_df.iterrows():
                         layer_index = int(rows[' Layer Number'][1:])
-                        layer_mem_cap = get_layer_memcap(model_csv_nd[layer_index, 0], model_csv_nd[layer_index, 1], model_csv_nd[layer_index, 3])
-                        if (kernel_mem_cap + layer_mem_cap) <= RRAM.mem_capacity:
-                            kernel_mem_cap = kernel_mem_cap + layer_mem_cap
+                        layer_memcap = get_layer_memcap(model_nd[layer_index, 0], model_nd[layer_index, 1], model_nd[layer_index, 3])
+                        if (kernel_memcap + layer_memcap) <= RRAM.mem_capacity:
+                            kernel_memcap = kernel_memcap + layer_memcap
                             on_RRAM_layer_index.append(layer_index)
                         else:
                             continue
@@ -104,14 +170,17 @@ def greedy_schedule(DLA, RRAM, model, EDP_cons, area_cons, ini_hw_param_dicts, m
                 for lyr in range(model_layers):
                     on_DLA_layer_index.append(lyr) if lyr not in on_RRAM_layer_index else None
                 assert len(MNSIM_layer_index_list) == len(on_RRAM_layer_index) + len(on_DLA_layer_index)
-                print(on_RRAM_layer_index, on_DLA_layer_index)
+                print('[mora][DSE][Preproc] layers on DLA: {}, RRAM: {}.'.format(len(on_DLA_layer_index), len(on_RRAM_layer_index)))
                 # run 1: run and get full on-rram result
                 MNSIM_result_csv = model + '_rram_noc' + str(RRAM.rram_dicts['noc_bw']) + '.csv'
                 MNSIM_result_csv_path = os.path.abspath(os.path.join(homepath, 'output/' + model + '/' + MNSIM_result_csv))
                 skip_simu = True if os.path.exists(MNSIM_result_csv_path) else False
                 RRAM.invoke_MNSIM(model, DLA.dataflow, skip_simu)
                 # post-process: add adjust rram and dla result
+                on_DLA_layer_index, on_RRAM_layer_index = post_process(on_DLA_layer_index, on_RRAM_layer_index, MNSIM_layer_index_list, RRAM.mem_capacity,
+                                                                       maestro_result_csv_path, MNSIM_result_csv_path, model_csv_path)
                 on_RRAM_layer_index2 = get_oRli2(on_RRAM_layer_index, MNSIM_layer_index_list)
+                print('[mora][DSE][Postproc] layers on DLA: {}, RRAM: {}.'.format(len(on_DLA_layer_index), len(on_RRAM_layer_index)))
                 DLA.export(model, on_DLA_layer_index)
                 RRAM.export(model, DLA.dataflow, len(on_RRAM_layer_index), on_RRAM_layer_index2)
 

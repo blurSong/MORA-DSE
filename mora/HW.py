@@ -86,7 +86,7 @@ class DLA(object):
                 if np.median(l2_size_nd) > self.dla_dicts['glb_size']:
                     print('[maestro] maestro L2 size exceed.')
                     return
-                output_csv_dicts['latency'] = runtime_nd.sum() * 1.765
+                output_csv_dicts['latency'] = runtime_nd.sum() * 1.283 * 1.765
                 output_csv_dicts['energy'] = energy_nd.sum()
                 output_csv_dicts['area'] = area  # wrong
                 output_csv_dicts['power'] = power_nd.mean()  # wrong
