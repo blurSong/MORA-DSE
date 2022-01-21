@@ -754,8 +754,8 @@ class Model_latency():
         if (layer_information):
             for i in range(len(self.begin_time)):
                 print("Layer", i, " type:", self.NetStruct[i][0][0]['type'])
-                # print("start time: ", self.begin_time[i])
-                # print("finish time:", self.finish_time[i])
+                print("start time: ", self.begin_time[i])
+                print("finish time:", self.finish_time[i])
                 # print("Time interval of working:", self.compute_interval[i])
                 print("Occupancy:", self.occupancy[i])
                 #     # print(self.xbar_latency[i])
@@ -802,19 +802,16 @@ class Model_latency():
                     print("     Inter tile transfer latency of layer", i, ":", self.total_tile_transfer_latency[i], '(',
                           "%.2f" % (100 * self.total_tile_transfer_latency[i] / total_latency), '%)')
                 print('----------------------------------------------')
-        # print("Latency simulation finished!")
-        # mora temp latancy estimation
-        latancy = max(max(self.finish_time))
-        mora_latency = 0
+        # mora
+        MNSIMlatency = max(max(self.finish_time))
+        latency_list = []
         for lyr in range(len(self.begin_time)):
-            if lyr in oRli2:
-                total_latency = self.total_buffer_latency[lyr] + self.total_computing_latency[lyr] + \
-                                self.total_digital_latency[lyr] + self.total_intra_tile_latency[lyr] + \
-                                self.total_inter_tile_latency[lyr]
-                mora_latency += total_latency
-        print("RRAM Latency:", mora_latency, '(MNSIM latancy ', latancy, ") ns")
-        # return latancy
-        return mora_latency
+            total_latency = self.total_buffer_latency[lyr] + self.total_computing_latency[lyr] + \
+                            self.total_digital_latency[lyr] + self.total_intra_tile_latency[lyr] + \
+                            self.total_inter_tile_latency[lyr]
+            latency_list.append(total_latency)
+        # print("RRAM Latency:", mora_latency, '(MNSIM latancy ', MNSIMlatancy, ") ns")
+        return latency_list, MNSIMlatency
 
     def calculate_model_latency(self, mode=0):
         '''

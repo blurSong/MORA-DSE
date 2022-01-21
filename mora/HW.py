@@ -1,5 +1,6 @@
 import copy
 import os
+from queue import Empty
 import sys
 import numpy as np
 from enum import Enum
@@ -60,7 +61,7 @@ class DLA(object):
         stdout, stderr = process.communicate()
         process.wait()
 
-    def export(self, model, on_DLA_layer_index=None):
+    def export(self, model, on_DLA_layer_index=[]):
         output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/[' + self.dataflow + ']' + model + '_dla.csv'))
         maestro_result_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + model + '_dla_' + self.dataflow + '.csv'))
         # maestro original maestro_result csv pisition: maestro/.
@@ -70,23 +71,28 @@ class DLA(object):
             layers = maestro_result_df.shape[0]
             if self.DSE_indicator == 0:
                 on_DLA_layer_index = range(layers)
-            elif on_DLA_layer_index is None:
-                raise AttributeError
-                sys.exit(1)
-            runtime_nd = maestro_result_df[' Runtime (Cycles)'].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
-            energy_nd = maestro_result_df[' Activity count-based Energy (nJ)'].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
-            area = maestro_result_df.at[0, ' Area']
-            power_nd = maestro_result_df[' Power'].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
-            l2_size_nd = maestro_result_df["  L2 SRAM Size Req (Bytes)"].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
-            if np.median(l2_size_nd) > self.dla_dicts['glb_size']:
-                print('[maestro] maestro L2 size exceed.')
-                return
+            if not on_DLA_layer_index:
+                print('No layers DLA can excute. Skip.')
+                output_csv_dicts['latency'] = 0
+                output_csv_dicts['area'] = 0
+                output_csv_dicts['power'] = 0
+                output_csv_dicts['energy'] = 0
+            else:
+                runtime_nd = maestro_result_df[' Runtime (Cycles)'].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
+                energy_nd = maestro_result_df[' Activity count-based Energy (nJ)'].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
+                area = maestro_result_df.at[0, ' Area']
+                power_nd = maestro_result_df[' Power'].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
+                l2_size_nd = maestro_result_df["  L2 SRAM Size Req (Bytes)"].to_numpy().reshape(-1, 1)[on_DLA_layer_index]
+                if np.median(l2_size_nd) > self.dla_dicts['glb_size']:
+                    print('[maestro] maestro L2 size exceed.')
+                    return
+                output_csv_dicts['latency'] = runtime_nd.sum() * 1.283 * 1.765
+                output_csv_dicts['energy'] = energy_nd.sum()
+                output_csv_dicts['area'] = area  # wrong
+                output_csv_dicts['power'] = power_nd.mean()  # wrong
+
             output_csv_dicts['DSE index'] = self.DSE_indicator
             output_csv_dicts['layers'] = len(on_DLA_layer_index)
-            output_csv_dicts['latency'] = runtime_nd.sum() * 1.5 * 1.7
-            output_csv_dicts['energy'] = energy_nd.sum()
-            output_csv_dicts['area'] = area  # wrong
-            output_csv_dicts['power'] = power_nd.mean()  # wrong
             output_csv_dicts['HW (pes, bw)'] = '{} {}'.format(self.dla_dicts['pes'], int(self.dla_dicts['noc_bw'] / 1024**2))
             output_csv_dicts['restraint'] = 'unexamined' if self.DSE_indicator != 0 else 'pass'
             csv = pd.DataFrame(output_csv_dicts, index=[self.DSE_indicator])
@@ -95,10 +101,10 @@ class DLA(object):
             else:
                 csv.to_csv(output_csv_path, index=False)
         except FileNotFoundError:
-            print('maestro invoke fatal.')
-        print('DLA Latency:', output_csv_dicts['latency'], 'ns')
-        print('DLA Area:', output_csv_dicts['area'], 'um2')
-        print('DLA Energy:', output_csv_dicts['energy'], 'nJ')
+            print('maestro export fatal.')
+        print('DLA Latency: {:.2f} ns'.format(output_csv_dicts['latency']))
+        print('DLA Area: {:.2f} um2'.format(output_csv_dicts['area']))
+        print('DLA Energy: {:.2f} nJ'.format(output_csv_dicts['energy']))
         return
 
 
@@ -134,14 +140,20 @@ class RRAM(object):
         xbar_polarity = int(configer.get('Process element level', 'Xbar_Polarity'))
         return self.rram_dicts['tiles'] * self.rram_dicts['tiles'] * 16 * 8 * xbar_polarity * 128 * 127 * 2  # bits
 
-    def invoke_MNSIM(self, model, dataflow, on_RRAM_layer_index=[]):
-        output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/[' + dataflow + ']' + model + '_rram.csv'))
+    def invoke_MNSIM(self, model, skip_simu=False):
+        MNSIM_result_csv = model + '_rram_noc' + str(self.rram_dicts['noc_bw']) + '.csv'
+        MNSIM_result_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + MNSIM_result_csv))
         # if os.path.exists(output_csv_path):
         #    print("rram outfile conflict.")
         #    raise AttributeError
-        print("[mnsim] invoked -", self.rram_dicts)
-        import_module("MNSIM_main").main(model, self.rram_dicts['tiles'], self.rram_dicts['tiles-buildin'], self.rram_dicts['noc_bw'], self.DSE_indicator,
-                                         dataflow, on_RRAM_layer_index)
+        if not skip_simu:
+            print("[mnsim] invoked -", self.rram_dicts)
+            import_module("MNSIM_main").main(model, self.rram_dicts['tiles'], self.rram_dicts['tiles-buildin'], self.rram_dicts['noc_bw'])
+            if os.path.exists(MNSIM_result_csv_path) is False:
+                print('MNSIM invoke fatal.')
+                raise FileNotFoundError
+        else:
+            print("[mnsim] bypassed -", self.rram_dicts)
         '''
         command = [
             "python", "../MNSIM.py", "--model {}".format(model), "--tiles {} {}".format(self.rram_dicts['tiles'], self.rram_dicts['tiles']),
@@ -149,11 +161,54 @@ class RRAM(object):
         ]
         process = SP.Popen(command, stdout=SP.PIPE, stderr=SP.PIPE)
         stdout, stderr = process.communicate()
-        process.wait()
-        '''
-        if os.path.exists(output_csv_path) is False:
-            print('MNSIM invoke fatal.')
-            raise FileNotFoundError
+        process.wait() '''
+        return
+
+    def export(self, model, dataflow, oRlayernum=-1, on_RRAM_layer_index2=[]):
+        output_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/[' + dataflow + ']' + model + '_rram.csv'))
+        MNSIM_result_csv = model + '_rram_noc' + str(self.rram_dicts['noc_bw']) + '.csv'
+        MNSIM_result_csv_path = os.path.abspath(os.path.join(self.home_path, 'output/' + model + '/' + MNSIM_result_csv))
+
+        output_csv_dicts = {}
+        try:
+            MNSIM_result_df = pd.read_csv(MNSIM_result_csv_path)
+            MNSIMlayers = MNSIM_result_df.shape[0] - 2  # -2 for total add
+            if self.DSE_indicator == 0:
+                on_RRAM_layer_index2 = range(MNSIMlayers)
+            if not on_RRAM_layer_index2:  # zero layers on RRAM
+                print('No layers RRAM can excute. Skip.')
+                output_csv_dicts['latency'] = 0
+                output_csv_dicts['area'] = 0
+                output_csv_dicts['power'] = 0
+                output_csv_dicts['energy'] = 0
+            else:
+                runtime_nd = MNSIM_result_df['latency'].to_numpy().reshape(-1, 1)[on_RRAM_layer_index2]
+                energy_nd = MNSIM_result_df['energy'].to_numpy().reshape(-1, 1)[on_RRAM_layer_index2]
+                area_nd = MNSIM_result_df['area'].to_numpy().reshape(-1, 1)[on_RRAM_layer_index2]
+                power_nd = MNSIM_result_df['power'].to_numpy().reshape(-1, 1)[on_RRAM_layer_index2]
+                output_csv_dicts['latency'] = runtime_nd.sum() + MNSIM_result_df.at[MNSIMlayers + 1, 'latency']
+                output_csv_dicts['area'] = area_nd.sum() + MNSIM_result_df.at[MNSIMlayers + 1, 'area']
+                output_csv_dicts['power'] = power_nd.sum() + MNSIM_result_df.at[MNSIMlayers + 1, 'power']
+                output_csv_dicts['energy'] = energy_nd.sum() + MNSIM_result_df.at[MNSIMlayers + 1, 'energy']
+        except FileNotFoundError:
+            print('MNSIM export fatal.')
+
+        # write mora csv ------------------------------------------------->
+        output_csv_dicts['DSE index'] = self.DSE_indicator
+        oRlayernum = copy.deepcopy(MNSIMlayers) if (oRlayernum == -1 and self.DSE_indicator == 0) else oRlayernum
+        output_csv_dicts['layers'] = oRlayernum
+        output_csv_dicts['HW (tiles, bw)'] = '{} {}'.format(self.rram_dicts['tiles'], self.rram_dicts['noc_bw'])
+        output_csv_dicts['restraint'] = 'unexamined' if self.DSE_indicator != 0 else 'pass'
+        csv = pd.DataFrame(output_csv_dicts, index=[self.DSE_indicator])
+        if os.path.exists(output_csv_path):
+            csv.to_csv(output_csv_path, mode='a', header=False, index=False)
+        else:
+            csv.to_csv(output_csv_path, index=False)
+        print('MNSIM Total: {:.2f} ns, {:.2f} um2, {:.2f} nJ.'.format(MNSIM_result_df.at[MNSIMlayers, 'latency'], MNSIM_result_df.at[MNSIMlayers, 'area'],
+                                                                      MNSIM_result_df.at[MNSIMlayers, 'energy']))
+        print('RRAM Latency: {:.2f} ns'.format(output_csv_dicts['latency']))
+        print('RRAM Area: {:.2f} um2'.format(output_csv_dicts['area']))
+        print('RRAM Energy: {:.2f} nJ'.format(output_csv_dicts['energy']))
         return
 
 

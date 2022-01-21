@@ -29,6 +29,9 @@ wait
 echo $RXN50
 python mora.py --scenario edge --dataflow $DATAFLOW1 --model $RXN50
 wait
+echo $SN
+python mora.py --scenario edge --dataflow $DATAFLOW1 --model $SN
+wait
 
 
 echo "Start dse cloudy" & echo $DATAFLOW2
@@ -43,6 +46,9 @@ python mora.py --scenario edge --dataflow $DATAFLOW2 --model $RN50
 wait
 echo $RXN50
 python mora.py --scenario edge --dataflow $DATAFLOW2 --model $RXN50
+wait
+echo $SN
+python mora.py --scenario edge --dataflow $DATAFLOW2 --model $SN
 wait
 
 
@@ -59,6 +65,9 @@ wait
 echo $RXN50
 python mora.py --scenario edge --dataflow $DATAFLOW3 --model $RXN50
 wait
+echo $SN
+python mora.py --scenario edge --dataflow $DATAFLOW3 --model $SN
+wait
 
 
 echo "Start dse cloudy" & echo $DATAFLOW4
@@ -74,6 +83,10 @@ wait
 echo $RXN50
 python mora.py --scenario edge --dataflow $DATAFLOW4 --model $RXN50
 wait
+echo $SN
+python mora.py --scenario edge --dataflow $DATAFLOW4 --model $SN
+wait
+
 
 echo "Start dse cloudy" & echo $DATAFLOW5
 echo $VG16
@@ -87,4 +100,7 @@ python mora.py --scenario edge --dataflow $DATAFLOW5 --model $RN50
 wait
 echo $RXN50
 python mora.py --scenario edge --dataflow $DATAFLOW5 --model $RXN50
+wait
+echo $SN
+python mora.py --scenario edge --dataflow $DATAFLOW5 --model $SN
 wait

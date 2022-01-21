@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*-coding:utf-8-*-
+from pickle import FALSE
 import torch
 import sys
 import os
@@ -44,7 +45,7 @@ def Data_clean():
     # print("Removed unnecessary file.")
 
 
-def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicator=0, _dataflow='kcp_ws', _on_RRAM_layer_index=[]):
+def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=32):
 
     home_path = os.getcwd()
     SimConfig_path = os.path.join(home_path, "rram_config.ini")
@@ -92,8 +93,8 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
     parser.add_argument("--model", type=str, default='vgg16', help="NN model name, default: vgg16")
     parser.add_argument("--tiles", nargs='+', type=int, default=24, help="tiles [row, col] of a chip")
     parser.add_argument("--noc_bw", type=int, default=20)
-    parser.add_argument("--dataflow", type=str, default='kcp_ws')
     parser.add_argument('--scenario', type=str, default='edge', choices=['embedded', 'edge', 'cloud'])
+    parser.add_argument('--dataflow', type=str, default='yxp_os', choices=['ykp_os', 'yxp_os', 'kcp_ws', 'xp_ws', 'rs'])
 
     args = parser.parse_args()
     if args.file_auto_delete:
@@ -118,10 +119,8 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
         args.model = _model
         args.tiles = _tiles
         args.noc_bw = _noc_bw
-        args.dataflow = _dataflow
         tiles_buildin = _tiles_buildin
-        mora_skip_simu = False
-
+    '''
     if _on_RRAM_layer_index:
         on_RRAM_layer_index = copy.deepcopy(_on_RRAM_layer_index)  # on_RRAM_layer_index is in-order now, no need oRli2
     elif _DSE_indicator == 0:
@@ -131,31 +130,21 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
         on_RRAM_layer_index = range(model_layer_num)
     else:  # indicates no layers RRAM can excu
         on_RRAM_layer_index = []
-        mora_skip_simu = True
+        skip_simu = True
         print('No layers RRAM can excute. Skip')
+    '''
 
-    output_csv_dicts = {}
-    output_csv_dicts['DSE index'] = _DSE_indicator
-    output_csv_dicts['layers'] = len(on_RRAM_layer_index)
     __TestInterface = TrainTestInterface(network_module=args.model,
                                          dataset_module='MNSIM.Interface.cifar10',
                                          SimConfig_path=args.hardware_description,
-                                         on_RRAM_layer_index=on_RRAM_layer_index,
                                          weights_file=args.weights,
                                          device=args.device)
     structure_file = __TestInterface.get_structure()
-    # on_RRAM_layer_index2 = copy.deepcopy(__TestInterface.on_RRAM_layer_index2)
-    MNSIM_layer_index_list = copy.deepcopy(__TestInterface.MNSIM_layer_index_list)
-    on_RRAM_layer_index2 = []
-    for line in MNSIM_layer_index_list:
-        if line in on_RRAM_layer_index:
-            for idx in MNSIM_layer_index_list[line]:
-                on_RRAM_layer_index2.append(idx)
+    # MNSIM_layer_index_list = copy.deepcopy(__TestInterface.MNSIM_layer_index_list)
 
     # MNSIM invoke ------------------------------------------------->
-
     TCG_mapping = TCG(structure_file, args.hardware_description, args.disable_inner_pipeline, tiles_buildin)
-    if not (args.disable_hardware_modeling) and not (mora_skip_simu):
+    if not (args.disable_hardware_modeling):
         __latency = Model_latency(NetStruct=structure_file, SimConfig_path=args.hardware_description, TCG_mapping=TCG_mapping, inter_tile_bandwidth=args.noc_bw)
         if not (args.disable_inner_pipeline):
             __latency.calculate_model_latency(mode=1)
@@ -172,19 +161,6 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
                                 model_latency=__latency,
                                 model_power=__power)
 
-        # print("======================== Results  =================================")
-        # todo: post dse process
-        MNSIM_latency_list = []
-        output_csv_dicts['latency'] = __latency.model_latency_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
-        output_csv_dicts['area'] = __area.model_area_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
-        output_csv_dicts['power'] = __power.model_power_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
-        output_csv_dicts['energy'] = __energy.model_energy_output(not (args.disable_module_output), not (args.disable_layer_output), on_RRAM_layer_index2)
-    else:
-        output_csv_dicts['latency'] = 0
-        output_csv_dicts['area'] = 0
-        output_csv_dicts['power'] = 0
-        output_csv_dicts['energy'] = 0
-
     if not (args.disable_accuracy_simulation):
         print("Accuracy simulation will take a few minutes on GPU")
         weight = __TestInterface.get_net_bits()
@@ -196,15 +172,28 @@ def main(_model='vgg16', _tiles=24, _tiles_buildin=24, _noc_bw=20, _DSE_indicato
             print("Original accuracy:", __TestInterface.origin_evaluate(method='FIX_TRAIN', adc_action='FIX'))
             print("PIM-based computing accuracy:", __TestInterface.set_net_bits_evaluate(weight_2, adc_action='FIX'))
 
-    # write mora csv
-    output_csv_dicts['HW (tiles, bw)'] = '{} {}'.format(args.tiles, args.noc_bw)
-    output_csv_dicts['restraint'] = 'unexamined' if _DSE_indicator != 0 else 'pass'
-    output_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/[' + args.dataflow + ']' + args.model + '_rram.csv'))
-    csv = pd.DataFrame(output_csv_dicts, index=[_DSE_indicator])
-    if os.path.exists(output_csv_path):
-        csv.to_csv(output_csv_path, mode='a', header=False, index=False)
-    else:
-        csv.to_csv(output_csv_path, index=False)
+    # MNSIM export outputs ------------------------------------------------->
+    latency_list, MNSIMlatency = __latency.model_latency_output(not (args.disable_module_output), not (args.disable_layer_output))
+    area_list, MNSIMarea, MNSIMacc_area = __area.model_area_output(not (args.disable_module_output), not (args.disable_layer_output))
+    power_list, MNSIMpower, MNSIMacc_power = __power.model_power_output(not (args.disable_module_output), not (args.disable_layer_output))
+    energy_list, MNSIMenergy, MNSIMnoc_energy = __energy.model_energy_output(not (args.disable_module_output), not (args.disable_layer_output))
+
+    # mora post-process ------------------------------------------------->
+    assert len(latency_list) == len(area_list) == len(power_list) == len(energy_list)
+    MNSIM_layer_resultlist_dict = {'latency': latency_list, 'area': area_list, 'power': power_list, 'energy': energy_list}
+    MNSIM_total_result_dict = {'latency': MNSIMlatency, 'area': MNSIMarea, 'power': MNSIMpower, 'energy': MNSIMenergy}
+    MNSIM_additional_result_dict = {'latency': 0, 'area': MNSIMacc_area, 'power': MNSIMacc_power, 'energy': MNSIMnoc_energy}
+    # save: model + nocbw
+    MNSIM_result_csv = args.model + '_rram_noc' + str(args.noc_bw) + '.csv'
+    MNSIM_result_csv_path = os.path.abspath(os.path.join(home_path, 'output/' + args.model + '/' + MNSIM_result_csv))
+    Mdf = pd.DataFrame(MNSIM_layer_resultlist_dict, index=range(len(latency_list)))
+    Mdft = pd.DataFrame(MNSIM_total_result_dict, index=['tol'])
+    Mdfa = pd.DataFrame(MNSIM_additional_result_dict, index=['add'])
+    Mdf = Mdf.append(Mdft)
+    Mdf = Mdf.append(Mdfa)
+    Mdf.to_csv(MNSIM_result_csv_path, index=False)
+
+    return
 
 
 if __name__ == '__main__':

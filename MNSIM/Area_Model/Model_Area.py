@@ -151,13 +151,8 @@ class Model_area():
         self.arch_total_DAC_utilization = used_total_DAC_num / (total_tile_num * self.tile_DAC_num)
         self.arch_total_ADC_utilization = used_total_ADC_num / (total_tile_num * self.tile_ADC_num)
 
-    def model_area_output(self, module_information=1, layer_information=1, oRli2=[]):
-        mora_area = 0
-        for lyr in range(self.total_layer_num):
-            if lyr in oRli2:
-                mora_area += self.arch_area[lyr]
-        assert mora_area <= self.arch_total_area
-        print("RRAM Area:", self.arch_total_area, "um^2")
+    def model_area_output(self, module_information=1, layer_information=1):
+        # print("Hardware area:", self.arch_total_area, "um^2")
         if module_information:
             print("		crossbar area:", self.arch_total_xbar_area, "um^2")
             print("		DAC area:", self.arch_total_DAC_area, "um^2")
@@ -189,7 +184,19 @@ class Model_area():
                     print("		crossbar utilization rate: ", self.arch_xbar_utilization[i] * 100, "%", sep='')
                     print("		DAC utilization rate: ", self.arch_DAC_utilization[i] * 100, "%", sep='')
                     print("		ADC utilization rate: ", self.arch_ADC_utilization[i] * 100, "%", sep='')
-        return mora_area
+        # mora
+        area_list = []
+        for lyr in range(self.total_layer_num):
+            layer_dict = self.NetStruct[lyr][0][0]
+            if layer_dict['type'] == 'element_sum':
+                area_list.append(0)
+            else:
+                area_list.append(self.arch_area[lyr])
+        MNSIM_acc_area = self.global_add.adder_area * self.graph.global_adder_num + self.global_buf.buf_area
+        MNSIMarea = self.arch_total_area
+        # assert mora_area <= self.arch_total_area
+        # print("RRAM Area:", mora_area, "um^2")
+        return area_list, MNSIMarea, MNSIM_acc_area
 
 
 if __name__ == '__main__':
