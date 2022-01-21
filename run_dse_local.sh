@@ -1,4 +1,5 @@
 #!/bin/zsh
+
 AN="alexnet"
 VG16="vgg16"
 VG19="vgg19"
