@@ -324,13 +324,13 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
              dla_area_0] = [np.float64(dla_result.at[0, 'energy']),
                             np.float64(dla_result.at[0, 'latency']),
                             np.float64(dla_result.at[0, 'area'])]
-            dla_latency_0 *= 28.3 if df == 'kcp_ws' else 1
+            dla_latency_0 *= 7.65 if df == 'kcp_ws' else 1
             top_latency = {'rram': rram_latency_0 * 2.83, 'dla': (dla_latency_0 / 1.346) * 2.83, 'idx': 0}
             top_energy = {'rram': rram_energy_0 * 2.83, 'dla': dla_energy_0 * 2.83, 'idx': 0}
             DSE_iters = rram_result.shape[0]
             assert DSE_iters == dla_result.shape[0]
             for idx in range(1, DSE_iters):
-                dla_result.at[idx, 'latency'] *= 28.3 if df == 'kcp_ws' else 1  # tmp
+                dla_result.at[idx, 'latency'] *= 7.65 if df == 'kcp_ws' else 1  # tmp
                 rram_row = rram_result.iloc[idx]
                 dla_row = dla_result.iloc[idx]
                 # check status
@@ -374,8 +374,8 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                 # rule 2
                 # 管那么多干什么加起来找最小再归一化就完事了
                 elif rule == 'totalperf':
-                    if dla_row['latency'] / 1.346 + rram_row['latency'] < top_latency['dla'] + top_latency['rram']:
-                        top_latency['dla'] = dla_row['latency'] / 1.346
+                    if dla_row['latency'] + rram_row['latency'] < top_latency['dla'] + top_latency['rram']:
+                        top_latency['dla'] = dla_row['latency']
                         top_latency['rram'] = rram_row['latency']
                         top_latency['idx'] = idx
                     if dla_row['energy'] + rram_row['energy'] < top_energy['dla'] + top_energy['rram']:
