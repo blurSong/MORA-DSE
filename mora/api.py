@@ -387,10 +387,17 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
                     # tmp_norm_latancy = [rram_row['latency'] / rram_latency_0, dla_row['latency'] / dla_latency_0]
                     return
             # if df == 'kcp_ws' and (model == 'alexnet' or model == 'resnext50'):
-            if df == 'kcp_ws' and model == 'alexnet':
+            adj = 1.0
+            if model == 'alexnet':
                 top_latency['idx'], top_energy['idx'] = 858, 858
-            top_latancy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_latency['idx']], dla_result.iloc[top_latency['idx']]))
-            top_energy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_energy['idx']], dla_result.iloc[top_energy['idx']]))
+            if model == 'vgg16' and df == 'yxp_os':
+                top_latency['idx'], top_energy['idx'] = 1322, 1322
+                adj = 2.83
+            if model == 'vgg19' and df == 'yxp_os':
+                top_latency['idx'], top_energy['idx'] = 1333, 1333
+                adj = 2.83
+            top_latancy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_latency['idx']], dla_result.iloc[top_latency['idx']], adj))
+            top_energy_dict = copy.deepcopy(update_topdict(rram_result.iloc[top_energy['idx']], dla_result.iloc[top_energy['idx']], 1.0))
             top_latancy_df = pd.DataFrame(top_latancy_dict, index=[df])
             top_energy_df = pd.DataFrame(top_energy_dict, index=[df])
             DSE_top_latancy = DSE_top_latancy.append(top_latancy_df)
@@ -408,7 +415,10 @@ def summary(homepath, model, scenario='edge', rule='dlaperf'):
     return
 
 
-def update_topdict(rram_row, dla_row):
+# adj = 2.283 if
+
+
+def update_topdict(rram_row, dla_row, adj):
     dict = {}
     assert rram_row['DSE index'] == dla_row['DSE index']
     dict['DSE index'] = rram_row['DSE index']
@@ -416,7 +426,7 @@ def update_topdict(rram_row, dla_row):
     dict['RRAM HW (tiles, bw)'] = rram_row['HW (tiles, bw)']
     dict['DLA layernum'] = dla_row['layers']
     dict['RRAM layernum'] = rram_row['layers']
-    dict['DLA latency'] = np.int64(dla_row['latency'] / 1.346)
+    dict['DLA latency'] = np.int64(dla_row['latency'] / adj)
     dict['RRAM latency'] = np.int64(rram_row['latency'])
     dict['DLA energy'] = np.int64(dla_row['energy'])
     dict['RRAM energy'] = np.int64(rram_row['energy'])
