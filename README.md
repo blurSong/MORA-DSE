@@ -101,19 +101,23 @@ python mora.py --dataflow DATAFLOW --model MODEL --scenario SCENARIO
                   others: default 0  
 4. All default blank could be： default value or NaN(blank)
 
-| base layer    | IC  | OC  | FS  | KS  | STR | RP  | IDX | APD                                            | Note               |
-| ------------- | --- | --- | --- | --- | --- | --- | --- | ---------------------------------------------- | ------------------ |
-| Linear  [0]   | IC  | OC  | 1   | 1   | 1   | RP  | IDX | see 3.[APD]                                    |                    |
-| CONV    [1]   | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0 (default) <br> -x (input index 2 for concat) |                    |
-| DWCONV [2]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0                                              | IC = OC            |
-| Residual [3]  | IC  | 1   | FS  | 1   | 1   | RP  | IDX | input index 2                                  | OC = 1 for maestro |
-| Batchnorm [4] | IC  | OC  | FS  | 1   | 1   | RP  | IDX | 0                                              |                    |
-| TRCONV [5]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | dilation                                       |                    |
-| NGCONV [6]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | group number                                   |                    |
-| VDP [7]       | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
-| VADD [8]      | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
-| VMUL [9]      | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
-| GEMM [10]     | M   | N   | K   | 1   | 1   | RP  | IDX | input index 2                                  | MK * KN            |
+| base layer     | IC  | OC  | FS  | KS  | STR | RP  | IDX | APD                                            | Note               |
+| -------------- | --- | --- | --- | --- | --- | --- | --- | ---------------------------------------------- | ------------------ |
+| Linear  [0]    | IC  | OC  | 1   | 1   | 1   | RP  | IDX | see 3.[APD]                                    |                    |
+| CONV    [1]    | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0 (default) <br> -x (input index 2 for concat) |                    |
+| DWCONV [2]     | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0                                              | IC = OC            |
+| Residual [3]   | IC  | 1   | FS  | 1   | 1   | RP  | IDX | input index 2                                  | OC = 1 for maestro |
+| Batchnorm [4]  | IC  | OC  | FS  | 1   | 1   | RP  | IDX | 0                                              |                    |
+| TRCONV [5]     | IC  | OC  | FS  | KS  | STR | RP  | IDX | dilation                                       |                    |
+| NGCONV [6]     | IC  | OC  | FS  | KS  | STR | RP  | IDX | group number                                   |                    |
+| VDP [7]        | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
+| VADD [8]       | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
+| VMUL [9]       | IC  | OC  | 1   | 1   | 1   | RP  | IDX | input index 2                                  | IC = OC            |
+| GEMM [10]      | M   | N   | K   | 1   | 1   | RP  | IDX | input index 2                                  | MK * KN            |
+| -------------  | --- | --- | --- | --- | --- | --- | --- | ---------------------------------------------- | ------------------ |
+| Pooling  [0]   | IC  | OC  | FS  | KS  | STR | RP  | IDX | 0                                              | IC = OC            |
+| Softmax1d  [1] | IC  | OC  | 1   | 1   | 1   | RP  | IDX | 0                                              | IC = OC            |
+| Softmax2d  [2] | IC  | OC  | 1   | 1   | 1   | RP  | IDX | 0                                              |                    |
 
 
 ## LINK
